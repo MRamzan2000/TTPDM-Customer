@@ -1,15 +1,39 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
+import 'package:ttpdm/controller/utils/alert_box.dart';
+import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 
-import '../bottom_navigationbar.dart';
 
-class RequestMoreDesign extends StatelessWidget {
+class RequestMoreDesign extends StatefulWidget {
   const RequestMoreDesign({super.key});
 
+  @override
+  State<RequestMoreDesign> createState() => _RequestMoreDesignState();
+}
+
+class _RequestMoreDesignState extends State<RequestMoreDesign> {
+  String? token;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _checkToken();
+  }
+  Future<void> _checkToken() async {
+    token = await PreferencesService().getAuthToken();
+    if (token != null) {
+      // Use the token as needed
+      log("Token: $token");
+    } else {
+      // Handle the case where the token is not available
+      log("No token available");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return  Scaffold(    appBar: AppBar(
@@ -35,7 +59,7 @@ getVerticalSpace(4.h),
           Text('Request for More Designs',style: CustomTextStyles.onBoardingHeading.copyWith(fontSize: 20.px),),
           getVerticalSpace(4.h),
           GestureDetector(onTap: (){
-            Get.to(()=> CustomBottomNavigationBar());
+            openCampaignPoster(context, token!);
           },
             child: Container(padding: EdgeInsets.symmetric(horizontal: 4.h,vertical: 1.2.h),
                 decoration: BoxDecoration(

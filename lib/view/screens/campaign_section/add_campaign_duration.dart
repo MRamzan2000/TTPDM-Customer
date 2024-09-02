@@ -1,5 +1,5 @@
 import 'dart:developer';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -14,7 +14,13 @@ import 'package:ttpdm/view/screens/campaign_section/campaign_details.dart';
 import '../../../controller/getx_controllers/add_campaign_controller.dart';
 
 class AddCampaignDuration extends StatelessWidget {
-  AddCampaignDuration({super.key});
+  final String businessId;
+  final String businessName;
+  final String campaignName;
+  final String campaignDescription;
+  final File selectedPoster;
+  final String token;
+  AddCampaignDuration({super.key, required this.businessId, required this.campaignName, required this.campaignDescription, required this.selectedPoster, required this.businessName, required this.token});
   final AddCampaignController addCampaignController =
       Get.put(AddCampaignController());
   final Rx<DateTime> minTime = DateTime(2023, 01, 01, 1).obs; // 1:00 AM
@@ -24,8 +30,13 @@ class AddCampaignDuration extends StatelessWidget {
   final Rx<DateTime> endTime =
       DateTime(2023, 01, 01, 16).obs; // Default end time: 4:00 PM (16:00)
 
+
   @override
   Widget build(BuildContext context) {
+    log('Campaign Name $campaignName');
+    log('campaignDescription $campaignDescription');
+    log('businessId $businessId');
+    log('selectedPoster $selectedPoster');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
@@ -456,6 +467,9 @@ class AddCampaignDuration extends StatelessWidget {
                               values.end.toInt() - 8 * 60 * 60 * 1000);
                           endTime.value = DateTime.fromMillisecondsSinceEpoch(
                               values.end.toInt());
+                          print('Start Time: ${DateFormat('HH:mm').format(startTime.value)}');
+                          print('End Time: ${DateFormat('HH:mm').format(endTime.value)}');
+
                         }
                       },
                     ),
@@ -466,9 +480,56 @@ class AddCampaignDuration extends StatelessWidget {
             getVerticalSpace(11.3.h),
             customElevatedButton(
                 onTap: () {
-                  Get.to(() => const CampaignDetails());
+                  String concatenatedString = selectionLst.join(', ');
+                  if(campaignName.isEmpty){
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Campaign name is required')));
+                  }else if(campaignDescription.isEmpty){
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Campaign description is required')));
+
+                  }else if(businessId.isEmpty){
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('business Id null')));
+
+                  }
+                  else if(selectedPoster.path.isEmpty){
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Campaign poster is null')));
+
+                  }else if(concatenatedString.isEmpty){
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('At least one platform is selected')));
+
+                  }else if(addCampaignController.startFormatDate.value.isEmpty)
+                  {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('please select campaign start date')));
+
+                  }else if( addCampaignController.endFormatDate.value.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('please select campaign end date')));
+
+                  }
+                  else if(DateFormat('HH:mm').format(startTime.value).isEmpty){
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('please select campaign start time')));
+
+                  }else if(DateFormat('HH:mm').format(endTime.value).isEmpty){
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('please select campaign end time')));
+
+                  }else{
+                    Get.to(() =>  CampaignDetails(
+                      campaignName: campaignName,
+                      campaignDescription: campaignDescription,
+                      businessId:businessId ,
+                      selectedPoster:selectedPoster ,
+                      campaignPlatForms: concatenatedString,
+                      startDate:addCampaignController.startFormatDate.value ,
+                      endDate: addCampaignController.endFormatDate.value ,
+                      startTime:DateFormat('HH:mm').format(startTime.value) ,
+                      endTime: DateFormat('HH:mm').format(endTime.value), businessName: businessName,
+                      token: token,
+                    ));
+                  }
+
                 },
-                title: 'Next',
+                title: Text(
+                  'Next',
+                  style: CustomTextStyles.buttonTextStyle.copyWith(color:AppColors.whiteColor ),
+                ),
                 bgColor: AppColors.mainColor,
                 titleColor: AppColors.whiteColor,
                 horizentalPadding: 5.h,

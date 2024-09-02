@@ -4,21 +4,24 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
-import 'package:ttpdm/view/screens/auth_section/otp_verification.dart';
+import 'package:ttpdm/controller/getx_controllers/signup_user_controller.dart';
+import 'package:ttpdm/controller/utils/apis_constant.dart';
 
 import 'login_screen.dart';
 
 class RegisterScreen extends StatelessWidget {
    RegisterScreen({super.key});
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController phoneNumber = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController locationController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
   TextEditingController();
+
   @override
   Widget build(BuildContext context) {
 
+    final SignUpController signUpController=Get.put(SignUpController(context: context));
     return Scaffold(
       backgroundColor: Colors.white,
       body: SizedBox(
@@ -81,8 +84,8 @@ class RegisterScreen extends StatelessWidget {
                 ),
                 getVerticalSpace(.4.h),
                 customTextFormField(
-                    controller: locationController,
-                    keyboardType: TextInputType.streetAddress),
+                    controller: phoneNumber,
+                    keyboardType: TextInputType.phone),
                 getVerticalSpace(1.6.h),
                 Text(
                   'Enter Password',
@@ -122,21 +125,69 @@ class RegisterScreen extends StatelessWidget {
                   ),
                 ),
                 getVerticalSpace(2.4.h),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: customElevatedButton(
-                      title: 'Sign up',
-                      onTap: () {
-                        Get.to(() => const OtpVerification(title: 'signup',));
-                      },
-                      bgColor: AppColors.mainColor,
-                      verticalPadding: 1.2.h,
-                      horizentalPadding: 4.8.h),
+                Obx(() =>
+                    Row(mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        customElevatedButton(
+                          title: signUpController.isLoading.value == true
+                              ? spinkit
+                              : Text(
+                            'Sign Up',
+                            style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
+                          ),
+                          onTap: () {
+                            if (nameController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Please enter the name')),
+                              );
+                            } else if (emailController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Please enter the email')),
+                              );
+                            } else if (phoneNumber.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Please enter the phone number')),
+                              );
+                            } else if (!signUpController.isValidCanadianPhoneNumber(phoneNumber.text)) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Please enter a valid Canadian phone number')),
+                              );
+                            } else if (passwordController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Please enter the password')),
+                              );
+                            } else if (confirmPasswordController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Please confirm your password')),
+                              );
+                            } else if (passwordController.text != confirmPasswordController.text) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Password and Confirm Password do not match')),
+                              );
+                            } else {
+                              signUpController.userSignUp(
+                                fullName: nameController.text,
+                                email: emailController.text,
+                                phoneNumber: phoneNumber.text,
+                                password: passwordController.text,
+                                confirmPassword: confirmPasswordController.text,
+                                role: 'customer',
+                              );
+                            }
+                          },
+                          bgColor: AppColors.mainColor,
+                          verticalPadding: 1.2.h,
+                          horizentalPadding: 4.8.h,
+                        ),
+                      ],
+                    ),
+
+
                 ),
                 getVerticalSpace(2.h),
                 GestureDetector(
                   onTap: () {
-                    Get.to(() => const LoginScreen());
+                    Get.to(() =>  LoginScreen());
                   },
                   child: Align(
                     alignment: Alignment.bottomCenter,

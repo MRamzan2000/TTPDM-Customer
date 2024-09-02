@@ -161,7 +161,10 @@ class OnBoardingScreen extends StatelessWidget {
                 right: 6.h,
                 child: firstPage.value == 2
                     ? customElevatedButton(
-                        title: 'Start',
+                        title:Text(
+                          'Start',
+                          style: CustomTextStyles.buttonTextStyle.copyWith(color:AppColors.whiteColor ),
+                        ),
                         onTap: () {
                           Get.to(()=> RegisterScreen());
 
@@ -183,7 +186,10 @@ class OnBoardingScreen extends StatelessWidget {
                             ),
                           ),
                           customElevatedButton(
-                              title: 'NEXT',
+                              title: Text(
+                                'NEXT',
+                                style: CustomTextStyles.buttonTextStyle.copyWith(color:AppColors.whiteColor ),
+                              ),
                               onTap: () {
                                 if (firstPage.value < 2) {
                                   pageController.animateToPage(
@@ -194,7 +200,7 @@ class OnBoardingScreen extends StatelessWidget {
                                 }
                               },
                               bgColor: AppColors.mainColor,
-                              verticalPadding: 1.5.h,
+                              verticalPadding: 2.h,
                               horizentalPadding: 0.h),
                         ],
                       ),

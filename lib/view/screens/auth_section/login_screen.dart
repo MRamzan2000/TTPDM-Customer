@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
+import 'package:ttpdm/controller/getx_controllers/login_user_controller.dart';
+import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/view/screens/auth_section/register_screen.dart';
 
-import '../bottom_navigationbar.dart';
 import 'reset_otp.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
-
+    LoginScreen({super.key});
+   final TextEditingController emailController=TextEditingController();
+   final TextEditingController passwordController=TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final LoginUserController loginUserController =Get.put(LoginUserController(context: context));
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SizedBox(
@@ -48,7 +51,9 @@ class LoginScreen extends StatelessWidget {
                       .copyWith(color: const Color(0xff000000)),
                 ),
                 getVerticalSpace(.4.h),
-                customTextFormField(),
+                customTextFormField(
+                  controller: emailController
+                ),
                 getVerticalSpace(1.6.h),
                 Text(
                   'Password',
@@ -56,12 +61,14 @@ class LoginScreen extends StatelessWidget {
                       .copyWith(color: const Color(0xff000000)),
                 ),
                 getVerticalSpace(.4.h),
-                customTextFormField(),
+                customTextFormField(
+                  controller: passwordController
+                ),
                 getVerticalSpace(.6.h),
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(onTap: (){
-                    Get.to(()=>const ResetOtpScreen());
+                    Get.to(()=> ResetOtpScreen());
                   },
                     child: Text(
                       'Forgot Password',
@@ -86,16 +93,38 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 getVerticalSpace(4.4.h),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: customElevatedButton(
-                      title: 'Login ',
-                      bgColor: AppColors.mainColor,
-                      onTap: () {
-                        Get.to(() =>  const CustomBottomNavigationBar());
-                      },
-                      horizentalPadding: 5.6.h,
-                      verticalPadding: 1.2.h),
+                Obx(() =>
+                   Row(mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      customElevatedButton(
+                        title: loginUserController.isLoading.value == true
+                            ? spinkit
+                            : Text(
+                          'Login ',
+                          style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
+                        ),
+                        onTap: () {
+                          if (emailController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please enter the email')),
+                            );
+                          }  else if(passwordController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please enter the password')),
+                            );
+                          }  else {
+                            loginUserController.userLogin(
+                              email: emailController.text,
+                              password: passwordController.text,
+                            );
+                          }
+                        },
+                        bgColor: AppColors.mainColor,
+                        verticalPadding: 1.2.h,
+                        horizentalPadding: 4.8.h,
+                      ),
+                    ],
+                  ),
                 ),
                 getVerticalSpace(1.2.h),
                 Align(

@@ -7,8 +7,13 @@ import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/view/screens/campaign_section/poster_screen.dart';
 
 class FillAddDetails extends StatelessWidget {
-  const FillAddDetails({super.key});
+  final String businessId;
+  final String token;
+  final String businessName;
+   FillAddDetails({super.key,required this.businessId, required this.businessName, required this.token});
 
+  final  TextEditingController businessNameController=TextEditingController();
+  final  TextEditingController businessDescriptionController=TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +23,7 @@ class FillAddDetails extends StatelessWidget {
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: Text(
-          'Add Campaign',
+          "Add Campaign",
           style: CustomTextStyles.buttonTextStyle.copyWith(
               fontSize: 20.px,
               fontWeight: FontWeight.w600,
@@ -79,7 +84,9 @@ class FillAddDetails extends StatelessWidget {
                           fontFamily: 'bold'),
                     ),
                     getVerticalSpace(.4.h),
-                    customTextFormField(bgColor: AppColors.whiteColor),
+                    customTextFormField(controller: businessNameController,
+                      bgColor: AppColors.whiteColor,
+                    ),
                     getVerticalSpace(1.2.h),
 
 
@@ -92,14 +99,32 @@ class FillAddDetails extends StatelessWidget {
                           fontFamily: 'bold'),
                     ),
                     getVerticalSpace(.4.h),
-                    customTextFormField(maxLine: 4,
+                    customTextFormField(controller: businessDescriptionController,
+                        maxLine: 4,
                         bgColor: AppColors.whiteColor),
                     getVerticalSpace(27.h),
                     Align(alignment: Alignment.bottomCenter,
                       child: customElevatedButton(onTap: (){
-Get.to(()=>const PosterScreen());
+                      if(businessNameController.text.isEmpty){
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter your campaign name')));
+
+                      }else if(businessDescriptionController.text.isEmpty){
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter your campaign Description')));
+
+                      }else{
+                        Get.to(()=> PosterScreen(
+                          businessId: businessId,
+                          businessName: businessName,
+                          campaignName:businessNameController.text ,
+                          campaignDescription:businessDescriptionController.text ,
+                          token: token,
+                        ));
+                      }
                       },
-                          title: 'Next',
+                          title:Text(
+                            'Next',
+                            style: CustomTextStyles.buttonTextStyle.copyWith(color:AppColors.whiteColor ),
+                          ),
                           horizentalPadding: 5.h,verticalPadding: .8.h,
                           bgColor: AppColors.mainColor,
                           titleColor: AppColors.whiteColor),

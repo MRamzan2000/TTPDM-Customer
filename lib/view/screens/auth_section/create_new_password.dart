@@ -1,13 +1,47 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
-import 'package:ttpdm/view/screens/auth_section/login_screen.dart';
+import 'package:ttpdm/controller/getx_controllers/create_new_password_controller.dart';
+import 'package:ttpdm/controller/utils/apis_constant.dart';
+import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 
-class CreateNewPassword extends StatelessWidget {
-  const CreateNewPassword({super.key});
+class CreateNewPassword extends StatefulWidget {
+  const CreateNewPassword({
+    super.key,
+  });
+
+  @override
+  State<CreateNewPassword> createState() => _CreateNewPasswordState();
+}
+
+class _CreateNewPasswordState extends State<CreateNewPassword> {
+  late CreateNewPasswordController createNewPasswordController;
+  RxString isLoggedInValue = "".obs;
+  Future<void> checkLoginStatus() async {
+    PreferencesService preferencesService = PreferencesService();
+    String? isLoggedIn = await preferencesService.getAuthToken();
+    isLoggedInValue.value = isLoggedIn!;
+  }
+
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    checkLoginStatus().then(
+      (value) {
+        log("token is that :${isLoggedInValue.value}");
+      },
+    );
+    createNewPasswordController = Get.put(CreateNewPasswordController(context));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +81,7 @@ class CreateNewPassword extends StatelessWidget {
                   ),
                 ),
                 getVerticalSpace(.4.h),
-                customTextFormField(),
+                customTextFormField(controller: passwordController),
                 getVerticalSpace(1.6.h),
                 Align(
                   alignment: Alignment.topLeft,
@@ -58,20 +92,55 @@ class CreateNewPassword extends StatelessWidget {
                   ),
                 ),
                 getVerticalSpace(.4.h),
-                customTextFormField(),
+                customTextFormField(controller: confirmPasswordController),
                 getVerticalSpace(2.4.h),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: customElevatedButton(
-                      title: 'Save ',
-                      bgColor: AppColors.mainColor,
-                      onTap: () {
-                        Get.to(()=>const LoginScreen());
-                      },
-                      horizentalPadding: 5.9.h,
-                      verticalPadding: 1.2.h),
-                ),
-
+                Obx(() => Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        customElevatedButton(
+                          title: createNewPasswordController.isLoading.value ==
+                                  true
+                              ? spinkit
+                              : Text(
+                                  'Next ',
+                                  style: CustomTextStyles.buttonTextStyle
+                                      .copyWith(color: AppColors.whiteColor),
+                                ),
+                          onTap: () {
+                            if (passwordController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Please enter the password')),
+                              );
+                            } else if (confirmPasswordController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Please enter the confirmPassword')),
+                              );
+                            }else if (confirmPasswordController.text!=passwordController.text) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('password and confirmPassword should be same')),
+                              );
+                            } else if (isLoggedInValue.value.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('AuthToken is empty')),
+                              );
+                            }  else {
+                              log("token ${isLoggedInValue.value}");
+                            createNewPasswordController.createNewPassword(
+                                newPassword: passwordController.text,
+                                confirmPassword: confirmPasswordController.text,
+                                userId:isLoggedInValue.value );
+                            }
+                          },
+                          bgColor: AppColors.mainColor,
+                          verticalPadding: 1.2.h,
+                          horizentalPadding: 4.8.h,
+                        ),
+                      ],
+                    )),
               ],
             ),
           ),

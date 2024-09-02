@@ -398,7 +398,10 @@ final AddCampaignController addCampaignController=Get.put(AddCampaignController(
               Align(
                 alignment: Alignment.center,
                 child: customElevatedButton(
-                    title: 'Submit',
+                    title:Text(
+                      'Submit',
+                      style: CustomTextStyles.buttonTextStyle.copyWith(color:AppColors.whiteColor ),
+                    ),
                     onTap: () {
                       Get.to(() =>   CampaignName( ));
                     },

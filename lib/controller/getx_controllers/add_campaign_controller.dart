@@ -4,12 +4,19 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:mime/mime.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:ttpdm/models/get_campaigns_by_status_model.dart';
+import 'package:ttpdm/models/getdesigns_model.dart';
 
+import '../apis_services/add_campaign_apis.dart';
 import '../custom_widgets/app_colors.dart';
 
 class AddCampaignController extends GetxController {
@@ -20,8 +27,14 @@ class AddCampaignController extends GetxController {
       TextEditingController();
   final TextEditingController totalCampaignBudgetController =
       TextEditingController();
+
   //Method Calender range of Dates
   RxString range = ''.obs;
+  RxString startDateCampaign = ''.obs;
+  RxString endDateCampaign = ''.obs;
+  RxString startFormatDate = ''.obs;
+  RxString endFormatDate = ''.obs;
+
   void onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
     if (args.value is PickerDateRange) {
       range.value = '${DateFormat('dd/MM/yyyy').format(args.value.startDate)} -'
@@ -31,16 +44,24 @@ class AddCampaignController extends GetxController {
       DateTime startDate = args.value.startDate;
       DateTime endDate = args.value.endDate ?? args.value.startDate;
 
-      String formattedStartDate = DateFormat('dd MMM yy').format(startDate);
-      String formattedEndDate = DateFormat('dd MMM yy').format(endDate);
+      startDateCampaign.value = DateFormat('dd MMM yy').format(startDate);
 
-      range.value = '$formattedStartDate TO $formattedEndDate';
+      endDateCampaign.value = DateFormat('dd MMM yy').format(endDate);
+      log('start Date is that :${startDateCampaign.value}');
+      log('end Date is that :${endDateCampaign.value}');
+      startFormatDate.value = DateFormat('yyyy-MM-dd').format(startDate);
+      endFormatDate.value = DateFormat('yyyy-MM-dd').format(endDate);
+      log('start Date is that :${startFormatDate.value}');
+      log('end Date is that :${endFormatDate.value}');
+
+      range.value = '${startDateCampaign.value} TO ${endDateCampaign.value}';
     } else if (args.value is DateTime) {
     } else if (args.value is List<DateTime>) {
     } else {}
   }
 
 //Dialog of Range Date picker
+
   void showDateRangePicker(BuildContext context) {
     showDialog(
       context: context,
@@ -71,13 +92,21 @@ class AddCampaignController extends GetxController {
   }
 
 //create instance for Image Picker
-  var pickedMediaList = <Map<String, String>>[].obs;
+  var pickedMediaList = <Map<String, dynamic>>[].obs;
+  var pickedFilesList = <File>[].obs;
+
+  // Method to convert Map type list to File type list and store in pickedFilesList
+  void convertMediaListToFileList() {
+    pickedFilesList.value = pickedMediaList.map((mediaInfo) {
+      return File(mediaInfo['path']);
+    }).toList();
+  }
 
   Future<void> pickMedia() async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['jpg', 'jpeg', 'png', 'mp4', 'avi', 'mov', 'mkv'],
+        allowedExtensions: ['jpg', 'jpeg', 'png'],
         allowMultiple: true,
       );
 
@@ -86,24 +115,32 @@ class AddCampaignController extends GetxController {
           if (file.path != null) {
             final mediaFile = File(file.path!);
             final mediaSize = _getFileSize(mediaFile.lengthSync(), 2);
-            final mediaType = _getFileExtension(mediaFile.path);
+            final mimeType = lookupMimeType(mediaFile.path);
 
-            final mediaInfo = {
-              'path': mediaFile.path,
-              'size': mediaSize,
-              'type': mediaType,
-              'isVideo': isVideo(mediaFile.path) ? 'true' : 'false',
-            };
+            log('Picked file: ${file.path}');
+            log('File size: $mediaSize');
+            log('MIME type: $mimeType');
 
-            pickedMediaList.add(mediaInfo);
-            log('${isVideo(mediaFile.path) ? 'Video' : 'Image'} size $mediaSize');
+            if (mimeType?.startsWith('image/') == true) {
+              final mediaInfo = {
+                'path': mediaFile.path,
+                'size': mediaSize,
+                'type': mimeType,
+                'isVideo': 'false',
+              };
+
+              pickedMediaList.add(mediaInfo);
+            } else {
+              log('File is not an image: ${file.path}');
+            }
           }
         }
+        convertMediaListToFileList();
       } else {
-        log('Sorry, no media selected');
+        log('No media selected');
       }
     } catch (e) {
-      log('Something went wrong: ${e.toString()}');
+      log('Error: ${e.toString()}');
     }
   }
 
@@ -128,6 +165,7 @@ class AddCampaignController extends GetxController {
   void removeMedia(int index) {
     pickedMediaList.removeAt(index);
   }
+
   //picked image
   var image = Rx<File?>(null);
   final ImagePicker _picker = ImagePicker();
@@ -141,6 +179,169 @@ class AddCampaignController extends GetxController {
       if (kDebugMode) {
         print('No image selected.');
       }
+    }
+  }
+
+  //AddCampaign Api call methods
+  RxBool isLoading = true.obs;
+
+  Future<void> submitCampaign(
+      {required String businessId,
+      required String adsName,
+      required String campaignDesc,
+      required String campaignPlatforms,
+      required String startDate,
+      required String endDate,
+      required String startTime,
+      required String endTime,
+      required String adBanner,
+      required String token,
+      required BuildContext context // Corrected list<File> to List<File>}
+      }) async {
+    try {
+      isLoading.value = true;
+      await AddCampaignApis()
+          .addCampaignApi(
+              businessId: businessId,
+              adsName: adsName,
+              campaignDesc: campaignDesc,
+              campaignPlatforms: campaignPlatforms,
+              startDate: startDate,
+              endDate: endDate,
+              startTime: startTime,
+              endTime: endTime,
+              token: token,
+              context: context,
+              adBannerUrl: adBanner)
+          .then(
+        (value) {
+          return isLoading.value = false;
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Something went wrong ${e.toString()}')));
+        log("un expected error ${e.toString()}");
+      }
+      isLoading.value = false;
+    }
+  }
+
+  // Define loadAsset method
+  Future<ByteData> loadAsset(String path) async {
+    debugPrint('Loading asset: $path');
+    return await rootBundle.load(path);
+  }
+
+  Future<File> writeByteDataToFile(ByteData data, String filename) async {
+    debugPrint('Writing ByteData to file: $filename');
+    final directory = await getTemporaryDirectory();
+    final path = '${directory.path}/$filename';
+
+    final file = File(path);
+    final buffer = data.buffer.asUint8List();
+    await file.writeAsBytes(buffer);
+
+    debugPrint('File written at: $path');
+    return file;
+  }
+
+  var campaignsList = <Campaign>[].obs;
+
+//Business Profile get Method
+//   Future<void> fetchAdds(
+//       {required BuildContext context,
+//       required String token,
+//       required String businessId}) async {
+//     isLoading.value = true;
+//     final data = await AddCampaignApis()
+//         .getCampaigns(businessId: businessId, token: token);
+//     if (data != null) {
+//       campaignsList.value = data.campaigns;
+//       log('this is length of business ${campaignsList[0].status}');
+//       isLoading.value = false;
+//     }
+//   }
+
+  //pay Campaign fee
+  Future<void> campaignFeeSubmit({
+    required BuildContext context,
+    required String token,
+  }) async {
+    try {
+      isLoading.value = true;
+
+      AddCampaignApis().payCampaignFee(context: context, token: token).then(
+        (value) {
+          return isLoading.value = false;
+        },
+      );
+    } catch (e) {
+      log('Unexpected error occurred :${e.toString()}');
+    }
+  }
+
+  //RequestMoreDesign
+  Future<void> requestForMoreDesign({
+    required BuildContext context,
+    required String token,
+    required String description,
+  }) async {
+    try {
+      isLoading.value = true;
+
+      AddCampaignApis()
+          .getDesignRequest(
+              description: description, token: token, context: context)
+          .then(
+        (value) {
+          return isLoading.value = false;
+        },
+      );
+    } catch (e) {
+      log('Unexpected error occurred :${e.toString()}');
+    }
+  }
+
+  //fetch All Designs
+
+  RxList<Design?> allPosters = <Design>[].obs;
+
+//Business Profile get Method
+  Future<void> fetchPosters({
+    required BuildContext context,
+    required bool loading,
+  }) async {
+    isLoading.value = loading;
+    final data = await AddCampaignApis().getAllDesigns();
+    if (data != null) {
+      allPosters.value = data.designs;
+      isLoading.value = false;
+    }
+  }
+
+  //getCampaignByStatus
+  Rxn<GetCampaignsByStatusModel?> previousCampaigns =
+      Rxn<GetCampaignsByStatusModel>();
+  Rxn<GetCampaignsByStatusModel?> pendingCampaigns =
+      Rxn<GetCampaignsByStatusModel>();
+  Rxn<GetCampaignsByStatusModel?> upcomingCampaigns =
+      Rxn<GetCampaignsByStatusModel>();
+
+  Future<void> fetchCampaignByStatus(
+      {required BuildContext context,
+      required bool isLoad,
+      required String status}) async {
+      isLoading.value = isLoad;
+    final data = await AddCampaignApis().getCampaignByStatus(status: status);
+    if (data != null) {
+      status == "previous"
+          ? previousCampaigns.value = data
+          : status == "pending"
+              ? pendingCampaigns.value = data
+              : upcomingCampaigns.value = data;
+      isLoading.value = false;
     }
   }
 }

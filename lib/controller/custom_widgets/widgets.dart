@@ -33,7 +33,7 @@ Widget pngImage(String name) {
 //Custom Elevated Button
 Widget customElevatedButton(
     {Callback? onTap,
-    required String title,
+    required Widget title,
     Color? bgColor,
     double? horizentalPadding,
     double? verticalPadding,
@@ -46,10 +46,7 @@ Widget customElevatedButton(
       padding: EdgeInsets.symmetric(
           horizontal: horizentalPadding ?? 6.h,
           vertical: verticalPadding ?? 1.h),
-      child: Text(
-        title,
-        style: CustomTextStyles.buttonTextStyle.copyWith(color:titleColor??AppColors.whiteColor ),
-      ),
+      child: title
     ),
   );
 }
@@ -71,6 +68,7 @@ Widget customTextFormField({
   Callback? onTap
 }) {
   return TextFormField(
+    cursorColor:AppColors.mainColor,
     onTap: onTap,
     readOnly:readOnly??false ,
     maxLines: maxLine??1,
@@ -95,6 +93,7 @@ Widget customTextFormField({
         fontWeight: FontWeight.w400,
         fontFamily: 'regular',
       ),
+
       prefixIcon: prefixIcons,
       focusedBorder: OutlineInputBorder(
         borderSide: BorderSide(color: focusBorderColor ?? Colors.transparent),

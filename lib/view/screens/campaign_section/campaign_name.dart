@@ -5,12 +5,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
-import 'package:ttpdm/view/screens/campaign_section/add_campaign_duration.dart';
 import 'package:ttpdm/view/screens/profile_section/business_profile.dart';
 
 import '../../../controller/utils/alert_box.dart';
-import 'campaign_details.dart';
-import 'poster_screen.dart';
 
 class CampaignName extends StatelessWidget {
   CampaignName({super.key});
@@ -43,13 +40,13 @@ class CampaignName extends StatelessWidget {
                 if (value == 'Cancel') {
                   openCampaignCancel(context);
                 }else if(value=='Business'){
-                  Get.to(()=>const BusinessProfile());
+                  // Get.to(()=> const BusinessProfile());
 
                 }else if(value=='Poster'){
-                  Get.to(()=>const PosterScreen());
+                  // Get.to(()=> PosterScreen());
 
                 }else{
-                  Get.to(()=> AddCampaignDuration());
+                  // Get.to(()=> AddCampaignDuration(businessId: '', campaignName: '', campaignDescription: '', selectedPoster: null,));
                 }
               },
               itemBuilder: (BuildContext context) {
