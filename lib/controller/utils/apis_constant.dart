@@ -17,6 +17,7 @@ const addCampaignEp="campaign/add";
 const getCampaignEp="campaign/business";
 const getCampaignByStatusEp="midAdmin/campaigns";
 const campaignFeeEp="campaign/pay-fee";
+const cancelCampaignEp="campaign/cancel";
 const subscriptionEp="business/select-plan";
 const confirmSubscriptionPaymentEp="business/payment-success?session_id=";
 const getAllDesignsEP="campaign/allDesigns";
@@ -24,6 +25,14 @@ const getAllCoinsEP="coin/coin-balance";
 const getAllCoinsPlanEP="superAdmin/allCoins";
 const purchaseCoinsEP="coin/purchase-coins";
 const resetPasswordEp="user/reset-password";
+const getUserProfileEp="user";
+const updateUserProfileEp="user/profile-pic";
+const getAllSubPlanEP="superAdmin/allPlans";
+const likeDesignEp="campaign/";
+const getFcmTokenEP="fcm-token";
+const sendNotificationEp="user/send-notification";
+
+
 
 
 final spinkit = Container(
@@ -46,6 +55,13 @@ final spinkit = Container(
 
  final spinkit1 =  Center(
   child: SpinKitWaveSpinner(
+    color: AppColors.mainColor,
+    size: 30.h,
+  )
+  ,
+);
+final internetLoading =  Center(
+  child: SpinKitRotatingCircle(
     color: AppColors.mainColor,
     size: 30.h,
   )

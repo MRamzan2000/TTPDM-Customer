@@ -8,9 +8,8 @@ import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/add_campaign_controller.dart';
 import 'package:ttpdm/controller/getx_controllers/subcription_controller.dart';
-import 'package:ttpdm/controller/utils/alert_box.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
-import 'package:ttpdm/view/screens/subscription_main.dart';
+import 'package:ttpdm/view/screens/bottom_navigationbar.dart';
 
 import '../../../controller/custom_widgets/app_colors.dart';
 
@@ -359,64 +358,82 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                 ],
               ),
               getVerticalSpace(4.3.h),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: customElevatedButton(
-                    onTap: () {
-                      if (subscriptionController.allCoins < 1200) {
-                        openCampaignFeeAdd(
-                          context,
-                          subscriptionController.allCoins.value,
-                              () {
-                            Get.to(() => Subscription(
-                              token: widget.token,
-                            ));
-                          },
-                        );
-
-                      } else {
-
-                        openCampaignSubmit(context, () {
-                          if (widget.token.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('device token is empty')));
-                          } else {
-                            addCampaignController
-                                .campaignFeeSubmit(
-                                context: context, token: widget.token)
-                                .then(
-                                  (value) {
-                                addCampaignController.submitCampaign(
-                                    businessId: widget.businessId,
-                                    adsName: widget.campaignName,
-                                    campaignDesc: widget.campaignDescription,
-                                    campaignPlatforms: widget.campaignPlatForms,
-                                    startDate: widget.startDate,
-                                    endDate: widget.endDate,
-                                    startTime: widget.startTime,
-                                    endTime: widget.endTime,
-                                    adBanner: widget.selectedPoster.path,
-                                    token: widget.token,
-                                    context: context);
-                              },
-                            );
-                          }
-                        },
-                            subscriptionController.allCoins.value);
-                      }
-                    },
-                    title: addCampaignController.isLoading.value
-                        ? spinkit
-                        : Text(
-                            'Submit',
-                            style: CustomTextStyles.buttonTextStyle
-                                .copyWith(color: AppColors.whiteColor),
-                          ),
-                    bgColor: AppColors.mainColor,
-                    titleColor: AppColors.whiteColor,
-                    horizentalPadding: 5.h,
-                    verticalPadding: .8.h),
+              Obx(() =>
+                 Row(mainAxisAlignment: MainAxisAlignment.center,
+                   children: [
+                     customElevatedButton(
+                         onTap: () {
+                           addCampaignController.submitCampaign(
+                               businessId: widget.businessId,
+                               adsName: widget.campaignName,
+                               campaignDesc: widget.campaignDescription,
+                               campaignPlatforms: widget.campaignPlatForms,
+                               startDate: widget.startDate,
+                               endDate: widget.endDate,
+                               startTime: widget.startTime,
+                               endTime: widget.endTime,
+                               adBanner: widget.selectedPoster.path,
+                               token: widget.token,
+                               context: context).then((value) {
+                                 Get.to(()=>const CustomBottomNavigationBar());
+                               },);
+                           // if (subscriptionController.allCoins < 1200) {
+                           //   openCampaignFeeAdd(
+                           //     context,
+                           //     subscriptionController.allCoins.value,
+                           //         () {
+                           //       Get.to(() => Subscription(
+                           //         token: widget.token,
+                           //       ));
+                           //     },
+                           //   );
+                           //
+                           // }
+                           // else {
+                           //
+                           //   openCampaignSubmit(context, () {
+                           //     if (widget.token.isEmpty) {
+                           //       ScaffoldMessenger.of(context).showSnackBar(
+                           //           const SnackBar(
+                           //               content: Text('device token is empty')));
+                           //     } else {
+                           //       addCampaignController
+                           //           .campaignFeeSubmit(
+                           //           context: context, token: widget.token)
+                           //           .then(
+                           //             (value) {
+                           //           addCampaignController.submitCampaign(
+                           //               businessId: widget.businessId,
+                           //               adsName: widget.campaignName,
+                           //               campaignDesc: widget.campaignDescription,
+                           //               campaignPlatforms: widget.campaignPlatForms,
+                           //               startDate: widget.startDate,
+                           //               endDate: widget.endDate,
+                           //               startTime: widget.startTime,
+                           //               endTime: widget.endTime,
+                           //               adBanner: widget.selectedPoster.path,
+                           //               token: widget.token,
+                           //               context: context);
+                           //         },
+                           //       );
+                           //     }
+                           //   },
+                           //       subscriptionController.allCoins.value);
+                           // }
+                         },
+                         title: addCampaignController.isLoading.value
+                             ? spinkit
+                             : Text(
+                                 'Submit',
+                                 style: CustomTextStyles.buttonTextStyle
+                                     .copyWith(color: AppColors.whiteColor),
+                               ),
+                         bgColor: AppColors.mainColor,
+                         titleColor: AppColors.whiteColor,
+                         horizentalPadding: 5.h,
+                         verticalPadding: .8.h),
+                   ],
+                 ),
               ),
               getVerticalSpace(3.h),
             ]),

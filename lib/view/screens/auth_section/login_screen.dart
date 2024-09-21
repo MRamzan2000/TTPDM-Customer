@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -10,13 +13,39 @@ import 'package:ttpdm/view/screens/auth_section/register_screen.dart';
 
 import 'reset_otp.dart';
 
-class LoginScreen extends StatelessWidget {
-    LoginScreen({super.key});
-   final TextEditingController emailController=TextEditingController();
-   final TextEditingController passwordController=TextEditingController();
+class LoginScreen extends StatefulWidget {
+    const LoginScreen({super.key});
+
   @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+   final TextEditingController emailController=TextEditingController();
+
+   final TextEditingController passwordController=TextEditingController();
+
+    late LoginUserController loginUserController;
+    @override
+  void initState() {
+    super.initState();
+    loginUserController =Get.put(LoginUserController(context: context));
+    getToken();
+  }
+RxString fcmToken="".obs;
+    void getToken()async{
+      FirebaseMessaging.instance.getToken().then((String? token) {
+        if (token != null) {
+          fcmToken.value=token;
+          log("Push Messaging token: ${fcmToken.value}");
+        }
+      }).catchError((error) {
+        log("Error getting push messaging token: $error");
+      });
+    }
+
+    @override
   Widget build(BuildContext context) {
-    final LoginUserController loginUserController =Get.put(LoginUserController(context: context));
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -114,8 +143,9 @@ class LoginScreen extends StatelessWidget {
                             );
                           }  else {
                             loginUserController.userLogin(
-                              email: emailController.text,
-                              password: passwordController.text,
+                                email: emailController.text,
+                                password: passwordController.text,
+                                fcmToken: fcmToken.value
                             );
                           }
                         },

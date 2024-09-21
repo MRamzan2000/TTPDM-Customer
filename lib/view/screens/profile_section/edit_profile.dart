@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -10,8 +9,7 @@ import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/business_profile_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
-import 'package:ttpdm/view/screens/bottom_navigationbar.dart';
-
+import 'package:ttpdm/controller/utils/preference_key.dart';
 import '../../../controller/custom_widgets/app_colors.dart';
 import '../../../controller/custom_widgets/custom_text_styles.dart';
 import '../../../controller/getx_controllers/add_campaign_controller.dart';
@@ -32,7 +30,6 @@ class EditProfile extends StatefulWidget {
   final String insta;
   final String tiktok;
   final String linkdin;
-
   const EditProfile(
       {super.key,
       required this.title,
@@ -82,45 +79,41 @@ class _EditProfileState extends State<EditProfile> {
       <String>[].obs; // This should be populated with the URLs or IDs of network images.
 
   void submitForm() {
-    businessProfileController.editBusinessProfile(
-        name: bsNameController.text,
-        phone: phoneNumberController.text,
-        location: locationController.text,
-        targetMapArea: targetController.text,
-        description: descriptionController.text,
-        gallery:networkImagesList,
-        token: token!,
-        websiteUrl: webUrlController.text,
-        tiktokUrl: tikTokUrlController.text,
-        linkedinUrl: linkdinUrlController.text,
-        instagramUrl: instagramUrlController.text,
-        facebookUrl: facebookUrlController.text,
-        logo: addCampaignController.image.value?.path??widget.logo,
-        context: context,
-        businessId: widget.businessId);
-  }
+    if(addCampaignController.image.value!.path.isEmpty){
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Logo is required")));
+    }else{
+      businessProfileController.editBusinessProfile(
+          name: bsNameController.text,
+          phone: phoneNumberController.text,
+          location: locationController.text,
+          targetMapArea: targetController.text,
+          description: descriptionController.text,
+          gallery:networkImagesList,
+          token: token.value,
+          websiteUrl: webUrlController.text,
+          tiktokUrl: tikTokUrlController.text,
+          linkedinUrl: linkdinUrlController.text,
+          instagramUrl: instagramUrlController.text,
+          facebookUrl: facebookUrlController.text,
+          logo: addCampaignController.image.value?.path??widget.logo,
+          context: context,
+          businessId: widget.businessId);
+
+    }
+    }
 
   final BusinessProfileController businessProfileController =
       Get.find(tag: 'business');
+  RxString token="".obs;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _checkToken();
+    token.value=MySharedPreferences.getString(authToken);
+
   }
 
-  String? token;
 
-  Future<void> _checkToken() async {
-    token = await PreferencesService().getAuthToken();
-    if (token != null) {
-      // Use the token as needed
-      log("Token: $token");
-    } else {
-      // Handle the case where the token is not available
-      log("No token available");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -484,7 +477,9 @@ class _EditProfileState extends State<EditProfile> {
                                                   networkImagesList.addAll(widget.imagesList);
                                                 },
                                                 child: SvgPicture.asset(
-                                                    "assets/svgs/crossicon.svg"),
+                                                    "assets/svgs/crossicon.svg",
+                                                  fit: BoxFit.cover,),
+
                                               )));
                                     },
                                   ),
@@ -531,7 +526,8 @@ class _EditProfileState extends State<EditProfile> {
                                                     image: FileImage(File(
                                                         addCampaignController
                                                                 .pickedMediaList[
-                                                            index]['path']!)),
+                                                            index]['path']!),
+                                                    ),
                                                     fit: BoxFit.cover,
                                                   ),
                                                   boxShadow: const [

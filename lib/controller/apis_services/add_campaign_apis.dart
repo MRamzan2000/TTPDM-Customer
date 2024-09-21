@@ -113,33 +113,7 @@ class AddCampaignApis {
     }
   }
 
-  //GetCampaign
-  // Future<GetCampaignModel?> getCampaigns({required String businessId,
-  // required String token}) async {
-  //   final url = Uri.parse("$baseUrl/$getCampaignEp/$businessId");
-  //   final headers = {
-  //     'Content-Type': 'application/json',
-  //     'Authorization': 'Bearer $token',
-  //   };
-  //   try {
-  //     final response = await http.get(url, headers: headers);
-  //
-  //     // Debug prints
-  //     log('Response status: ${response.statusCode}');
-  //     log('Response body: ${response.body}');
-  //     if (response.statusCode == 200) {
-  //       return GetCampaignModel.fromJson(jsonDecode(response.body));
-  //     } else {
-  //       log('Error fetching business profiles: ${response.body}');
-  //       return null;
-  //     }
-  //   } catch (e) {
-  //     log('UnExpected Error fetching business profiles: ${e.toString()}');
-  //     return null;
-  //   }
-  // }
 
-  //pay Campaign fee
   Future<void> payCampaignFee({required context,required String token}) async {
     final url = Uri.parse("$baseUrl/$campaignFeeEp");
     final headers = {
@@ -197,13 +171,17 @@ class AddCampaignApis {
   Future<void> getDesignRequest(
       {required String description,
       required String token,
+      required String businessId,
       required context}) async {
     final url = Uri.parse("$baseUrl/$getDesignRequestEp");
     final headers = {
       "Content-Type": "application/json",
       'Authorization': 'Bearer $token',
     };
-    final body = jsonEncode({"description": description});
+    final body = jsonEncode({
+      "description": description,
+      "businessId":businessId,
+    });
 
     try {
       final response = await http.post(url, headers: headers, body: body);
@@ -228,30 +206,7 @@ class AddCampaignApis {
     }
   }
 
-  //Get All design
-  //GetCampaign
-  Future<GetAllDesignsModel?> getAllDesigns() async {
-    final url = Uri.parse("$baseUrl/$getAllDesignsEP");
-    final headers = {
-      'Content-Type': 'application/json',
-    };
-    try {
-      final response = await http.get(url, headers: headers);
 
-      // Debug prints
-      log('Response status: ${response.statusCode}');
-      log('Response body: ${response.body}');
-      if (response.statusCode == 200) {
-        return GetAllDesignsModel.fromJson(jsonDecode(response.body));
-      } else {
-        log('Error fetching business profiles: ${response.body}');
-        return null;
-      }
-    } catch (e) {
-      log('UnExpected Error fetching business profiles: ${e.toString()}');
-      return null;
-    }
-  }
 
   //getCampaignByStatus
   Future<GetCampaignsByStatusModel?> getCampaignByStatus(

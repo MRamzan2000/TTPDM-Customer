@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDSvvxuhHWn-4SP3cX8eBHH9SWVANut8No',
-    appId: '1:871329247685:android:b46df5a4df8accd3331bac',
-    messagingSenderId: '871329247685',
-    projectId: 'advyro',
-    storageBucket: 'advyro.appspot.com',
+    apiKey: 'AIzaSyBRPyKfVW11jhrY8bvdMQmqrC2UJpEAV1Y',
+    appId: '1:591801525051:android:3e359c0c1e7981e48e0d1e',
+    messagingSenderId: '591801525051',
+    projectId: 'advyro-33ad7',
+    storageBucket: 'advyro-33ad7.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAawY2Km1DfSodjznaYyBsPfxzfgRbqSr0',
-    appId: '1:871329247685:ios:15bec2b936dbab46331bac',
-    messagingSenderId: '871329247685',
-    projectId: 'advyro',
-    storageBucket: 'advyro.appspot.com',
+    apiKey: 'AIzaSyAmGQ8mp-coXgvqF5N0ToruBYceWLml7t0',
+    appId: '1:591801525051:ios:6011d45b7041da0f8e0d1e',
+    messagingSenderId: '591801525051',
+    projectId: 'advyro-33ad7',
+    storageBucket: 'advyro-33ad7.appspot.com',
     iosBundleId: 'com.example.ttpdm',
   );
+
 }

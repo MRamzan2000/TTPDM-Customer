@@ -403,7 +403,7 @@ final AddCampaignController addCampaignController=Get.put(AddCampaignController(
                       style: CustomTextStyles.buttonTextStyle.copyWith(color:AppColors.whiteColor ),
                     ),
                     onTap: () {
-                      Get.to(() =>   CampaignName( ));
+                      // Get.to(() =>   CampaignName( ));
                     },
                     bgColor: AppColors.mainColor,
                     titleColor: AppColors.whiteColor,

@@ -29,6 +29,7 @@ class BusinessApis {
     required String linkedinUrl,
     required String tiktokUrl,
     required String token,
+    required String fullname,
     required File logo,
     required BuildContext context,
     required List<File> gallery,
@@ -38,6 +39,7 @@ class BusinessApis {
 
     // Add fields
     request.fields['name'] = name;
+    request.fields['fullname'] = fullname;
     request.fields['phone'] = phone;
     request.fields['location'] = location;
     request.fields['targetMapArea'] = targetMapArea;

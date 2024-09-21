@@ -1,16 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
-import 'package:ttpdm/view/screens/profile_section/business_profile.dart';
+import 'package:ttpdm/models/get_campaigns_by_status_model.dart';
 
 import '../../../controller/utils/alert_box.dart';
 
 class CampaignName extends StatelessWidget {
-  CampaignName({super.key});
+  final String businessId;
+  final String businessName;
+  final String campaignName;
+  final String campaignDescription;
+  final String selectedPoster;
+  final List campaignPlatForms;
+  final List<Analytics> analysis;
+  final DateTime startDate;
+  final DateTime endDate;
+  final String startTime;
+  final String endTime;
+  final String status;
+  CampaignName(
+      {super.key,
+      required this.businessId,
+      required this.businessName,
+      required this.campaignName,
+      required this.campaignDescription,
+      required this.selectedPoster,
+      required this.campaignPlatForms,
+      required this.startDate,
+      required this.endDate,
+      required this.startTime,
+      required this.endTime,
+      required this.status,
+      required this.analysis,
+      });
   final RxBool isOpen1 = false.obs;
   final RxBool isOpen3 = false.obs;
   final String range = '';
@@ -24,37 +51,46 @@ class CampaignName extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,
+        leading: GestureDetector(
+            onTap: () {
+              Get.back();
+            },
+            child: Icon(
+              Icons.arrow_back_ios_new,
+              size: 2.4.h,
+              color: AppColors.blackColor,
+            )),
         automaticallyImplyLeading: false,
         title: Text(
-          'Campaign Name',
+          campaignName,
           style: CustomTextStyles.buttonTextStyle.copyWith(
               fontSize: 20.px,
               fontWeight: FontWeight.w600,
               color: AppColors.mainColor),
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 1.h),
-            child: PopupMenuButton<String>(
-              onSelected: (String value) {
-                if (value == 'Cancel') {
-                  openCampaignCancel(context);
-                }else if(value=='Business'){
-                  // Get.to(()=> const BusinessProfile());
-
-                }else if(value=='Poster'){
-                  // Get.to(()=> PosterScreen());
-
-                }else{
-                  // Get.to(()=> AddCampaignDuration(businessId: '', campaignName: '', campaignDescription: '', selectedPoster: null,));
-                }
-              },
-              itemBuilder: (BuildContext context) {
-                return _buildPopupMenuItems(items);
-              },
-              icon: const Icon(Icons.more_vert),
-            ),
-          ),
+          status == "pending"
+              ? Padding(
+                  padding: EdgeInsets.only(right: 1.h),
+                  child: PopupMenuButton<String>(
+                    onSelected: (String value) {
+                      if (value == 'Cancel') {
+                        openCampaignCancel(context);
+                      } else if (value == 'Business') {
+                        // Get.to(()=> const BusinessProfile());
+                      } else if (value == 'Poster') {
+                        // Get.to(()=> PosterScreen());
+                      } else {
+                        // Get.to(()=> AddCampaignDuration(businessId: '', campaignName: '', campaignDescription: '', selectedPoster: null,));
+                      }
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return _buildPopupMenuItems(items);
+                    },
+                    icon: const Icon(Icons.more_vert),
+                  ),
+                )
+              : const SizedBox.shrink(),
         ],
       ),
       body: SizedBox(
@@ -122,9 +158,8 @@ class CampaignName extends StatelessWidget {
                                 height: 24.h,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(1.h),
-                                  image: const DecorationImage(
-                                    image: AssetImage(
-                                        'assets/pngs/mainposter.png'),
+                                  image: DecorationImage(
+                                    image: NetworkImage(selectedPoster),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -144,7 +179,7 @@ class CampaignName extends StatelessWidget {
                               ),
                               getVerticalSpace(.8.h),
                               Text(
-                                'Business name',
+                                businessName,
                                 style: TextStyle(
                                   fontSize: 14.px,
                                   fontFamily: 'bold',
@@ -166,7 +201,7 @@ class CampaignName extends StatelessWidget {
                               ),
                               getVerticalSpace(.8.h),
                               Text(
-                                'Ads Name',
+                                campaignName,
                                 style: TextStyle(
                                   fontSize: 14.px,
                                   fontFamily: 'bold',
@@ -177,53 +212,6 @@ class CampaignName extends StatelessWidget {
                               getVerticalSpace(1.2.h),
                               const Divider(
                                   color: Color(0xff6E6E6D), thickness: 1),
-                              getVerticalSpace(1.2.h),
-                              Text(
-                                'What’s the business name?',
-                                style: TextStyle(
-                                  fontSize: 14.px,
-                                  fontFamily: 'bold',
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color(0xff191918),
-                                ),
-                              ),
-                              getVerticalSpace(.8.h),
-                              Text(
-                                'What’s the business name?',
-                                style: TextStyle(
-                                  fontSize: 14.px,
-                                  fontFamily: 'bold',
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color(0xff6E6E6D),
-                                ),
-                              ),
-                              getVerticalSpace(1.2.h),
-                              const Divider(
-                                  color: Color(0xff6E6E6D), thickness: 1),
-                              getVerticalSpace(1.2.h),
-                              Text(
-                                'What’s your website URL?',
-                                style: TextStyle(
-                                  fontSize: 14.px,
-                                  fontFamily: 'bold',
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color(0xff191918),
-                                ),
-                              ),
-                              getVerticalSpace(.8.h),
-                              Text(
-                                'www.com',
-                                style: TextStyle(
-                                  fontSize: 14.px,
-                                  fontFamily: 'bold',
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color(0xff007AFF),
-                                ),
-                              ),
-                              getVerticalSpace(1.2.h),
-                              const Divider(
-                                  color: Color(0xff6E6E6D), thickness: 1),
-                              getVerticalSpace(1.2.h),
                               Text(
                                 'Campaign Descriptions',
                                 style: TextStyle(
@@ -234,7 +222,7 @@ class CampaignName extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                                campaignDescription,
                                 style: TextStyle(
                                   fontSize: 12.px,
                                   fontFamily: 'bold',
@@ -254,14 +242,28 @@ class CampaignName extends StatelessWidget {
                                 ),
                               ),
                               getVerticalSpace(.8.h),
-                              Text(
-                                'Google    Facebook    Instagram',
-                                style: TextStyle(
-                                  fontSize: 14.px,
-                                  fontFamily: 'bold',
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.mainColor,
-                                ),
+                              Wrap(
+                                spacing: 8.0, // Horizontal space between items
+                                children: campaignPlatForms.map((platform) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      // Optionally, you can add a border or background color if needed
+                                      borderRadius: BorderRadius.circular(
+                                          8.0), // Rounded corners
+                                      color: Colors
+                                          .transparent, // Background color (transparent in this case)
+                                    ),
+                                    child: Text(
+                                      platform,
+                                      style: TextStyle(
+                                        fontSize: 14.px,
+                                        fontFamily: 'bold',
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.mainColor,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
                               ),
                               getVerticalSpace(1.2.h),
                               const Divider(color: Color(0xff6E6E6D)),
@@ -291,9 +293,7 @@ class CampaignName extends StatelessWidget {
                                       ),
                                       SizedBox(width: .8.h),
                                       Text(
-                                        range.isNotEmpty
-                                            ? range
-                                            : '25 May 24 TO 04 June 24',
+                                        "${DateFormat('dd MMM yy').format(startDate)} To ${DateFormat('dd MMM yy').format(endDate)}",
                                         style: TextStyle(
                                           color: range.isNotEmpty
                                               ? AppColors.blackColor
@@ -321,7 +321,7 @@ class CampaignName extends StatelessWidget {
                               ),
                               getVerticalSpace(1.2.h),
                               Text(
-                                range.isNotEmpty ? range : 'From 8am to 4pm',
+                                "$startTime To $endTime",
                                 style: TextStyle(
                                   color: range.isNotEmpty
                                       ? AppColors.blackColor
@@ -335,79 +335,86 @@ class CampaignName extends StatelessWidget {
                           ),
                         )
                       : const SizedBox.shrink(),
-                  GestureDetector(
-                    onTap: () {
-                      isOpen3.value = !isOpen3.value;
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 1.h, vertical: 1.1.h),
-                      margin: EdgeInsets.symmetric(vertical: 1.6.h),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(1.h),
-                        color: AppColors.whiteColor,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Analysis',
-                            style: TextStyle(
-                              color: AppColors.blackColor,
-                              fontSize: 14.px,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'bold',
+                  status == "rejected" || status == "pending"
+                      ? const SizedBox.shrink()
+                      : GestureDetector(
+                          onTap: () {
+                            isOpen3.value = !isOpen3.value;
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 1.h, vertical: 1.1.h),
+                            margin: EdgeInsets.symmetric(vertical: 1.6.h),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(1.h),
+                              color: AppColors.whiteColor,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Analysis',
+                                  style: TextStyle(
+                                    color: AppColors.blackColor,
+                                    fontSize: 14.px,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'bold',
+                                  ),
+                                ),
+                                isOpen3.value
+                                    ? SvgPicture.asset('assets/svgs/up.svg')
+                                    : SvgPicture.asset('assets/svgs/down.svg'),
+                              ],
                             ),
                           ),
-                          isOpen3.value
-                              ? SvgPicture.asset('assets/svgs/up.svg')
-                              : SvgPicture.asset('assets/svgs/down.svg'),
-                        ],
-                      ),
-                    ),
-                  ),
+                        ),
                   isOpen3.value
-                      ? Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(1.h),
-                            color: AppColors.whiteColor,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Analytics',
-                                style: TextStyle(
-                                  color: AppColors.blackColor,
-                                  fontSize: 17.px,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: 'bold',
-                                ),
+                      ? status == "rejected" || status == "pending"
+                          ? const SizedBox.shrink()
+                          : Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(1.h),
+                                color: AppColors.whiteColor,
                               ),
-                              getVerticalSpace(.9.h),
-                              Text(
-                                '5.000,00 Importation',
-                                style: CustomTextStyles.onBoardingHeading
-                                    .copyWith(fontSize: 25.px),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Analytics',
+                                    style: TextStyle(
+                                      color: AppColors.blackColor,
+                                      fontSize: 17.px,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'bold',
+                                    ),
+                                  ),
+                                  getVerticalSpace(.9.h),
+                                  Text(
+                                    '${analysis.isEmpty?"0":analysis[0].impressions} Importation',
+                                    style: CustomTextStyles.onBoardingHeading
+                                        .copyWith(fontSize: 25.px),
+                                  ),
+                                  getVerticalSpace(.9.h),
+                                  Text(
+                                    '${analysis.isEmpty?"0":analysis[0].clicks} Clicks',
+                                    style: TextStyle(
+                                      color: AppColors.blackColor,
+                                      fontSize: 17.px,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'regular',
+                                    ),
+                                  ),
+                                  getVerticalSpace(.9.h),
+                                  const Image(
+                                      image: AssetImage(
+                                          'assets/pngs/splinechart.png')),
+                                ],
                               ),
-                              getVerticalSpace(.9.h),
-                              Text(
-                                '50 Clicks',
-                                style: TextStyle(
-                                  color: AppColors.blackColor,
-                                  fontSize: 17.px,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: 'regular',
-                                ),
-                              ),
-                              getVerticalSpace(.9.h),
-                              const Image(
-                                  image: AssetImage(
-                                      'assets/pngs/splinechart.png')),
-                            ],
-                          ),
-                        )
+                            )
                       : const SizedBox.shrink(),
+                  status == "rejected" || status == "pending"
+                      ? getVerticalSpace(3.h)
+                      : const SizedBox.shrink()
                 ],
               ),
             ),

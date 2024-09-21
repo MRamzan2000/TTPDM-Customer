@@ -1,12 +1,10 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/get_rx.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mime/mime.dart';
@@ -14,11 +12,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:ttpdm/models/get_campaigns_by_status_model.dart';
-import 'package:ttpdm/models/getdesigns_model.dart';
-
 import '../apis_services/add_campaign_apis.dart';
 import '../custom_widgets/app_colors.dart';
-
 class AddCampaignController extends GetxController {
   //TextEditingController
   final TextEditingController businessNameController = TextEditingController();
@@ -27,14 +22,12 @@ class AddCampaignController extends GetxController {
       TextEditingController();
   final TextEditingController totalCampaignBudgetController =
       TextEditingController();
-
   //Method Calender range of Dates
   RxString range = ''.obs;
   RxString startDateCampaign = ''.obs;
   RxString endDateCampaign = ''.obs;
   RxString startFormatDate = ''.obs;
   RxString endFormatDate = ''.obs;
-
   void onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
     if (args.value is PickerDateRange) {
       range.value = '${DateFormat('dd/MM/yyyy').format(args.value.startDate)} -'
@@ -247,23 +240,6 @@ class AddCampaignController extends GetxController {
     return file;
   }
 
-  var campaignsList = <Campaign>[].obs;
-
-//Business Profile get Method
-//   Future<void> fetchAdds(
-//       {required BuildContext context,
-//       required String token,
-//       required String businessId}) async {
-//     isLoading.value = true;
-//     final data = await AddCampaignApis()
-//         .getCampaigns(businessId: businessId, token: token);
-//     if (data != null) {
-//       campaignsList.value = data.campaigns;
-//       log('this is length of business ${campaignsList[0].status}');
-//       isLoading.value = false;
-//     }
-//   }
-
   //pay Campaign fee
   Future<void> campaignFeeSubmit({
     required BuildContext context,
@@ -287,13 +263,16 @@ class AddCampaignController extends GetxController {
     required BuildContext context,
     required String token,
     required String description,
+    required String businessId,
   }) async {
     try {
       isLoading.value = true;
 
       AddCampaignApis()
           .getDesignRequest(
-              description: description, token: token, context: context)
+              description: description, token: token, context: context,
+          businessId: businessId,
+          )
           .then(
         (value) {
           return isLoading.value = false;
@@ -304,44 +283,30 @@ class AddCampaignController extends GetxController {
     }
   }
 
-  //fetch All Designs
-
-  RxList<Design?> allPosters = <Design>[].obs;
-
-//Business Profile get Method
-  Future<void> fetchPosters({
-    required BuildContext context,
-    required bool loading,
-  }) async {
-    isLoading.value = loading;
-    final data = await AddCampaignApis().getAllDesigns();
-    if (data != null) {
-      allPosters.value = data.designs;
-      isLoading.value = false;
-    }
-  }
 
   //getCampaignByStatus
-  Rxn<GetCampaignsByStatusModel?> previousCampaigns =
+  Rxn<GetCampaignsByStatusModel?> approvedCampaigns =
       Rxn<GetCampaignsByStatusModel>();
   Rxn<GetCampaignsByStatusModel?> pendingCampaigns =
       Rxn<GetCampaignsByStatusModel>();
-  Rxn<GetCampaignsByStatusModel?> upcomingCampaigns =
+  Rxn<GetCampaignsByStatusModel?> rejectedCampaigns =
       Rxn<GetCampaignsByStatusModel>();
 
   Future<void> fetchCampaignByStatus(
       {required BuildContext context,
       required bool isLoad,
       required String status}) async {
-      isLoading.value = isLoad;
+    isLoading.value = isLoad;
     final data = await AddCampaignApis().getCampaignByStatus(status: status);
     if (data != null) {
-      status == "previous"
-          ? previousCampaigns.value = data
+      status == "approved"
+          ? approvedCampaigns.value = data
           : status == "pending"
               ? pendingCampaigns.value = data
-              : upcomingCampaigns.value = data;
+              : rejectedCampaigns.value = data;
       isLoading.value = false;
     }
   }
+  //Cancel Campaign
+
 }

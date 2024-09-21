@@ -22,12 +22,11 @@ class OnBoardingScreen extends StatelessWidget {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Obx(
-          () => Stack(
+          () => Stack(alignment: Alignment.center,
             children: [
               Positioned(
                 bottom: 40.h,
-                left: 22.h,
-                right: 19.9.h,
+
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -44,7 +43,7 @@ class OnBoardingScreen extends StatelessWidget {
                                   ? Colors.transparent
                                   : Colors.black)),
                     ),
-                    getHorizentalSpace(.6.h),
+                    getHorizentalSpace(1.h),
                     Container(
                       height: 1.3.h,
                       width: 1.3.h,
@@ -58,7 +57,7 @@ class OnBoardingScreen extends StatelessWidget {
                                   ? Colors.transparent
                                   : Colors.black)),
                     ),
-                    getHorizentalSpace(.6.h),
+                    getHorizentalSpace(1.h),
                     Container(
                       height: 1.3.h,
                       width: 1.3.h,

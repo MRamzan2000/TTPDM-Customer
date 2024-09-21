@@ -20,11 +20,6 @@ class AddNewCampaign extends StatefulWidget {
 }
 
 class _AddNewCampaignState extends State<AddNewCampaign> {
-  final RxList<String> titles = <String>[
-    'Business Profile One',
-    'Business Profile Two',
-    'Business Profile Three'
-  ].obs;
   final RxString businessId = ''.obs;
   final RxString businessName = ''.obs;
   final RxInt selectedIndex = 0.obs;
@@ -34,9 +29,11 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
   @override
   void initState() {
     super.initState();
-    businessProfileController.fetchBusiness(token: widget.token, context: context,
-        loading: businessProfileController.businessProfiles.isEmpty);
-    log('Business are that :${ businessProfileController.fetchBusiness}');
+    businessProfileController.fetchBusiness(
+        token: widget.token,
+        context: context,
+        loading: businessProfileController.allBusinessProfiles.isEmpty);
+    log('Business are that :${businessProfileController.fetchBusiness}');
   }
 
   @override
@@ -98,7 +95,7 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
                     ? ListView.builder(
                         itemCount: widget.token.isNotEmpty
                             ? 3
-                            : businessProfileController.businessProfiles
+                            : businessProfileController.allBusinessProfiles
                                 .length, // Number of shimmer items
                         shrinkWrap: true,
                         padding: EdgeInsets.zero,
@@ -129,100 +126,123 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
                           );
                         },
                       )
-                    : businessProfileController.businessProfiles.isEmpty
+                    : businessProfileController.allBusinessProfiles.isEmpty
                         ? Text(
-                          'No Business Available for Campaign',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'bold',
-                            fontSize: 14.px,
-                            color: AppColors.mainColor,
-                          ),
-                        )
-                        : ListView.builder(
-                            itemCount: businessProfileController
-                                .businessProfiles.length,
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  selectedIndex.value = index;
-                                  businessId.value = businessProfileController
-                                      .businessProfiles[selectedIndex.value]!.id;
-                                  businessName.value = businessProfileController
-                                      .businessProfiles[selectedIndex.value]!
-                                      .name;
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 1.6.h, vertical: 2.h),
-                                  margin: EdgeInsets.symmetric(vertical: 1.6.h),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(1.h),
-                                      color: AppColors.whiteColor),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(businessProfileController
-                                          .businessProfiles[index]!.name),
-                                      Container(
-                                        padding: EdgeInsets.all(.3.h),
-                                        height: 2.4.h,
-                                        width: 2.4.h,
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.transparent,
-                                            border: Border.all(
-                                                color: selectedIndex.value ==
-                                                        index
-                                                    ? AppColors.mainColor
-                                                    : const Color(0xff7C7C7C),
-                                                width: 2)),
-                                        child: CircleAvatar(
-                                          backgroundColor:
-                                              selectedIndex.value == index
-                                                  ? AppColors.mainColor
-                                                  : Colors.transparent,
-                                          radius: 1.h,
-                                        ),
-                                      )
-                                    ],
+                            'No Business Available for Campaign',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'bold',
+                              fontSize: 14.px,
+                              color: AppColors.mainColor,
+                            ),
+                          )
+                        : Expanded(
+                          child: ListView.builder(
+                              itemCount: businessProfileController
+                                  .allBusinessProfiles.length,
+                              shrinkWrap: true,
+
+                              padding: EdgeInsets.zero,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    selectedIndex.value = index;
+                                    businessId.value = businessProfileController
+                                        .allBusinessProfiles[selectedIndex.value]!
+                                        .id;
+                                    businessName.value = businessProfileController
+                                        .allBusinessProfiles[selectedIndex.value]!
+                                        .name;
+                                    if (businessId.isEmpty) {
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                          content: Text(
+                                              'Please Select your business for Campaign')));
+                                    } else if (businessName.isEmpty) {
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                          content: Text(
+                                              'Please Select your business for Campaign')));
+                                    } else {
+                                      Get.to(() => FillAddDetails(
+                                        businessId: businessId.value,
+                                        businessName: businessName.value,
+                                        token: widget.token,
+                                      ));
+                                    }
+                                  },
+                                  child: Obx(
+                                    () => Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 1.6.h, vertical: 2.h),
+                                      margin:
+                                          EdgeInsets.symmetric(vertical: 1.6.h),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(1.h),
+                                          color: AppColors.whiteColor),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(businessProfileController
+                                              .allBusinessProfiles[index]!.name),
+                                          Container(
+                                            padding: EdgeInsets.all(.3.h),
+                                            height: 2.4.h,
+                                            width: 2.4.h,
+                                            decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.transparent,
+                                                border: Border.all(
+                                                    color: selectedIndex.value ==
+                                                            index
+                                                        ? AppColors.mainColor
+                                                        : const Color(0xff7C7C7C),
+                                                    width: 2)),
+                                            child: CircleAvatar(
+                                              backgroundColor:
+                                                  selectedIndex.value == index
+                                                      ? AppColors.mainColor
+                                                      : Colors.transparent,
+                                              radius: 1.h,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                const Spacer(),
-                customElevatedButton(
-                    onTap: () {
-                      if (businessId.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                            content: Text(
-                                'Please Select your business for Campaign')));
-                      } else if (businessName.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                            content: Text(
-                                'Please Select your business for Campaign')));
-                      } else {
-                        Get.to(() => FillAddDetails(
-                              businessId: businessId.value,
-                              businessName: businessName.value,
-                          token: widget.token,
-                            ));
-                      }
-                    },
-                    title: Text(
-                      'Next',
-                      style: CustomTextStyles.buttonTextStyle
-                          .copyWith(color: AppColors.whiteColor),
-                    ),
-                    horizentalPadding: 5.h,
-                    verticalPadding: .8.h,
-                    bgColor: AppColors.mainColor,
-                    titleColor: AppColors.whiteColor),
-                getVerticalSpace(6.4.h)
+                                );
+                              },
+                            ),
+                        ),
+
+                // customElevatedButton(
+                //     onTap: () {
+                //       if (businessId.isEmpty) {
+                //         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                //             content: Text(
+                //                 'Please Select your business for Campaign')));
+                //       } else if (businessName.isEmpty) {
+                //         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                //             content: Text(
+                //                 'Please Select your business for Campaign')));
+                //       } else {
+                //         Get.to(() => FillAddDetails(
+                //               businessId: businessId.value,
+                //               businessName: businessName.value,
+                //               token: widget.token,
+                //             ));
+                //       }
+                //     },
+                //     title: Text(
+                //       'Next',
+                //       style: CustomTextStyles.buttonTextStyle
+                //           .copyWith(color: AppColors.whiteColor),
+                //     ),
+                //     horizentalPadding: 5.h,
+                //     verticalPadding: .8.h,
+                //     bgColor: AppColors.mainColor,
+                //     titleColor: AppColors.whiteColor),
+                // getVerticalSpace(6.4.h),
               ],
             ),
           ),

@@ -1,3 +1,16 @@
+// Root-level build.gradle (usually located at the root of your project)
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.3.1'
+        // Add other classpath dependencies here if needed
+    }
+}
+
 allprojects {
     repositories {
         google()

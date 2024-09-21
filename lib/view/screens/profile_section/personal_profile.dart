@@ -7,6 +7,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/business_profile_controller.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
+import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/view/screens/profile_section/add_business.dart';
 import 'package:ttpdm/view/screens/profile_section/business_profile.dart';
 
@@ -15,36 +16,33 @@ import '../../../controller/custom_widgets/custom_text_styles.dart';
 import 'settng_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key,});
+  const ProfileScreen({
+    super.key,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-
   final BusinessProfileController businessProfileController =
       Get.find(tag: 'business');
-  String? token;
+  RxString token = "".obs;
 
   @override
   void initState() {
     super.initState();
-    _checkToken();
+
+    token.value = MySharedPreferences.getString(authToken);
+    businessProfileController.fetchBusiness(
+        token: token.value,
+        context: context,
+        loading: businessProfileController.allBusinessProfiles.isEmpty).then((value) {
+          log("Business profile is :${businessProfileController.allBusinessProfiles.length}");
+        },);
   }
 
-  Future<void> _checkToken() async {
-    token = await PreferencesService().getAuthToken();
-    if (token != null) {
-      // Use the token as needed
-      businessProfileController.fetchBusiness(token: token!, context: context, loading: businessProfileController.businessProfiles.isEmpty);
-
-      log("Token: $token");
-    } else {
-      // Handle the case where the token is not available
-      log("No token available");
-    }
-  }
+  RxBool hasDisplayedNoProfileMessage = false.obs;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: businessProfileController.businessProfiles
+                    itemCount: businessProfileController.approvedProfiles
                         .length, // Number of shimmer items you want to display
                     itemBuilder: (context, index) {
                       return Shimmer.fromColors(
@@ -146,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                   )
-                else if (businessProfileController.businessProfiles.isEmpty)
+                else if (businessProfileController.approvedProfiles.isEmpty)
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: Column(
@@ -173,45 +171,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     padding: EdgeInsets.zero,
                     itemCount:
-                        businessProfileController.businessProfiles.length,
+                        businessProfileController.approvedProfiles.length,
                     itemBuilder: (context, index) {
                       final business =
-                          businessProfileController.businessProfiles[index];
-                      if (business!.status == 'Approved') {
+                          businessProfileController.approvedProfiles[index];
+                      if (business!.status == 'accepted') {
                         return GestureDetector(
                           onTap: () {
-                            log('logo detail ${businessProfileController.businessProfiles[index]!.logo}');
+                            log('logo detail ${businessProfileController.approvedProfiles[index]!.logo}');
                             Get.to(() => BusinessProfile(
-                              targetArea: businessProfileController
-                                  .businessProfiles[index]!.targetMapArea,
-                              logo: businessProfileController
-                                  .businessProfiles[index]!.logo!,
-                              location: businessProfileController
-                                  .businessProfiles[index]!.location,
-                              description: businessProfileController
-                                  .businessProfiles[index]!.description,
-                              businessName: businessProfileController
-                                  .businessProfiles[index]!.name,
-                              phoneNumber: businessProfileController
-                                  .businessProfiles[index]!.phone,
-                              businessId: businessProfileController
-                                  .businessProfiles[index]!.id,
-                              imagesList: businessProfileController
-                                  .businessProfiles[index]!.gallery,
-                              token:token! ,
-                              fb:businessProfileController
-                                  .businessProfiles[index]!.facebookUrl! ,
-                              insta: businessProfileController
-                                  .businessProfiles[index]!.instagramUrl!,
-                              linkdin:businessProfileController
-                                  .businessProfiles[index]!.linkedinUrl! ,
-                              tiktok: businessProfileController
-                                  .businessProfiles[index]!.tiktokUrl!,
-                              webUrl:businessProfileController
-                                  .businessProfiles[index]!.websiteUrl! ,
-
-
-                            ));
+                                  targetArea: businessProfileController
+                                      .approvedProfiles[index]!.targetMapArea,
+                                  logo: businessProfileController
+                                      .approvedProfiles[index]!.logo!,
+                                  location: businessProfileController
+                                      .approvedProfiles[index]!.location,
+                                  description: businessProfileController
+                                      .approvedProfiles[index]!.description,
+                                  businessName: businessProfileController
+                                      .approvedProfiles[index]!.name,
+                                  phoneNumber: businessProfileController
+                                      .approvedProfiles[index]!.phone,
+                                  businessId: businessProfileController
+                                      .approvedProfiles[index]!.id,
+                                  imagesList: businessProfileController
+                                      .approvedProfiles[index]!.gallery,
+                                  token: token.value,
+                                  fb: businessProfileController
+                                      .approvedProfiles[index]!.facebookUrl!,
+                                  insta: businessProfileController
+                                      .approvedProfiles[index]!.instagramUrl!,
+                                  linkdin: businessProfileController
+                                      .approvedProfiles[index]!.linkedinUrl!,
+                                  tiktok: businessProfileController
+                                      .approvedProfiles[index]!.tiktokUrl!,
+                                  webUrl: businessProfileController
+                                      .approvedProfiles[index]!.websiteUrl!,
+                              status: businessProfileController
+                                  .approvedProfiles[index]!.status,
+                                ));
                           },
                           child: Container(
                             margin: EdgeInsets.symmetric(
@@ -327,7 +325,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                   )
-                else if (businessProfileController.businessProfiles.isEmpty)
+                else if (businessProfileController.pendingProfiles.isEmpty)
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: Column(
@@ -353,45 +351,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     padding: EdgeInsets.zero,
-                    itemCount:
-                        businessProfileController.businessProfiles.length,
+                    itemCount: businessProfileController.pendingProfiles.length,
                     itemBuilder: (context, index) {
                       final business =
-                          businessProfileController.businessProfiles[index];
+                          businessProfileController.pendingProfiles[index];
                       if (business!.status == 'pending') {
                         return GestureDetector(
                           onTap: () {
                             Get.to(() => BusinessProfile(
-                              targetArea: businessProfileController
-                                  .businessProfiles[index]!.targetMapArea,
-                              logo: businessProfileController
-                                  .businessProfiles[index]!.logo!,
-                              location: businessProfileController
-                                  .businessProfiles[index]!.location,
-                              description: businessProfileController
-                                  .businessProfiles[index]!.description,
-                              businessName: businessProfileController
-                                  .businessProfiles[index]!.name,
-                              phoneNumber: businessProfileController
-                                  .businessProfiles[index]!.phone,
-                              businessId: businessProfileController
-                                  .businessProfiles[index]!.id,
-                              imagesList: businessProfileController
-                                  .businessProfiles[index]!.gallery,
-                              token:token! ,
-                              fb:businessProfileController
-                                  .businessProfiles[index]!.facebookUrl! ,
-                              insta: businessProfileController
-                                  .businessProfiles[index]!.instagramUrl!,
-                              linkdin:businessProfileController
-                                  .businessProfiles[index]!.linkedinUrl! ,
-                              tiktok: businessProfileController
-                                  .businessProfiles[index]!.tiktokUrl!,
-                              webUrl:businessProfileController
-                                  .businessProfiles[index]!.websiteUrl! ,
-
-
-                            ));
+                                  targetArea: businessProfileController
+                                      .pendingProfiles[index]!.targetMapArea,
+                                  logo: businessProfileController
+                                      .pendingProfiles[index]!.logo!,
+                                  location: businessProfileController
+                                      .pendingProfiles[index]!.location,
+                                  description: businessProfileController
+                                      .pendingProfiles[index]!.description,
+                                  businessName: businessProfileController
+                                      .pendingProfiles[index]!.name,
+                                  phoneNumber: businessProfileController
+                                      .pendingProfiles[index]!.phone,
+                                  businessId: businessProfileController
+                                      .pendingProfiles[index]!.id,
+                                  imagesList: businessProfileController
+                                      .pendingProfiles[index]!.gallery,
+                                  token: token.value,
+                                  fb: businessProfileController
+                                      .pendingProfiles[index]!.facebookUrl!,
+                                  insta: businessProfileController
+                                      .pendingProfiles[index]!.instagramUrl!,
+                                  linkdin: businessProfileController
+                                      .pendingProfiles[index]!.linkedinUrl!,
+                                  tiktok: businessProfileController
+                                      .pendingProfiles[index]!.tiktokUrl!,
+                                  webUrl: businessProfileController
+                                      .pendingProfiles[index]!.websiteUrl!,
+                              status: businessProfileController
+                                  .pendingProfiles[index]!.status,
+                                ));
                           },
                           child: Container(
                             margin: EdgeInsets.symmetric(
@@ -472,7 +469,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: businessProfileController.businessProfiles
+                    itemCount: businessProfileController.rejectedProfiles
                         .length, // Number of shimmer items you want to display
                     itemBuilder: (context, index) {
                       return Shimmer.fromColors(
@@ -506,7 +503,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                   )
-                else if (businessProfileController.businessProfiles.isEmpty)
+                else if (businessProfileController.rejectedProfiles.isEmpty)
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: Column(
@@ -533,43 +530,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     padding: EdgeInsets.zero,
                     itemCount:
-                        businessProfileController.businessProfiles.length,
+                        businessProfileController.rejectedProfiles.length,
                     itemBuilder: (context, index) {
                       final business =
-                          businessProfileController.businessProfiles[index];
+                          businessProfileController.rejectedProfiles[index];
                       if (business!.status == 'Rejected') {
                         return GestureDetector(
                           onTap: () {
                             Get.to(() => BusinessProfile(
                                   targetArea: businessProfileController
-                                      .businessProfiles[index]!.targetMapArea,
+                                      .rejectedProfiles[index]!.targetMapArea,
                                   logo: businessProfileController
-                                      .businessProfiles[index]!.logo!,
+                                      .rejectedProfiles[index]!.logo!,
                                   location: businessProfileController
-                                      .businessProfiles[index]!.location,
+                                      .rejectedProfiles[index]!.location,
                                   description: businessProfileController
-                                      .businessProfiles[index]!.description,
+                                      .rejectedProfiles[index]!.description,
                                   businessName: businessProfileController
-                                      .businessProfiles[index]!.name,
+                                      .rejectedProfiles[index]!.name,
                                   phoneNumber: businessProfileController
-                                      .businessProfiles[index]!.phone,
+                                      .rejectedProfiles[index]!.phone,
                                   businessId: businessProfileController
-                                      .businessProfiles[index]!.id,
+                                      .rejectedProfiles[index]!.id,
                                   imagesList: businessProfileController
-                                      .businessProfiles[index]!.gallery,
-                              token:token! ,
-                              fb:businessProfileController
-                                  .businessProfiles[index]!.facebookUrl! ,
-                              insta: businessProfileController
-                                  .businessProfiles[index]!.instagramUrl!,
-                              linkdin:businessProfileController
-                                  .businessProfiles[index]!.linkedinUrl! ,
-                              tiktok: businessProfileController
-                                  .businessProfiles[index]!.tiktokUrl!,
-                              webUrl:businessProfileController
-                                  .businessProfiles[index]!.websiteUrl! ,
-
-
+                                      .rejectedProfiles[index]!.gallery,
+                                  token: token.value,
+                                  fb: businessProfileController
+                                      .rejectedProfiles[index]!.facebookUrl!,
+                                  insta: businessProfileController
+                                      .rejectedProfiles[index]!.instagramUrl!,
+                                  linkdin: businessProfileController
+                                      .rejectedProfiles[index]!.linkedinUrl!,
+                                  tiktok: businessProfileController
+                                      .rejectedProfiles[index]!.tiktokUrl!,
+                                  webUrl: businessProfileController
+                                      .rejectedProfiles[index]!.websiteUrl!, status:businessProfileController
+                                .rejectedProfiles[index]!.status ,
                                 ));
                           },
                           child: Container(
@@ -629,7 +625,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 getVerticalSpace(1.6.h),
                 GestureDetector(
                   onTap: () {
-                    Get.to(() =>  const AddNewBusiness());
+                    Get.to(() => const AddNewBusiness());
                   },
                   child: Container(
                     margin: EdgeInsets.symmetric(

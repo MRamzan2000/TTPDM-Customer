@@ -44,9 +44,6 @@ final RxString otpCode=''.obs;
                 ),
                 getVerticalSpace(5.2.h),
                 OtpTextField(
-
-
-
                   textStyle: TextStyle(
                       fontSize: 24.px,
                       color: const Color(0xff4D4F53),
@@ -84,7 +81,7 @@ final RxString otpCode=''.obs;
                               );
                             } else {
                               verifyOtpController.verifyOtp(
-                                email: email, otp: otpCode.value,
+                                email: email, otp: otpCode.value, title: title,
 
                               );
                             }

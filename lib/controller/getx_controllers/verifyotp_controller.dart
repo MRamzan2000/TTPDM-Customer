@@ -11,10 +11,11 @@ class VerifyOtpController extends GetxController {
   Future<void> verifyOtp({
     required email,
     required otp,
+    required title,
   }) async {
     try {
       isLoading.value = true;
-      await AuthApis(context: context).verifyOtp(email: email, otp: otp).then(
+      await AuthApis(context: context).verifyOtp(email: email, otp: otp, title:title ).then(
         (value) {
           return isLoading.value = false;
         },

@@ -1,19 +1,14 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/extensions.dart';
 import 'package:ttpdm/controller/getx_controllers/add_card_controller.dart';
-import 'package:ttpdm/controller/getx_controllers/coins_controller.dart';
-import 'package:ttpdm/controller/utils/apis_constant.dart';
 
 import '../../controller/custom_widgets/app_colors.dart';
 import '../../controller/custom_widgets/custom_text_styles.dart';
-import 'campaign_section/campaign_name.dart';
 
 class Subscription extends StatefulWidget {
   final String token;
@@ -25,15 +20,6 @@ class Subscription extends StatefulWidget {
 
 class _SubscriptionState extends State<Subscription> {
   final AddCardController addCardController = Get.put(AddCardController());
-  final CoinsController coinsController = Get.put(CoinsController());
-
-  @override
-  void initState() {
-    super.initState();
-    coinsController.fetchCoinsPlan(token: widget.token, context: context,
-        loading: coinsController.purchaseCoinsPlane.isEmpty);
-    log("Coins balance is :${widget.token}");
-  }
 
   String convertCentsToDollars({required int priceInCents}) {
     // Convert cents to dollars
@@ -55,7 +41,7 @@ class _SubscriptionState extends State<Subscription> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Subscription ',
+          'Wallet',
           style: CustomTextStyles.onBoardingHeading.copyWith(fontSize: 20.px),
         ),
         centerTitle: true,
@@ -66,215 +52,145 @@ class _SubscriptionState extends State<Subscription> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 2.5.h),
-          child: Obx(
-            () => Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            padding: EdgeInsets.symmetric(horizontal: 2.5.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                getVerticalSpace(4.h),
-                Text(
-                  'Coin Balance',
-                  style: TextStyle(
-                      fontSize: 12.px,
-                      fontFamily: 'bold',
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xff191918)),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                        height: 3.2.h,
-                        child: const Image(
-                            image: AssetImage('assets/pngs/coinicon.png'))),
-                    Text(
-                      '1200', // Placeholder value
-                      style: TextStyle(
-                          fontSize: 32.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xff191918)),
-                    ),
-                  ],
-                ),
-                getVerticalSpace(4.h),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Buy Credit',
-                    style: TextStyle(
-                        fontSize: 14.px,
-                        fontFamily: 'bold',
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xff191918)),
+                getVerticalSpace(2.4.h),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 5.h),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      color: AppColors.mainColor,
+                      borderRadius: BorderRadius.circular(1.5.h)),
+                  child: Column(
+                    children: [
+                      Text(
+                        "Total Balance",
+                        style: CustomTextStyles.onBoardingHeading.copyWith(
+                            fontSize: 18.px,
+                            color: AppColors.whiteColor,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      getVerticalSpace(.6.h),
+                      Text(
+                        "\$23.0",
+                        style: CustomTextStyles.onBoardingHeading.copyWith(
+                            fontSize: 18.px,
+                            color: AppColors.whiteColor,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ],
                   ),
                 ),
-                getVerticalSpace(1.6.h),
-                Expanded(
-                  child: coinsController.isLoading.value
-                      ? GridView.builder(
-                          padding: EdgeInsets.zero,
-                          itemCount: 7, // Display 7 shimmer items
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  mainAxisSpacing: 2.1.h,
-                                  crossAxisSpacing: 1.6.h),
-                          itemBuilder: (context, index) {
-                            return Shimmer.fromColors(
-                              baseColor: AppColors.baseColor,
-                              highlightColor: AppColors.highlightColor,
-                              child: Container(
-                                alignment: Alignment.center,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: .5.h, vertical: .5.h),
-                                height: 11.3.h,
-                                width: 11.6.h,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(1.h),
-                                    color: AppColors.whiteColor,
-                                    boxShadow: const [
-                                      BoxShadow(
-                                          offset: Offset(0, 1),
-                                          spreadRadius: 0,
-                                          blurRadius: 8,
-                                          color: Color(0xffFFE4EA))
-                                    ]),
-                              ),
-                            );
-                          },
-                        )
-                      : coinsController.purchaseCoinsPlane.isEmpty
-                          ? Center(
-                              child: Text(
-                                "No plan added by Super Admin",
-                                style: TextStyle(
-                                    fontSize: 14.px,
-                                    fontFamily: 'bold',
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.mainColor),
-                              ),
-                            )
-                          : GridView.builder(
-                              padding: EdgeInsets.zero,
-                              itemCount:
-                                  coinsController.purchaseCoinsPlane.length,
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 3,
-                                      mainAxisSpacing: 2.1.h,
-                                      crossAxisSpacing: 1.6.h),
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    selectedIndex.value = index;
-                                  },
-                                  child: Obx(
-                                    () => Container(
-                                      alignment: Alignment.center,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: .5.h, vertical: .5.h),
-                                      height: 11.3.h,
-                                      width: 11.6.h,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(1.h),
-                                          color: selectedIndex.value == index
-                                              ? AppColors.mainColor
-                                              : AppColors.whiteColor,
-                                          boxShadow: const [
-                                            BoxShadow(
-                                                offset: Offset(0, 1),
-                                                spreadRadius: 0,
-                                                blurRadius: 8,
-                                                color: Color(0xffFFE4EA))
-                                          ]),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                              height: 3.2.h,
-                                              child: const Image(
-                                                  image: AssetImage(
-                                                      'assets/pngs/coinicon.png'))),
-                                          Text(
-                                            coinsController
-                                                .purchaseCoinsPlane[index]!
-                                                .amount
-                                                .toString(),
-                                            style: TextStyle(
-                                                fontSize: 14.px,
-                                                fontFamily: 'bold',
-                                                fontWeight: FontWeight.w500,
-                                                color: selectedIndex.value ==
-                                                        index
-                                                    ? AppColors.whiteColor
-                                                    : const Color(0xff4D4F53)),
-                                          ),
-                                          getVerticalSpace(1.2.h),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: .5.h,
-                                                vertical: .5.h),
-                                            decoration: BoxDecoration(
-                                                color:
-                                                    selectedIndex.value == index
-                                                        ? AppColors.whiteColor
-                                                        : AppColors.mainColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(5.h)),
-                                            child: Text(
-                                              '\$${convertCentsToDollars(
-                                                priceInCents: coinsController
-                                                    .purchaseCoinsPlane[index]!
-                                                    .priceInCents,
-                                              )}', // Placeholder value
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  fontFamily: 'bold',
-                                                  fontSize: 12.px,
-                                                  color: selectedIndex.value ==
-                                                          index
-                                                      ? AppColors.mainColor
-                                                      : AppColors.whiteColor),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
+                getVerticalSpace(1.2.h),
+
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 2.7.h),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      color: AppColors.mainColor,
+                      borderRadius: BorderRadius.circular(1.5.h)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/svgs/withdraw.svg"),
+                      getHorizentalSpace(.6.h),
+                      Text(
+                        "Withdraw Request",
+                        style: CustomTextStyles.onBoardingHeading.copyWith(
+                            fontSize: 16.px,
+                            color: AppColors.whiteColor,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
                 ),
-                Obx(() =>
-                   Row(mainAxisAlignment: MainAxisAlignment.center,
-                     children: [
-                       customElevatedButton(
-                          title:coinsController.loading.value?spinkit: Text(
-                            'Recharge',
-                            style: CustomTextStyles.buttonTextStyle
-                                .copyWith(color: AppColors.whiteColor),
+                getVerticalSpace(2.h),
+                Text(
+                  "Withdraw",
+                  style: CustomTextStyles.buttonTextStyle
+                      .copyWith(color: AppColors.mainColor),
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: 1,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            "Withdraw Request",
+                            style: CustomTextStyles.buttonTextStyle.copyWith(
+                                color: AppColors.blackColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16.px),
                           ),
-                          onTap: () {
-                           coinsController. buyCoinsPlan(coinAmount: coinsController.purchaseCoinsPlane[selectedIndex.value]!.amount,
-                               token: widget.token,
-                               context: context);
-                            openBottomSheet(context);
-                          },
-                          bgColor: AppColors.mainColor,
-                          titleColor: AppColors.whiteColor,
-                          verticalPadding: .9.h,
-                          horizentalPadding: 3.h),
-                     ],
-                   ),
+                          subtitle: Text(
+                            "10:00 am , 12 jul 2023",
+                            style: CustomTextStyles.buttonTextStyle.copyWith(
+                                color: AppColors.blackColor, fontSize: 12.px),
+                          ),
+                          trailing: Text(
+                            "-\$23.0",
+                            style: CustomTextStyles.buttonTextStyle.copyWith(
+                                color: AppColors.mainColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.px),
+                          ),
+                        ),
+                        Divider(
+                          color: AppColors.textFieldGreyColor,
+                        )
+                      ],
+                    );
+                  },
                 ),
-                getVerticalSpace(15.h),
+                Text(
+                  "History",
+                  style: CustomTextStyles.buttonTextStyle
+                      .copyWith(color: AppColors.mainColor),
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: 2,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            index==0?"Payment ":"Withdraw",
+                            style: CustomTextStyles.buttonTextStyle.copyWith(
+                                color: AppColors.blackColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16.px),
+                          ),
+                          subtitle: Text(
+                            "10:00 am , 12 jul 2023",
+                            style: CustomTextStyles.buttonTextStyle.copyWith(
+                                color: AppColors.blackColor, fontSize: 12.px),
+                          ),
+                          trailing: Text(
+                            "-\$23.0",
+                            style: CustomTextStyles.buttonTextStyle.copyWith(
+                                color: AppColors.mainColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.px),
+                          ),
+                        ),
+                        Divider(
+                          color: AppColors.textFieldGreyColor,
+                        )
+                      ],
+                    );
+                  },
+                )
               ],
-            ),
-          ),
-        ),
+            )),
       ),
     );
   }
@@ -374,7 +290,7 @@ class _SubscriptionState extends State<Subscription> {
                           .copyWith(color: AppColors.whiteColor),
                     ),
                     onTap: () {
-                      Get.to(() => CampaignName());
+                      // Get.to(() => CampaignName());
                     },
                     bgColor: AppColors.mainColor,
                     titleColor: AppColors.whiteColor,

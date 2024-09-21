@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:ttpdm/controller/utils/apis_constant.dart';
-import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
+import 'package:ttpdm/models/get_all_plans_model.dart';
 import 'package:ttpdm/models/getall_coins_model.dart';
 
 class SubscriptionApi {
   final BuildContext context;
   SubscriptionApi({required this.context});
-  final PreferencesService preferencesService = PreferencesService();
 
   //subscription plan Api hit
   Future<void> subscriptionPlan(
@@ -26,6 +25,8 @@ class SubscriptionApi {
     final response = await http.post(url, body: body, headers: headers);
     try {
       if (response.statusCode == 200) {
+        Map<String,dynamic>responseBody=jsonDecode(response.body);
+        log("response body:$responseBody");
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('please pay your payment')));
@@ -68,5 +69,27 @@ class SubscriptionApi {
       log('UnExpected Error fetching business profiles: ${e.toString()}');
       return null;
     }
+  }
+  //Get All Plans Api Methods
+  Future<List<GetAllPlansModel>?> getAllPlans() async {
+    final url = Uri.parse("$baseUrl/$getAllSubPlanEP");
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+    try {
+      final response = await http.get(headers: headers, url);
+      if (response.statusCode == 200) {
+        log("response :${response.body}");
+        return getAllPlansModelFromJson(response.body);
+      }
+      log("response body :${response.body}");
+      return null;
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("unexpected error occurred :${e.toString()}")));
+      }
+    }
+    return null;
   }
 }

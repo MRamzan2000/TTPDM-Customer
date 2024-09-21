@@ -59,6 +59,8 @@ dependencies:
   firebase_messaging: ^15.1.0
   flutter_local_notifications: ^17.2.2
   firebase_auth: ^5.2.0
+  fl_chart: ^0.69.0
+  internet_connection_checker: ^2.0.0
 
 
 

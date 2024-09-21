@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,6 +7,7 @@ import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/utils/alert_box.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
+import 'package:ttpdm/controller/utils/preference_key.dart';
 
 class LogOutScreen extends StatefulWidget {
   const LogOutScreen({super.key});
@@ -17,23 +17,14 @@ class LogOutScreen extends StatefulWidget {
 }
 
 class _LogOutScreenState extends State<LogOutScreen> {
-  String? token;
+  RxString token="".obs;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _checkToken();
+  token.value=MySharedPreferences.getString(authToken);
   }
-  Future<void> _checkToken() async {
-    token = await PreferencesService().getAuthToken();
-    if (token != null) {
-      // Use the token as needed
-      log("Token: $token");
-    } else {
-      // Handle the case where the token is not available
-      log("No token available");
-    }
-  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +59,7 @@ class _LogOutScreenState extends State<LogOutScreen> {
             children: [
               getVerticalSpace(1.6.h),
               GestureDetector(onTap: (){
-                openChooseSubscription(context,token!
+                openChooseSubscription(context,token.value
                 );
               },
                 child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,

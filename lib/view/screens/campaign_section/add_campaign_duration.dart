@@ -10,7 +10,6 @@ import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/utils/alert_box.dart';
 import 'package:ttpdm/view/screens/campaign_section/campaign_details.dart';
-
 import '../../../controller/getx_controllers/add_campaign_controller.dart';
 
 class AddCampaignDuration extends StatelessWidget {
@@ -131,7 +130,7 @@ class AddCampaignDuration extends StatelessWidget {
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 1.h, vertical: 1.h),
+                                horizontal: .8.h, vertical: 1.h),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.h),
                                 color: selectionLst
@@ -146,7 +145,7 @@ class AddCampaignDuration extends StatelessWidget {
                                           .contains('TTPDM Social Media pages')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
-                                  fontSize: 12.px,
+                                  fontSize: 11.px,
                                   fontWeight: FontWeight.w400),
                             ),
                           ),
@@ -161,7 +160,7 @@ class AddCampaignDuration extends StatelessWidget {
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 1.h, vertical: 1.h),
+                                horizontal: .8.h, vertical: 1.h),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.h),
                                 color: selectionLst.contains('Facebook')
@@ -174,7 +173,7 @@ class AddCampaignDuration extends StatelessWidget {
                                   color: selectionLst.contains('Facebook')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
-                                  fontSize: 12.px,
+                                  fontSize: 11.px,
                                   fontWeight: FontWeight.w400),
                             ),
                           ),
@@ -189,7 +188,7 @@ class AddCampaignDuration extends StatelessWidget {
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 1.h, vertical: 1.h),
+                                horizontal: .8.h, vertical: 1.h),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.h),
                                 color: selectionLst.contains('TIKTOK')
@@ -202,7 +201,7 @@ class AddCampaignDuration extends StatelessWidget {
                                   color: selectionLst.contains('TIKTOK')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
-                                  fontSize: 12.px,
+                                  fontSize: 11.px,
                                   fontWeight: FontWeight.w400),
                             ),
                           ),
@@ -236,7 +235,7 @@ class AddCampaignDuration extends StatelessWidget {
                                   color: selectionLst.contains('Instagram')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
-                                  fontSize: 12.px,
+                                  fontSize: 11.px,
                                   fontWeight: FontWeight.w400),
                             ),
                           ),
@@ -265,7 +264,7 @@ class AddCampaignDuration extends StatelessWidget {
                                   color: selectionLst.contains('Youtube')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
-                                  fontSize: 12.px,
+                                  fontSize: 11.px,
                                   fontWeight: FontWeight.w400),
                             ),
                           ),
@@ -294,7 +293,7 @@ class AddCampaignDuration extends StatelessWidget {
                                   color: selectionLst.contains('Google')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
-                                  fontSize: 14.px,
+                                  fontSize: 12.px,
                                   fontWeight: FontWeight.w400),
                             ),
                           ),

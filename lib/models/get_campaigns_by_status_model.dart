@@ -38,7 +38,7 @@ class Campaign {
   String startTime;
   String endTime;
   String status;
-  List<dynamic> analytics;
+  List<Analytics> analytics; // Update type here
   int v;
 
   Campaign({
@@ -52,38 +52,9 @@ class Campaign {
     required this.startTime,
     required this.endTime,
     required this.status,
-    required this.analytics,
+    required this.analytics, // Update type here
     required this.v,
   });
-
-  Campaign copyWith({
-    DateSchedule? dateSchedule,
-    String? id,
-    String? adBanner,
-    Business? business,
-    String? adsName,
-    String? campaignDesc,
-    List<String>? campaignPlatforms,
-    String? startTime,
-    String? endTime,
-    String? status,
-    List<dynamic>? analytics,
-    int? v,
-  }) =>
-      Campaign(
-        dateSchedule: dateSchedule ?? this.dateSchedule,
-        id: id ?? this.id,
-        adBanner: adBanner ?? this.adBanner,
-        business: business ?? this.business,
-        adsName: adsName ?? this.adsName,
-        campaignDesc: campaignDesc ?? this.campaignDesc,
-        campaignPlatforms: campaignPlatforms ?? this.campaignPlatforms,
-        startTime: startTime ?? this.startTime,
-        endTime: endTime ?? this.endTime,
-        status: status ?? this.status,
-        analytics: analytics ?? this.analytics,
-        v: v ?? this.v,
-      );
 
   factory Campaign.fromJson(Map<String, dynamic> json) => Campaign(
     dateSchedule: DateSchedule.fromJson(json["dateSchedule"]),
@@ -96,7 +67,7 @@ class Campaign {
     startTime: json["startTime"],
     endTime: json["endTime"],
     status: json["status"],
-    analytics: List<dynamic>.from(json["analytics"].map((x) => x)),
+    analytics: List<Analytics>.from(json["analytics"].map((x) => Analytics.fromJson(x))), // Update parsing here
     v: json["__v"],
   );
 
@@ -111,8 +82,34 @@ class Campaign {
     "startTime": startTime,
     "endTime": endTime,
     "status": status,
-    "analytics": List<dynamic>.from(analytics.map((x) => x)),
+    "analytics": List<dynamic>.from(analytics.map((x) => x.toJson())), // Update serialization here
     "__v": v,
+  };
+}
+class Analytics {
+  DateTime date;
+  int clicks;
+  int impressions;
+  String id;
+
+  Analytics({
+    required this.date,
+    required this.clicks,
+    required this.impressions,
+    required this.id,
+  });
+
+  factory Analytics.fromJson(Map<String, dynamic> json) => Analytics(
+    date: DateTime.parse(json["date"]),
+    clicks: json["clicks"],
+    impressions: json["impressions"],
+    id: json["_id"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "date": date.toIso8601String(),
+    "clicks": clicks,
+    "impressions": impressions,
   };
 }
 

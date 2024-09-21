@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ttpdm/controller/apis_services/subplan_api.dart';
+import 'package:ttpdm/models/get_all_plans_model.dart';
 
 class SubscriptionController extends GetxController {
   RxBool isLoading = false.obs;
@@ -34,4 +35,34 @@ class SubscriptionController extends GetxController {
       allCoins.value = data.coinBalance;
     }
   }
+  RxBool planLoading = false.obs;
+
+  RxList<GetAllPlansModel?> getAllPlans = <GetAllPlansModel>[].obs;
+
+  // Method to fetch coin plans
+  Future<void> fetchAllPlans({
+    required bool loading,
+    required BuildContext context,
+  }) async {
+    planLoading.value = loading; // Start loading
+
+    try {
+      final data = await SubscriptionApi(context: context).getAllPlans();
+
+      if (data != null) {
+        getAllPlans.value = data;
+        log("when data is not null :$getAllPlans");
+        planLoading.value = false;
+      } else {
+        log("when data clear :$getAllPlans");
+        planLoading.value = false;
+      }
+    } catch (e) {
+      log("Unexpected error occurred :${e.toString()}");
+      planLoading.value = false;
+      log("when data clear :$getAllPlans");
+
+    }
+  }
+
 }

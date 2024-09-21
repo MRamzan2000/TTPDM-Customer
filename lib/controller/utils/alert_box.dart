@@ -1,23 +1,198 @@
 
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/add_campaign_controller.dart';
+import 'package:ttpdm/controller/getx_controllers/get_fcm_token_send_notification_controller.dart';
+import 'package:ttpdm/controller/getx_controllers/image_picker_controller.dart';
 import 'package:ttpdm/controller/getx_controllers/subcription_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
+import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/view/screens/auth_section/login_screen.dart';
 import 'package:ttpdm/view/screens/bottom_navigationbar.dart';
 
+import '../getx_controllers/user_profile_controller.dart';
 import 'my_shared_prefrence.dart';
 
 RxList<String> selectionLst = <String>[].obs;
 final AddCampaignController addCampaignController =
     Get.put(AddCampaignController());
+void openChooseEditProfile(
+    BuildContext context, {
+      required String name,
+      required String token,
+      required String profileImage,
+    }) {
+  final TextEditingController nameController = TextEditingController();
+  final ImagePickerController imagePickerController =
+  Get.put(ImagePickerController());
+  final UserProfileController userProfileController =
+  Get.put(UserProfileController(context: context));
+
+  log(profileImage);
+
+  // Define a function to reset the image picker when the dialog is closed
+  void resetImagePicker() {
+    imagePickerController.image.value = null;
+  }
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 2.h),
+          child: Material(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 2.h, vertical: 2.h),
+              height: 42.h,
+              decoration: BoxDecoration(
+                  color: const Color(0xffF8F9FA),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Expanded(child: SizedBox()),
+                      getHorizentalSpace(5.h),
+                      Text(
+                        'Profile',
+                        style: CustomTextStyles.buttonTextStyle.copyWith(
+                            color: AppColors.blackColor,
+                            fontFamily: 'regular',
+                            fontSize: 20.px),
+                      ),
+                      const Expanded(child: SizedBox()),
+                      getHorizentalSpace(5.h),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop(); // Close dialog
+                          resetImagePicker(); // Reset image picker
+                        },
+                        child: SizedBox(
+                            height: 3.h,
+                            width: 3.h,
+                            child: const Image(
+                                image: AssetImage('assets/pngs/crossicon.png'))),
+                      )
+                    ],
+                  ),
+                  getVerticalSpace(2.h),
+                  Obx(
+                        () => GestureDetector(
+                      onTap: () {
+                        imagePickerController.pickImage(ImageSource.gallery);
+                      },
+                      child: imagePickerController.image.value == null
+                          ? CircleAvatar(
+                        radius: 6.h,
+                        backgroundColor: AppColors.baseColor,
+                        backgroundImage: NetworkImage(profileImage),
+                      )
+                          : CircleAvatar(
+                        radius: 6.h,
+                        backgroundColor: AppColors.baseColor,
+                        backgroundImage: FileImage(File(
+                            imagePickerController.image.value!.path)),
+                      ),
+                    ),
+                  ),
+                  getVerticalSpace(1.3.h),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.h),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Name',
+                        style: TextStyle(
+                            fontSize: 14.px,
+                            fontFamily: 'regular',
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xff454544)),
+                      ),
+                    ),
+                  ),
+                  getVerticalSpace(.8.h),
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5.h),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(3.h),
+                        boxShadow: [
+                          BoxShadow(
+                              color: const Color(0xff000000).withOpacity(0.25),
+                              blurRadius: 8,
+                              spreadRadius: 0,
+                              offset: const Offset(0, 1))
+                        ],
+                        color: AppColors.whiteColor),
+                    child: customTextFormField1(
+                      controller: nameController, // Set the controller
+                      title: name,
+                      bgColor: AppColors.whiteColor,
+                      borderRadius: BorderRadius.circular(3.h),
+                      borderRadius1: BorderRadius.circular(3.h),
+                    ),
+                  ),
+                  getVerticalSpace(2.6.h),
+                  Obx(
+                        () => Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        customElevatedButton(
+                            onTap: () {
+
+                              userProfileController
+                                  .uploadProfileImage(
+                                  token: token,
+                                  profileImage: imagePickerController
+                                      .image.value?.path.isEmpty ?? true
+                                      ? File("")
+                                      : File(imagePickerController
+                                      .image.value!.path),
+                                  fullname: nameController.text.isEmpty?name:nameController.text)
+                                  .then(
+                                    (value) {
+                                  Navigator.of(context).pop(); // Close dialog
+                                },
+                              );
+                            },
+                            title: userProfileController.uploading.value
+                                ? spinkit
+                                : Text(
+                              'Save',
+                              style: CustomTextStyles.buttonTextStyle
+                                  .copyWith(
+                                  color: AppColors.whiteColor,
+                                  fontFamily: 'bold'),
+                            ),
+                            bgColor: AppColors.mainColor,
+                            verticalPadding: .8.h,
+                            horizentalPadding: 6.h),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
 
 void openAlertBox(BuildContext context) {
   showDialog(
@@ -238,8 +413,18 @@ void openCancelAlertBox(BuildContext context) {
   );
 }
 
-void openCampaignPoster(BuildContext context, String token) {
+void openCampaignPoster(BuildContext context,
+{
+ required String token,
+  required String businessId ,
+  required String posterId ,
+  required String currentUserId ,
+  required String currentUserName ,
+}
+    ) {
   final TextEditingController descriptionController = TextEditingController();
+ final GetFcmTokenSendNotificationController getFcmTokenSendNotificationController = Get.put(GetFcmTokenSendNotificationController(context: context));
+
 
   showDialog(
     context: context,
@@ -251,7 +436,7 @@ void openCampaignPoster(BuildContext context, String token) {
             borderRadius: BorderRadius.circular(10),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 2.4.h, vertical: 1.h),
-              height: 35.h,
+              height: 37.h,
               decoration: BoxDecoration(
                   color: const Color(0xffF8F9FA),
                   borderRadius: BorderRadius.circular(10)),
@@ -308,8 +493,17 @@ void openCampaignPoster(BuildContext context, String token) {
                                   context: context,
                                   token: token,
                                   description:
-                                      descriptionController.text.toString(),
-                                );
+                                      descriptionController.text.toString(), businessId:businessId,
+                                ).then((value) {
+                                  getFcmTokenSendNotificationController.fetchFcmToken(
+                                      loading: getFcmTokenSendNotificationController.fcmToken.value==null,
+                                      userId: posterId,
+                                      token: token,
+                                      title: "Request",
+                                      message: "$currentUserName for more design",
+                                      info1: currentUserId,
+                                      info2: "");
+                                },);
                               }
                             },
                             title: addCampaignController.isLoading.value
@@ -350,7 +544,7 @@ void openCampaignFeeAdd(BuildContext context, int coins,
             borderRadius: BorderRadius.circular(10),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 2.h, vertical: 2.h),
-              height: 26.h,
+              height: 29.h,
               decoration: BoxDecoration(
                   color: const Color(0xffF8F9FA),
                   borderRadius: BorderRadius.circular(10)),
@@ -598,7 +792,7 @@ void openCampaignCancel(BuildContext context) {
             borderRadius: BorderRadius.circular(10),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 1.h, vertical: 2.h),
-              height: 30.h,
+              height: 34.h,
               decoration: BoxDecoration(
                   color: const Color(0xffF8F9FA),
                   borderRadius: BorderRadius.circular(10)),
@@ -696,13 +890,12 @@ void openChooseSubscription(BuildContext context,
   final SubscriptionController subscriptionController=Get.put(SubscriptionController());
   final RxInt isSelected = 0.obs;
   RxList<String> titles = <String>["basic", "standard", "pro"].obs;
-  RxList<String> prices = <String>['\$10', '\$25', '\$50'].obs;
   RxList<String> description = <String>[
-    'Add 1 Business only',
-    'Add up to 3 Business only',
-    'Add up to 10 Business only'
+    'Add Business only',
+    'Add up to Business only',
+    'Add up to Business only'
   ].obs;
-
+  subscriptionController.fetchAllPlans(loading: subscriptionController.getAllPlans.isEmpty, context: context);
   showDialog(
     context: context,
     builder: (context) {
@@ -727,66 +920,132 @@ void openChooseSubscription(BuildContext context,
                         .copyWith(color: AppColors.blackColor),
                   ),
                   getVerticalSpace(1.6.h),
-                  Obx(() => ListView.builder(
+                  Obx(() =>subscriptionController.planLoading.value?
+                  ListView.builder(
                         shrinkWrap: true,
                         padding: EdgeInsets.zero,
                         itemCount: titles.length,
                         itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              titles.refresh();
-                              isSelected.value = index;
-
-                            },
-                            child: Container(
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 1.6.h, horizontal: 1.9.h),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12.h, vertical: 1.h),
-                              decoration: BoxDecoration(
-                                  color: AppColors.whiteColor,
-                                  borderRadius: BorderRadius.circular(1.h),
-                                  border: Border.all(
-                                      color: isSelected.value == index
-                                          ? AppColors.mainColor
-                                          : Colors.transparent)),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    titles[index],
-                                    style: TextStyle(
-                                      color: AppColors.mainColor,
-                                      fontSize: 14.px,
-                                      fontFamily: 'bold',
-                                      fontWeight: FontWeight.w400,
-                                    ),
+                          return Container(
+                            margin: EdgeInsets.symmetric(
+                                vertical: 1.6.h, horizontal: 1.9.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.h, vertical: 1.h),
+                            decoration: BoxDecoration(
+                                color: AppColors.whiteColor,
+                                borderRadius: BorderRadius.circular(1.h),
+                                border: Border.all(
+                                    color: isSelected.value == index
+                                        ? AppColors.mainColor
+                                        : Colors.transparent)),
+                            child: Column(
+                              children: [
+                                Text(
+                                 "",
+                                  style: TextStyle(
+                                    color: AppColors.mainColor,
+                                    fontSize: 14.px,
+                                    fontFamily: 'bold',
+                                    fontWeight: FontWeight.w400,
                                   ),
-                                  getVerticalSpace(.9.h),
-                                  Text(
-                                    prices[index],
-                                    style: TextStyle(
-                                      color: const Color(0xff444545),
-                                      fontSize: 16.px,
-                                      fontFamily: 'bold',
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                                ),
+                                getVerticalSpace(.9.h),
+                                Text(
+                                "",
+                                  style: TextStyle(
+                                    color: const Color(0xff444545),
+                                    fontSize: 16.px,
+                                    fontFamily: 'bold',
+                                    fontWeight: FontWeight.w700,
                                   ),
-                                  getVerticalSpace(.4.h),
-                                  Text(
-                                    description[index],
-                                    style: TextStyle(
-                                      color: const Color(0xff444545),
-                                      fontSize: 10.px,
-                                      fontFamily: 'regular',
-                                      fontWeight: FontWeight.w400,
-                                    ),
+                                ),
+                                getVerticalSpace(.4.h),
+                                Text(
+                                "",
+                                  style: TextStyle(
+                                    color: const Color(0xff444545),
+                                    fontSize: 10.px,
+                                    fontFamily: 'regular',
+                                    fontWeight: FontWeight.w400,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           );
                         },
-                      )),
+                      ):
+                  subscriptionController.getAllPlans.isEmpty?
+                  Text(
+                    'No Subscription Available',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'bold',
+                      fontSize: 14.px,
+                      color: AppColors.mainColor,
+                    ),
+                  ):
+                  ListView.builder(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    itemCount: subscriptionController.getAllPlans.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          subscriptionController.getAllPlans.refresh();
+                          titles.refresh();
+                          isSelected.value = index;
+
+                        },
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                              vertical: 1.6.h, horizontal: 1.9.h),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12.h, vertical: 1.h),
+                          decoration: BoxDecoration(
+                              color: AppColors.whiteColor,
+                              borderRadius: BorderRadius.circular(1.h),
+                              border: Border.all(
+                                  color: isSelected.value == index
+                                      ? AppColors.mainColor
+                                      : Colors.transparent)),
+                          child: Column(
+                            children: [
+                              Text(
+                                subscriptionController.getAllPlans[index]!.name,
+                                style: TextStyle(
+                                  color: AppColors.mainColor,
+                                  fontSize: 14.px,
+                                  fontFamily: 'bold',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              getVerticalSpace(.9.h),
+                              Text(
+                                subscriptionController.getAllPlans[index]!.price.toString(),
+                                style: TextStyle(
+                                  color: const Color(0xff444545),
+                                  fontSize: 16.px,
+                                  fontFamily: 'bold',
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              getVerticalSpace(.4.h),
+                              Text(
+                                "${description[index]}${subscriptionController.getAllPlans[index]!.businessLimit}",
+                                style: TextStyle(
+                                  color: const Color(0xff444545),
+                                  fontSize: 10.px,
+                                  fontFamily: 'regular',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                  ),
                   getVerticalSpace(2.4.h),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 1.h),
@@ -813,7 +1072,7 @@ void openChooseSubscription(BuildContext context,
                                 onTap: () {
                                   subscriptionController.chooseSubscriptionPlan(
                                       token: token,
-                                      planType:titles[isSelected.value]
+                                      planType:subscriptionController.getAllPlans[isSelected.value]!.name
                                       , context: context);
 
                                 },
@@ -852,7 +1111,7 @@ void logoutPopUp(BuildContext context) {
             borderRadius: BorderRadius.circular(10),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 2.4.h, vertical: 2.h),
-              height: 33.h,
+              height: 36.h,
               decoration: BoxDecoration(
                   color: const Color(0xffF8F9FA),
                   borderRadius: BorderRadius.circular(10)),
@@ -924,8 +1183,9 @@ void logoutPopUp(BuildContext context) {
                       Expanded(
                         child: customElevatedButton(
                             onTap: () {
-                              PreferencesService().removeLoginStatus();
-                              Get.off(() => LoginScreen());
+                              MySharedPreferences.setBool(isLoggedInKey, false);
+
+                              Get.off(() => const LoginScreen());
                             },
                             title: Text(
                               'Yes',

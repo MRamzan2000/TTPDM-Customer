@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
+import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/view/screens/auth_section/create_new_password.dart';
 import 'package:ttpdm/view/screens/auth_section/login_screen.dart';
 import 'package:ttpdm/view/screens/auth_section/otp_verification.dart';
@@ -13,7 +14,6 @@ import '../../view/screens/bottom_navigationbar.dart';
 class AuthApis {
   final BuildContext context;
   AuthApis({required this.context});
-  final PreferencesService preferencesService = PreferencesService();
   Future<void> signUPApis({
     required String fullName,
     required String email,
@@ -51,7 +51,7 @@ class AuthApis {
             builder: (context) {
               return OtpVerification(
                 email: email,
-                title: 'signUp',
+                title: 'newUser',
               );
             },
           ));
@@ -93,19 +93,31 @@ class AuthApis {
   }
 
   //Login Api hit
-  Future<void> loginApis({required email, required password}) async {
+  Future<void> loginApis({
+    required email,
+    required password,
+    required fcmToken,
+
+  }) async {
     final url = Uri.parse("$baseUrl/$signInEndP");
     final headers = {"Content-Type": "application/json"};
     final body = jsonEncode({
       "email": email,
       "password": password,
+      "fcmToken": fcmToken,
+
+
     });
     Response response = await post(url, headers: headers, body: body);
     if (response.statusCode == 200) {
       final  Map<String, dynamic> responseBody = jsonDecode(response.body);
       log('token is that ${responseBody['token']}');
       if (context.mounted) {
-        preferencesService.setLoginStatus(true,responseBody['token']);
+        MySharedPreferences.setString(authToken,responseBody['token']);
+        MySharedPreferences.setString(userId,responseBody["user"]['_id']);
+        MySharedPreferences.setString(userName,responseBody["user"]['fullname']);
+        MySharedPreferences.setBool(isLoggedInKey, true);
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful')),
         );
@@ -129,8 +141,9 @@ class AuthApis {
       }
     } else {
       if (context.mounted) {
+        Map<String, dynamic> responseBody = jsonDecode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Unexpected status code: ${response.body}')),
+          SnackBar(content: Text(responseBody["message"])),
         );
       }
     }
@@ -184,6 +197,7 @@ class AuthApis {
   Future<void> verifyOtp({
     required email,
     required otp,
+    required title,
 
   }) async {
     final url = Uri.parse("$baseUrl/$verifyOtpEp");
@@ -202,15 +216,23 @@ class AuthApis {
 
       }
       Map<String,dynamic>responseBody=jsonDecode(response.body);
-      preferencesService.setAuthToken(responseBody['token']);
-      if (context.mounted) {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            return  CreateNewPassword(
-
-            );
-          },
-        ));
+      MySharedPreferences.setString(authToken,responseBody['token']);
+      if(title=="newUser"){
+        if (context.mounted) {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) {
+              return   const LoginScreen();
+            },
+          ));
+        }
+      }else{
+        if (context.mounted) {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) {
+              return  const CreateNewPassword();
+            },
+          ));
+        }
       }
     } else if (response.statusCode == 400) {
       if (context.mounted) {

@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
@@ -96,7 +98,7 @@ Widget customTextFormField({
 
       prefixIcon: prefixIcons,
       focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: focusBorderColor ?? Colors.transparent),
+        borderSide: BorderSide(color: focusBorderColor ?? AppColors.mainColor),
         borderRadius: BorderRadius.circular(1.h),
       ),
       enabledBorder: OutlineInputBorder(
@@ -113,3 +115,50 @@ Widget customTextFormField({
     ),
   );
 }
+Widget customTextFormField1({
+  String? title,
+  TextEditingController? controller,
+  TextInputType? keyboardType,
+  int? maxLines = 1, // Set default to 1 for single-line input
+  String? errorText,
+  Color? focusBorderColor,
+  Color? bgColor,
+  Color? borderColor,
+  BorderRadius? borderRadius,
+  BorderRadius? borderRadius1,
+}) {
+  return TextFormField(
+    maxLines: maxLines,
+    keyboardType: keyboardType,
+    controller: controller,
+    decoration: InputDecoration(
+      hintText: title,
+      hintStyle: CustomTextStyles.hintTextStyle,
+      isCollapsed: true,
+      labelText: errorText,
+      labelStyle: TextStyle(
+        fontSize: 15.sp,
+        color: const Color(0xff808080),
+        fontWeight: FontWeight.w400,
+        fontFamily: 'regular',
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: focusBorderColor ?? Colors.transparent),
+        borderRadius: borderRadius1 ?? BorderRadius.circular(1.h),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: borderColor ?? Colors.transparent),
+        borderRadius: borderRadius ?? BorderRadius.circular(1.h),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: borderRadius ?? BorderRadius.circular(1.h),
+        borderSide: const BorderSide(color: Colors.transparent),
+      ),
+      filled: true,
+      fillColor: bgColor ?? AppColors.textFieldGreyColor,
+      contentPadding: EdgeInsets.symmetric(horizontal: 1.6.h, vertical: 1.h),
+    ),
+  );
+}
+
+

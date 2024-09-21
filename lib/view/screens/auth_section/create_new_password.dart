@@ -9,6 +9,7 @@ import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/create_new_password_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
+import 'package:ttpdm/controller/utils/preference_key.dart';
 
 class CreateNewPassword extends StatefulWidget {
   const CreateNewPassword({
@@ -21,26 +22,17 @@ class CreateNewPassword extends StatefulWidget {
 
 class _CreateNewPasswordState extends State<CreateNewPassword> {
   late CreateNewPasswordController createNewPasswordController;
-  RxString isLoggedInValue = "".obs;
-  Future<void> checkLoginStatus() async {
-    PreferencesService preferencesService = PreferencesService();
-    String? isLoggedIn = await preferencesService.getAuthToken();
-    isLoggedInValue.value = isLoggedIn!;
-  }
+
 
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+  RxString token="".obs;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    checkLoginStatus().then(
-      (value) {
-        log("token is that :${isLoggedInValue.value}");
-      },
-    );
     createNewPasswordController = Get.put(CreateNewPasswordController(context));
+   token.value=MySharedPreferences.getString(authToken);
   }
 
   @override
@@ -122,17 +114,17 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                                 const SnackBar(
                                     content: Text('password and confirmPassword should be same')),
                               );
-                            } else if (isLoggedInValue.value.isEmpty) {
+                            } else if (token.value.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                     content: Text('AuthToken is empty')),
                               );
                             }  else {
-                              log("token ${isLoggedInValue.value}");
+                              log("token ${token.value}");
                             createNewPasswordController.createNewPassword(
                                 newPassword: passwordController.text,
                                 confirmPassword: confirmPasswordController.text,
-                                userId:isLoggedInValue.value );
+                                userId:token.value );
                             }
                           },
                           bgColor: AppColors.mainColor,

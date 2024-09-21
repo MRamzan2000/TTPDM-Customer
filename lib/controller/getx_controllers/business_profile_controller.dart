@@ -5,24 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ttpdm/controller/apis_services/business_apis.dart';
 import 'package:ttpdm/models/getbusiness_profile_model.dart';
-import 'package:ttpdm/view/screens/bottom_navigationbar.dart';
-
-import '../utils/my_shared_prefrence.dart';
 
 class BusinessProfileController extends GetxController {
   final BuildContext context;
   BusinessProfileController({required this.context});
   final RxBool isLoading2 = false.obs;
   final RxBool isLoading1 = false.obs;
-  //onInit Method
-  @override
-  Future<void> onInit() async {
-    log("this is token ${PreferencesService.keyToken}");
-    super.onInit();
-    await PreferencesService().getAuthToken();
-  }
 
-//Business Profile Api Method
   Future<void> submitBusinessProfile(
       {required String name,
       required String phone,
@@ -36,7 +25,8 @@ class BusinessProfileController extends GetxController {
       required String tiktokUrl,
       required File logo,
       required List<File> gallery,
-      required String token, // Corrected list<File> to List<File>}
+      required String token,
+      required String fullname,
       required BuildContext context}) async {
     try {
       isLoading1.value = true;
@@ -55,7 +45,7 @@ class BusinessProfileController extends GetxController {
         logo: logo,
         tiktokUrl: tiktokUrl,
         token: token,
-        context: context,
+        context: context, fullname: fullname,
       )
           .then(
         (value) {
@@ -65,42 +55,52 @@ class BusinessProfileController extends GetxController {
     } catch (e) {
       log("Unexpected error Occurred :${e.toString()}");
       isLoading1.value = false;
-
-      // if (context.mounted) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //       SnackBar(content: Text('Something went wrong ${e.toString()}')));
-      // }
     }
   }
 
-  RxList <Business?> businessProfiles = <Business>[].obs;
+  RxList<Business?> allBusinessProfiles = <Business>[].obs;
+  RxList<Business?> approvedProfiles = <Business>[].obs;
+  RxList<Business?> rejectedProfiles = <Business>[].obs;
+  RxList<Business?> pendingProfiles = <Business>[].obs;
 
-//Business Profile get Method
-  Future<void> fetchBusiness(
-      {
-        required String token, 
-        required bool loading,
-        required BuildContext context
-      }) async {
+  Future<void> fetchBusiness({
+    required String token,
+    required bool loading,
+    required BuildContext context,
+  }) async {
     isLoading2.value = loading;
     final data =
         await BusinessApis().getBusinessProfile(context: context, token: token);
     if (data != null) {
-      businessProfiles.value = data.businesses;
+      allBusinessProfiles.value = data.businesses;
+      categorizeProfiles();
       isLoading2.value = false;
     }
   }
 
+  void categorizeProfiles() {
+    approvedProfiles.value = allBusinessProfiles
+        .where((profile) => profile?.status == 'accepted')
+        .toList();
+    rejectedProfiles.value = allBusinessProfiles
+        .where((profile) => profile?.status == 'rejected')
+        .toList();
+    pendingProfiles.value = allBusinessProfiles
+        .where((profile) => profile?.status == 'pending')
+        .toList();
+  }
+
   //Delete Business profile
-  Future<void> deleteBusiness(
-      {required String token,
-      required BuildContext context,
-      required String businessId,
-      }) async {
+  Future<void> deleteBusiness({
+    required String token,
+    required BuildContext context,
+    required String businessId,
+  }) async {
     try {
       isLoading1.value = true;
       await BusinessApis()
-          .deleteBusinessProfile(businessId: businessId, context: context, token: token)
+          .deleteBusinessProfile(
+              businessId: businessId, context: context, token: token)
           .then(
             (value) => isLoading1.value = false,
           );
@@ -112,22 +112,21 @@ class BusinessProfileController extends GetxController {
 
   //edit business Profile
   Future<void> editBusinessProfile(
-      {
-        required String businessId,
-        required String name,
-        required String phone,
-        required String location,
-        required String targetMapArea,
-        required String description,
-        required String websiteUrl,
-        required String facebookUrl,
-        required String instagramUrl,
-        required String linkedinUrl,
-        required String tiktokUrl,
-        required String logo,
-        required List<String> gallery,
-        required String token, // Corrected list<File> to List<File>}
-        required BuildContext context}) async {
+      {required String businessId,
+      required String name,
+      required String phone,
+      required String location,
+      required String targetMapArea,
+      required String description,
+      required String websiteUrl,
+      required String facebookUrl,
+      required String instagramUrl,
+      required String linkedinUrl,
+      required String tiktokUrl,
+      required String logo,
+      required List<String> gallery,
+      required String token, // Corrected list<File> to List<File>}
+      required BuildContext context}) async {
     try {
       isLoading1.value = true;
       await BusinessApis()
@@ -146,10 +145,11 @@ class BusinessProfileController extends GetxController {
         logo: logo,
         tiktokUrl: tiktokUrl,
         token: token,
-        context: context, removeGallery: gallery,
+        context: context,
+        removeGallery: gallery,
       )
           .then(
-            (value) {
+        (value) {
           return isLoading1.value = false;
         },
       );

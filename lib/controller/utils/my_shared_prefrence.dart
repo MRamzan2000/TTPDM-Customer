@@ -1,59 +1,70 @@
+import 'dart:convert';
 import 'dart:developer';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PreferencesService {
-  static const String keyIsLoggedIn = 'is_logged_in';
-  static const String keyToken = 'auth_token';
-  static const String deviceToken = 'device_Token';
-  String? cachedToken;
+class MySharedPreferences {
+  static late SharedPreferences _preferences;
 
-  /// Saves the login status and auth token to shared preferences.
-  Future<void> setLoginStatus(bool isLoggedIn, String token) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyIsLoggedIn, isLoggedIn);
-    await setAuthToken(token);
+  static Future<void> init() async {
+    _preferences = await SharedPreferences.getInstance();
   }
 
-  /// Retrieves the login status from shared preferences.
-  Future<bool> isLoggedIn() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyIsLoggedIn) ?? false;
+  static Future<void> reload() async {
+    _preferences.reload();
   }
 
-  /// Stores the auth token.
-  Future<void> setAuthToken(String token) async {
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString(keyToken, token);
-    } catch (e) {
-      log('Something went wrong: ${e.toString()}');
+  static containKey(String key) {
+    return _preferences.containsKey(key);
+  }
+
+  static setString(String key, String value) {
+    return _preferences.setString(key, value);
+  }
+
+  static String getString(String key) {
+    return _preferences.getString(key) ?? "";
+  }
+
+  static setBool(String key, bool value) {
+    return _preferences.setBool(key, value);
+  }
+
+  static bool getBool(String key) {
+    return _preferences.getBool(key) ?? false;
+  }
+
+  static removeKey(String key) {
+    return _preferences.remove(key) ;
+  }
+  Future<void> saveNotification(RemoteMessage message) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> notifications = prefs.getStringList('notifications') ?? [];
+
+    String receivedTime = DateTime.now().toIso8601String();
+
+    // Create a properly formatted notification JSON string
+    String notificationJson = '''
+    {
+      "title": "${message.notification?.title}",
+      "body": "${message.notification?.body}",
+      "data": ${json.encode(message.data)},  
+      "receivedTime": "$receivedTime"
     }
-  }
-  /// Stores the auth token.
-  Future<void> setDeviceToken(String deviceToken) async {
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString(deviceToken, deviceToken);
-      cachedToken = deviceToken; // Cache the token
-    } catch (e) {
-      log('Something went wrong: ${e.toString()}');
-    }
-  }
-  Future<String?> getAuthToken() async {
-    if (cachedToken != null) {
-      return cachedToken;
-    }
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    cachedToken = prefs.getString(keyToken);
-    log("token is $cachedToken");
-    return cachedToken;
+  ''';
+
+    notifications.add(notificationJson);
+    await prefs.setStringList('notifications', notifications);
   }
 
-  /// Removes the login status from shared preferences.
-  Future<void> removeLoginStatus() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove(keyIsLoggedIn);
-    // Optionally, clear the cached token when logging out
-    cachedToken = null;
+  List<String> notifications=[];
+  Future<List<Map<String, dynamic>>> getSavedNotifications() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    notifications= prefs.getStringList('notifications') ?? [];
+    log("notifications length:${notifications.length}");
+    return notifications.map((notification) {
+      return json.decode(notification) as Map<String, dynamic>; // Explicitly cast
+    }).toList();
   }
 }

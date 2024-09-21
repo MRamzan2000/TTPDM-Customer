@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "871329247685",
-    "project_id": "advyro",
-    "storage_bucket": "advyro.appspot.com"
+    "project_number": "591801525051",
+    "project_id": "advyro-33ad7",
+    "storage_bucket": "advyro-33ad7.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:871329247685:android:b46df5a4df8accd3331bac",
+        "mobilesdk_app_id": "1:591801525051:android:3e359c0c1e7981e48e0d1e",
         "android_client_info": {
           "package_name": "com.example.ttpdm"
         }
@@ -15,7 +15,26 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDSvvxuhHWn-4SP3cX8eBHH9SWVANut8No"
+          "current_key": "AIzaSyBRPyKfVW11jhrY8bvdMQmqrC2UJpEAV1Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591801525051:android:63a122330b351ca18e0d1e",
+        "android_client_info": {
+          "package_name": "com.example.ttpdm_admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRPyKfVW11jhrY8bvdMQmqrC2UJpEAV1Y"
         }
       ],
       "services": {
