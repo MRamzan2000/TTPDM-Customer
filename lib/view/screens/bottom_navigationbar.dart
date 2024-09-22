@@ -12,7 +12,7 @@ import 'package:ttpdm/view/screens/campaign_section/addcampaign.dart';
 import 'package:ttpdm/view/screens/home_section/home_screen.dart';
 import 'package:ttpdm/view/screens/notification_section/notification_screen.dart';
 import 'package:ttpdm/view/screens/profile_section/personal_profile.dart';
-import 'package:ttpdm/view/screens/subscription_main.dart';
+import 'package:ttpdm/view/screens/wallet.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   const CustomBottomNavigationBar({super.key});

@@ -36,7 +36,6 @@ class PosterController extends GetxController {
     }
   }
 
-
 //like poster
   Future<void> likeCampaignPoster({
     required String designId,
@@ -53,6 +52,7 @@ class PosterController extends GetxController {
       }
     }
   }
+
 //like poster
   Future<void> dislikeCampaignPoster({
     required String designId,
@@ -62,6 +62,33 @@ class PosterController extends GetxController {
       await PosterApis(context: context)
           .dislikeDesignApi(designId: designId, token: token);
     } catch (e) {
+      log("unexpected error occurred :${e.toString()}");
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("unexpected error occurred :${e.toString()}")));
+      }
+    }
+  }
+
+  //Edit Design Request
+  RxBool editLoading = false.obs;
+  Future<void> editDesign({
+    required String designId,
+    required String businessId,
+    required String comment,
+  }) async {
+    try {
+      editLoading.value = true;
+      await PosterApis(context: context)
+          .editPosterRequestApi(
+              designId: designId, businessId: businessId, comment: comment)
+          .then(
+        (value) {
+          editLoading.value = false;
+        },
+      );
+    } catch (e) {
+      editLoading.value = false;
       log("unexpected error occurred :${e.toString()}");
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

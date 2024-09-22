@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
+import 'package:get/get.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:ttpdm/view/screens/auth_section/register_screen.dart';
 
 import '../../models/get_user_profile_model.dart';
 import '../utils/apis_constant.dart';
@@ -13,7 +14,6 @@ import '../utils/apis_constant.dart';
 class UserProfileApi {
   final BuildContext context;
   UserProfileApi({required this.context});
-  //get User Profile
   Future<GetUserProfileModel?> getUserProfile({required String id}) async {
     final headers = {'Content-Type': 'application/json'};
     final url = Uri.parse("$baseUrl/$getUserProfileEp/$id");
@@ -37,40 +37,28 @@ class UserProfileApi {
       return null;
     }
   }
-  //Update Profile
-
   Future<void> updateProfile({
     required String token,
     required File profileImage, // Expecting a File object for image
     required String fullname,
   }) async {
     final url = Uri.parse('$baseUrl/$updateUserProfileEp');
-
-    // Prepare multipart request
     var request = http.MultipartRequest('POST', url)
       ..headers.addAll({
         'Authorization': 'Bearer $token',
       });
-
-    // Add profile image to request
-    if (profileImage != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'profilePic',
-          profileImage.path,
-          contentType:
-              MediaType('image', 'jpeg'), // Adjust if using other image formats
-        ),
-      );
-    }
-
-    // Add other fields
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'profilePic',
+        profileImage.path,
+        contentType:
+            MediaType('image', 'jpeg'), // Adjust if using other image formats
+      ),
+    );
     request.fields['fullname'] = fullname;
 
     try {
-      // Send request and get response
       var response = await request.send();
-
       final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
@@ -78,25 +66,59 @@ class UserProfileApi {
         log('Decoded JSON: $jsonResponse');
 
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
-        );
+       if(context.mounted){
+         ScaffoldMessenger.of(context).showSnackBar(
+           const SnackBar(content: Text('Profile updated successfully!')),
+         );
+       }
       } else {
         log('Failed to update profile. Status code: ${response.statusCode}');
 
         // Show failure message
+      if(context.mounted){
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to update profile.')),
         );
+      }
       }
     } catch (e) {
       log('Exception: $e');
 
       // Show error message
+     if(context.mounted){
+       ScaffoldMessenger.of(context).showSnackBar(
+         const SnackBar(
+             content: Text('An error occurred while updating profile.')),
+       );
+     }
+    }
+  }
+
+  //Delete user APi
+  Future<void> deleteUserAccountMethod({required String token}) async {
+    final url = Uri.parse("$baseUrl/$deleteUserProfileEp");
+    final headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    };
+    http.Response response = await http.delete(
+      url,
+      headers: headers,
+    );
+    if (response.statusCode == 200) {
+    if(context.mounted){
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('An error occurred while updating profile.')),
+        const SnackBar(content: Text('User Account Deleted Successfully')),
       );
+      Get.to(()=>RegisterScreen());
+    }
+    } else {
+      Map<String, dynamic> responseBody = jsonDecode(response.body);
+    if(context.mounted){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(responseBody["message"])),
+      );
+    }
     }
   }
 }

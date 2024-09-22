@@ -116,6 +116,7 @@ class AuthApis {
         MySharedPreferences.setString(authToken,responseBody['token']);
         MySharedPreferences.setString(userId,responseBody["user"]['_id']);
         MySharedPreferences.setString(userName,responseBody["user"]['fullname']);
+        MySharedPreferences.setString(subscription,responseBody["user"]['subscription']["expiryDate"]);
         MySharedPreferences.setBool(isLoggedInKey, true);
 
         ScaffoldMessenger.of(context).showSnackBar(

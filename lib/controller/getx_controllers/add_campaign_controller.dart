@@ -177,6 +177,8 @@ class AddCampaignController extends GetxController {
 
   //AddCampaign Api call methods
   RxBool isLoading = true.obs;
+  RxBool addCampaignLoading = false.obs;
+
 
   Future<void> submitCampaign(
       {required String businessId,
@@ -192,7 +194,7 @@ class AddCampaignController extends GetxController {
       required BuildContext context // Corrected list<File> to List<File>}
       }) async {
     try {
-      isLoading.value = true;
+      addCampaignLoading.value = true;
       await AddCampaignApis()
           .addCampaignApi(
               businessId: businessId,
@@ -208,7 +210,7 @@ class AddCampaignController extends GetxController {
               adBannerUrl: adBanner)
           .then(
         (value) {
-          return isLoading.value = false;
+          return addCampaignLoading.value = false;
         },
       );
     } catch (e) {
@@ -217,7 +219,7 @@ class AddCampaignController extends GetxController {
             SnackBar(content: Text('Something went wrong ${e.toString()}')));
         log("un expected error ${e.toString()}");
       }
-      isLoading.value = false;
+      addCampaignLoading.value = false;
     }
   }
 
@@ -259,6 +261,7 @@ class AddCampaignController extends GetxController {
   }
 
   //RequestMoreDesign
+  RxBool requestLoading=false.obs;
   Future<void> requestForMoreDesign({
     required BuildContext context,
     required String token,
@@ -266,7 +269,7 @@ class AddCampaignController extends GetxController {
     required String businessId,
   }) async {
     try {
-      isLoading.value = true;
+      requestLoading.value = true;
 
       AddCampaignApis()
           .getDesignRequest(
@@ -275,7 +278,7 @@ class AddCampaignController extends GetxController {
           )
           .then(
         (value) {
-          return isLoading.value = false;
+          return requestLoading.value = false;
         },
       );
     } catch (e) {
@@ -304,6 +307,8 @@ class AddCampaignController extends GetxController {
           : status == "pending"
               ? pendingCampaigns.value = data
               : rejectedCampaigns.value = data;
+      isLoading.value = false;
+    }else{
       isLoading.value = false;
     }
   }

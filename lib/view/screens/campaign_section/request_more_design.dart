@@ -10,8 +10,8 @@ import 'package:ttpdm/controller/utils/preference_key.dart';
 
 class RequestMoreDesign extends StatefulWidget {
 final  String businessId ;
-final  String posterId ;
-   const RequestMoreDesign({super.key,required this.businessId, required this.posterId});
+final  String postId ;
+   const RequestMoreDesign({super.key,required this.businessId, required this.postId,});
 
   @override
   State<RequestMoreDesign> createState() => _RequestMoreDesignState();
@@ -67,8 +67,7 @@ class _RequestMoreDesignState extends State<RequestMoreDesign> {
               onTap: () {
                 openCampaignPoster(context,
                   token:   token.value,
-                posterId:widget.posterId ,
-                 businessId: widget.businessId, currentUserId: currentUserId.value, currentUserName: currentUserName.value);
+                 businessId: widget.businessId, currentUserId: currentUserId.value, currentUserName: currentUserName.value, posterId:widget. postId, );
               },
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 4.h, vertical: 1.2.h),

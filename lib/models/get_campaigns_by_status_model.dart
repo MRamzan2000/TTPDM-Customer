@@ -60,7 +60,12 @@ class Campaign {
     dateSchedule: DateSchedule.fromJson(json["dateSchedule"]),
     id: json["_id"],
     adBanner: json["adBanner"],
-    business: Business.fromJson(json["business"]),
+    business: Business.fromJson(json["business"] ?? {
+      "_id": "12345",
+      "name": "Tech Innovations",
+      "location": "Silicon Valley, CA"
+    }
+    ),
     adsName: json["adsName"],
     campaignDesc: json["campaignDesc"],
     campaignPlatforms: List<String>.from(json["campaignPlatforms"].map((x) => x)),

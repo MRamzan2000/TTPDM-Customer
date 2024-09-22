@@ -7,9 +7,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/add_campaign_controller.dart';
+import 'package:ttpdm/controller/getx_controllers/get_stripe_key_controller.dart';
 import 'package:ttpdm/controller/getx_controllers/subcription_controller.dart';
-import 'package:ttpdm/controller/utils/apis_constant.dart';
-import 'package:ttpdm/view/screens/bottom_navigationbar.dart';
+import 'package:ttpdm/controller/utils/alert_box.dart';
 
 import '../../../controller/custom_widgets/app_colors.dart';
 
@@ -25,6 +25,7 @@ class CampaignDetails extends StatefulWidget {
   final String startTime;
   final String endTime;
   final String token;
+  final int numberOfPlatforms;
   const CampaignDetails(
       {super.key,
       required this.businessId,
@@ -37,6 +38,7 @@ class CampaignDetails extends StatefulWidget {
       required this.startTime,
       required this.endTime,
       required this.businessName,
+      required this.numberOfPlatforms,
       required this.token});
 
   @override
@@ -48,13 +50,43 @@ class _CampaignDetailsState extends State<CampaignDetails> {
       Get.put(AddCampaignController());
   final SubscriptionController subscriptionController =
       Get.put(SubscriptionController());
-
+  double socialFee = 0.5;
+  int dayFee = 3;
+  int hourFee = 1;
+  double? totalFee;
+  late GetStripeKeyController getStripeKeyController;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    subscriptionController.fetchAllCoins(token: widget.token, context: context);
-    log("Coins :${subscriptionController.allCoins}");
+    getStripeKeyController=Get.put(GetStripeKeyController(context: context));
+    getStripeKeyController.fetchStripeKey(loading: true).then((_) {
+      getStripeKeyController.keyLoading.value = false; // Update loading state
+    });
+    feeCalculation();
+  }
+
+  void feeCalculation() {
+    DateTime startDate = DateTime.parse(widget.startDate);
+    DateTime endDate = DateTime.parse(widget.endDate);
+    final difference = endDate.difference(startDate);
+    int totalDays = difference.inDays;
+    DateTime dateForTime = startDate; // Use startDate or another valid date
+    DateTime startTime = DateTime.parse('${dateForTime.toIso8601String().split("T")[0]} ${widget.startTime}'); // E.g., "2024-05-25 09:00"
+    DateTime endTime = DateTime.parse('${dateForTime.toIso8601String().split("T")[0]} ${widget.endTime}'); // E.g., "2024-05-25 17:30"
+    Duration hours = endTime.difference(startTime);
+    int numberOfHours = hours.inHours;
+    totalFee = (socialFee * widget.numberOfPlatforms) +
+        (dayFee * totalDays) +
+        (hourFee * numberOfHours) ;
+
+    log("platform:${widget.campaignPlatForms}");
+    log("totalDays:$totalDays");
+    log("numberOfHours:$numberOfHours");
+    // Round off total fee to 2 decimal places
+    totalFee = double.parse(totalFee!.toStringAsFixed(2));
+
+    // Debug output
+    log('Total fee: $totalFee');
   }
 
   @override
@@ -342,13 +374,8 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                         color: const Color(0xff191918)),
                   ),
                   const Expanded(child: SizedBox()),
-                  SizedBox(
-                      height: 2.h,
-                      width: 2.h,
-                      child: const Image(
-                          image: AssetImage('assets/pngs/coins.png'))),
                   Text(
-                    '1200',
+                    "\$${totalFee.toString()}",
                     style: TextStyle(
                         fontSize: 14.px,
                         fontFamily: 'bold',
@@ -358,83 +385,42 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                 ],
               ),
               getVerticalSpace(4.3.h),
-              Obx(() =>
-                 Row(mainAxisAlignment: MainAxisAlignment.center,
-                   children: [
-                     customElevatedButton(
-                         onTap: () {
-                           addCampaignController.submitCampaign(
-                               businessId: widget.businessId,
-                               adsName: widget.campaignName,
-                               campaignDesc: widget.campaignDescription,
-                               campaignPlatforms: widget.campaignPlatForms,
-                               startDate: widget.startDate,
-                               endDate: widget.endDate,
-                               startTime: widget.startTime,
-                               endTime: widget.endTime,
-                               adBanner: widget.selectedPoster.path,
-                               token: widget.token,
-                               context: context).then((value) {
-                                 Get.to(()=>const CustomBottomNavigationBar());
-                               },);
-                           // if (subscriptionController.allCoins < 1200) {
-                           //   openCampaignFeeAdd(
-                           //     context,
-                           //     subscriptionController.allCoins.value,
-                           //         () {
-                           //       Get.to(() => Subscription(
-                           //         token: widget.token,
-                           //       ));
-                           //     },
-                           //   );
-                           //
-                           // }
-                           // else {
-                           //
-                           //   openCampaignSubmit(context, () {
-                           //     if (widget.token.isEmpty) {
-                           //       ScaffoldMessenger.of(context).showSnackBar(
-                           //           const SnackBar(
-                           //               content: Text('device token is empty')));
-                           //     } else {
-                           //       addCampaignController
-                           //           .campaignFeeSubmit(
-                           //           context: context, token: widget.token)
-                           //           .then(
-                           //             (value) {
-                           //           addCampaignController.submitCampaign(
-                           //               businessId: widget.businessId,
-                           //               adsName: widget.campaignName,
-                           //               campaignDesc: widget.campaignDescription,
-                           //               campaignPlatforms: widget.campaignPlatForms,
-                           //               startDate: widget.startDate,
-                           //               endDate: widget.endDate,
-                           //               startTime: widget.startTime,
-                           //               endTime: widget.endTime,
-                           //               adBanner: widget.selectedPoster.path,
-                           //               token: widget.token,
-                           //               context: context);
-                           //         },
-                           //       );
-                           //     }
-                           //   },
-                           //       subscriptionController.allCoins.value);
-                           // }
-                         },
-                         title: addCampaignController.isLoading.value
-                             ? spinkit
-                             : Text(
-                                 'Submit',
-                                 style: CustomTextStyles.buttonTextStyle
-                                     .copyWith(color: AppColors.whiteColor),
-                               ),
-                         bgColor: AppColors.mainColor,
-                         titleColor: AppColors.whiteColor,
-                         horizentalPadding: 5.h,
-                         verticalPadding: .8.h),
-                   ],
-                 ),
-              ),
+               Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    customElevatedButton(
+                        onTap: () {
+                          if (totalFee != null) {
+                            openCampaignSubmit(
+                                context ,totalFee!,
+                              campaignName: widget .campaignName,
+                              campaignDescription:widget . campaignDescription,
+                              businessId:widget .businessId ,
+                              selectedPoster:widget .selectedPoster ,
+                              campaignPlatForms:widget.campaignPlatForms,
+                              startDate:addCampaignController.startFormatDate.value ,
+                              endDate: addCampaignController.endFormatDate.value ,
+                              startTime:widget .startTime ,
+                              endTime: widget.endTime,
+                              businessName: widget.businessName,
+                              token: widget .token, clientSecretKey:getStripeKeyController.stripeKey.value!.secretKey.toString(),
+                            );
+                          }
+
+                        },
+                        title:
+                            Text(
+                                'Submit',
+                                style: CustomTextStyles.buttonTextStyle
+                                    .copyWith(color: AppColors.whiteColor),
+                              ),
+                        bgColor: AppColors.mainColor,
+                        titleColor: AppColors.whiteColor,
+                        horizentalPadding: 5.h,
+                        verticalPadding: .8.h),
+                  ],
+                ),
+
               getVerticalSpace(3.h),
             ]),
           ),

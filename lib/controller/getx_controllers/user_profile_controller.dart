@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import '../../models/get_user_profile_model.dart';
 import '../apis_services/user_profile_api.dart';
 
-
 class UserProfileController extends GetxController {
   final BuildContext context;
   UserProfileController({required this.context});
@@ -32,7 +31,6 @@ class UserProfileController extends GetxController {
         userProfile.value = null;
       }
       isLoading.value = false;
-
     } catch (e) {
       log("Exception during fetch: $e");
       if (context.mounted) {
@@ -42,7 +40,6 @@ class UserProfileController extends GetxController {
       }
       userProfile.value = null;
       isLoading.value = false;
-
     } finally {
       isLoading.value = false;
     }
@@ -70,9 +67,24 @@ class UserProfileController extends GetxController {
       );
     } catch (e) {
       log("Unexpected error occurred :${e.toString()}");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("unexpected error occurred :${e.toString()}")));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("unexpected error occurred :${e.toString()}")));
+      }
       uploading.value = false;
+    }
+  }
+
+  //Delete user Account
+  Future<void> deleteUserAccount({required String token}) async {
+    try {
+      await UserProfileApi(context: context)
+          .deleteUserAccountMethod(token: token);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("unexpected error occurred :${e.toString()}")));
+      }
     }
   }
 }

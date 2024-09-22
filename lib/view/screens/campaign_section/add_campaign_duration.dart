@@ -466,8 +466,8 @@ class AddCampaignDuration extends StatelessWidget {
                               values.end.toInt() - 8 * 60 * 60 * 1000);
                           endTime.value = DateTime.fromMillisecondsSinceEpoch(
                               values.end.toInt());
-                          print('Start Time: ${DateFormat('HH:mm').format(startTime.value)}');
-                          print('End Time: ${DateFormat('HH:mm').format(endTime.value)}');
+                          log('Start Time: ${DateFormat('HH:mm').format(startTime.value)}');
+                          log('End Time: ${DateFormat('HH:mm').format(endTime.value)}');
 
                         }
                       },
@@ -510,7 +510,7 @@ class AddCampaignDuration extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('please select campaign end time')));
 
                   }else{
-                    Get.to(() =>  CampaignDetails(
+                    Get.to(() =>CampaignDetails(
                       campaignName: campaignName,
                       campaignDescription: campaignDescription,
                       businessId:businessId ,
@@ -520,7 +520,7 @@ class AddCampaignDuration extends StatelessWidget {
                       endDate: addCampaignController.endFormatDate.value ,
                       startTime:DateFormat('HH:mm').format(startTime.value) ,
                       endTime: DateFormat('HH:mm').format(endTime.value), businessName: businessName,
-                      token: token,
+                      token: token, numberOfPlatforms: selectionLst.length,
                     ));
                   }
 

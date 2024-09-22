@@ -131,7 +131,14 @@ class BusinessApis {
     };
     try {
       final response = await http.get(url, headers: headers);
+      log("Before this is body :${response.body}");
+      log("Before this is statusCode :${response.statusCode}");
+
       if (response.statusCode == 200) {
+        Map<String ,dynamic>responseBody=jsonDecode(response.body);
+        log("this is body :$responseBody");
+        log("this is body :${response.body}");
+        log("Businesses :${GetBusinessProfileModel.fromJson(jsonDecode(response.body))}");
         return GetBusinessProfileModel.fromJson(jsonDecode(response.body));
       } else {
         log('Error fetching business profiles: ${response.body}');

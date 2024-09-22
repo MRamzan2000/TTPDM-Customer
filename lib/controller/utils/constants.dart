@@ -1,0 +1,1 @@
+const String placeHolderImage="https://firebasestorage.googleapis.com/v0/b/advyro-33ad7.appspot.com/o/ttpdm_logo_white.png?alt=media&token=1404541c-fa65-4afb-a31e-d52dcee0a43f";

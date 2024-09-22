@@ -1,9 +1,8 @@
-// To parse this JSON data, do
-//
-//     final getUserProfileModel = getUserProfileModelFromJson(jsonString);
 
-import 'package:meta/meta.dart';
+
 import 'dart:convert';
+
+import 'package:ttpdm/controller/utils/constants.dart';
 
 GetUserProfileModel getUserProfileModelFromJson(String str) => GetUserProfileModel.fromJson(json.decode(str));
 
@@ -74,7 +73,7 @@ class GetUserProfileModel {
   factory GetUserProfileModel.fromJson(Map<String, dynamic> json) => GetUserProfileModel(
     subscription: Subscription.fromJson(json["subscription"]),
     permissions: Permissions.fromJson(json["permissions"]),
-    profilePic: json["profilePic"],
+    profilePic: json["profilePic"]??placeHolderImage,
     fcmToken: json["fcmToken"],
     id: json["_id"],
     fullname: json["fullname"],

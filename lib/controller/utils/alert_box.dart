@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 import 'dart:io';
 
@@ -8,15 +7,20 @@ import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
+import 'package:ttpdm/controller/extensions.dart';
 import 'package:ttpdm/controller/getx_controllers/add_campaign_controller.dart';
+import 'package:ttpdm/controller/getx_controllers/add_card_controller.dart';
 import 'package:ttpdm/controller/getx_controllers/get_fcm_token_send_notification_controller.dart';
 import 'package:ttpdm/controller/getx_controllers/image_picker_controller.dart';
+import 'package:ttpdm/controller/getx_controllers/poster_controller.dart';
 import 'package:ttpdm/controller/getx_controllers/subcription_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
+import 'package:ttpdm/controller/utils/stripe_method.dart';
 import 'package:ttpdm/view/screens/auth_section/login_screen.dart';
 import 'package:ttpdm/view/screens/bottom_navigationbar.dart';
 
@@ -26,21 +30,21 @@ import 'my_shared_prefrence.dart';
 RxList<String> selectionLst = <String>[].obs;
 final AddCampaignController addCampaignController =
     Get.put(AddCampaignController());
+
 void openChooseEditProfile(
-    BuildContext context, {
-      required String name,
-      required String token,
-      required String profileImage,
-    }) {
+  BuildContext context, {
+  required String name,
+  required String token,
+  required String profileImage,
+}) {
   final TextEditingController nameController = TextEditingController();
   final ImagePickerController imagePickerController =
-  Get.put(ImagePickerController());
+      Get.put(ImagePickerController());
   final UserProfileController userProfileController =
-  Get.put(UserProfileController(context: context));
+      Get.put(UserProfileController(context: context));
 
   log(profileImage);
 
-  // Define a function to reset the image picker when the dialog is closed
   void resetImagePicker() {
     imagePickerController.image.value = null;
   }
@@ -86,28 +90,29 @@ void openChooseEditProfile(
                             height: 3.h,
                             width: 3.h,
                             child: const Image(
-                                image: AssetImage('assets/pngs/crossicon.png'))),
+                                image:
+                                    AssetImage('assets/pngs/crossicon.png'))),
                       )
                     ],
                   ),
                   getVerticalSpace(2.h),
                   Obx(
-                        () => GestureDetector(
+                    () => GestureDetector(
                       onTap: () {
                         imagePickerController.pickImage(ImageSource.gallery);
                       },
                       child: imagePickerController.image.value == null
                           ? CircleAvatar(
-                        radius: 6.h,
-                        backgroundColor: AppColors.baseColor,
-                        backgroundImage: NetworkImage(profileImage),
-                      )
+                              radius: 6.h,
+                              backgroundColor: AppColors.baseColor,
+                              backgroundImage: NetworkImage(profileImage),
+                            )
                           : CircleAvatar(
-                        radius: 6.h,
-                        backgroundColor: AppColors.baseColor,
-                        backgroundImage: FileImage(File(
-                            imagePickerController.image.value!.path)),
-                      ),
+                              radius: 6.h,
+                              backgroundColor: AppColors.baseColor,
+                              backgroundImage: FileImage(File(
+                                  imagePickerController.image.value!.path)),
+                            ),
                     ),
                   ),
                   getVerticalSpace(1.3.h),
@@ -139,7 +144,8 @@ void openChooseEditProfile(
                         ],
                         color: AppColors.whiteColor),
                     child: customTextFormField1(
-                      controller: nameController, // Set the controller
+                      controller: nameController,
+                      // Set the controller
                       title: name,
                       bgColor: AppColors.whiteColor,
                       borderRadius: BorderRadius.circular(3.h),
@@ -148,23 +154,25 @@ void openChooseEditProfile(
                   ),
                   getVerticalSpace(2.6.h),
                   Obx(
-                        () => Row(
+                    () => Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customElevatedButton(
                             onTap: () {
-
                               userProfileController
                                   .uploadProfileImage(
-                                  token: token,
-                                  profileImage: imagePickerController
-                                      .image.value?.path.isEmpty ?? true
-                                      ? File("")
-                                      : File(imagePickerController
-                                      .image.value!.path),
-                                  fullname: nameController.text.isEmpty?name:nameController.text)
+                                      token: token,
+                                      profileImage: imagePickerController
+                                                  .image.value?.path.isEmpty ??
+                                              true
+                                          ? File("")
+                                          : File(imagePickerController
+                                              .image.value!.path),
+                                      fullname: nameController.text.isEmpty
+                                          ? name
+                                          : nameController.text)
                                   .then(
-                                    (value) {
+                                (value) {
                                   Navigator.of(context).pop(); // Close dialog
                                 },
                               );
@@ -172,12 +180,12 @@ void openChooseEditProfile(
                             title: userProfileController.uploading.value
                                 ? spinkit
                                 : Text(
-                              'Save',
-                              style: CustomTextStyles.buttonTextStyle
-                                  .copyWith(
-                                  color: AppColors.whiteColor,
-                                  fontFamily: 'bold'),
-                            ),
+                                    'Save',
+                                    style: CustomTextStyles.buttonTextStyle
+                                        .copyWith(
+                                            color: AppColors.whiteColor,
+                                            fontFamily: 'bold'),
+                                  ),
                             bgColor: AppColors.mainColor,
                             verticalPadding: .8.h,
                             horizentalPadding: 6.h),
@@ -413,18 +421,18 @@ void openCancelAlertBox(BuildContext context) {
   );
 }
 
-void openCampaignPoster(BuildContext context,
-{
- required String token,
-  required String businessId ,
-  required String posterId ,
-  required String currentUserId ,
-  required String currentUserName ,
-}
-    ) {
+void openCampaignPoster(
+  BuildContext context, {
+  required String token,
+  required String businessId,
+  required String posterId,
+  required String currentUserId,
+  required String currentUserName,
+}) {
   final TextEditingController descriptionController = TextEditingController();
- final GetFcmTokenSendNotificationController getFcmTokenSendNotificationController = Get.put(GetFcmTokenSendNotificationController(context: context));
-
+  final GetFcmTokenSendNotificationController
+      getFcmTokenSendNotificationController =
+      Get.put(GetFcmTokenSendNotificationController(context: context));
 
   showDialog(
     context: context,
@@ -489,24 +497,34 @@ void openCampaignPoster(BuildContext context,
                                         content: Text(
                                             'Please enter the description Text')));
                               } else {
-                                addCampaignController.requestForMoreDesign(
+                                addCampaignController
+                                    .requestForMoreDesign(
                                   context: context,
                                   token: token,
                                   description:
-                                      descriptionController.text.toString(), businessId:businessId,
-                                ).then((value) {
-                                  getFcmTokenSendNotificationController.fetchFcmToken(
-                                      loading: getFcmTokenSendNotificationController.fcmToken.value==null,
-                                      userId: posterId,
-                                      token: token,
-                                      title: "Request",
-                                      message: "$currentUserName for more design",
-                                      info1: currentUserId,
-                                      info2: "");
-                                },);
+                                      descriptionController.text.toString(),
+                                  businessId: businessId,
+                                )
+                                    .then(
+                                  (value) {
+                                    getFcmTokenSendNotificationController
+                                        .fetchFcmToken(
+                                            loading:
+                                                getFcmTokenSendNotificationController
+                                                        .fcmToken.value ==
+                                                    null,
+                                            userId: posterId,
+                                            token: token,
+                                            title: "Request",
+                                            message:
+                                                "$currentUserName for more design",
+                                            info1: currentUserId,
+                                            info2: "");
+                                  },
+                                );
                               }
                             },
-                            title: addCampaignController.isLoading.value
+                            title: addCampaignController.requestLoading.value
                                 ? spinkit
                                 : Text(
                                     'Send',
@@ -530,8 +548,135 @@ void openCampaignPoster(BuildContext context,
   );
 }
 
-void openCampaignFeeAdd(BuildContext context, int coins,
-    Callback onTap) {
+void openCampaignPosterEdit(
+  BuildContext context, {
+  required String token,
+  required String businessId,
+  required String posterId,
+  required String ownerId,
+  required String currentUserId,
+  required String currentUserName,
+}) {
+  final TextEditingController descriptionController = TextEditingController();
+  final GetFcmTokenSendNotificationController
+      getFcmTokenSendNotificationController =
+      Get.put(GetFcmTokenSendNotificationController(context: context));
+  final PosterController posterController =
+      Get.put(PosterController(context: context));
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 2.4.h),
+          child: Material(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 2.4.h, vertical: 1.h),
+              height: 37.h,
+              decoration: BoxDecoration(
+                  color: const Color(0xffF8F9FA),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Text(
+                      'Campaign poster design',
+                      style: CustomTextStyles.buttonTextStyle
+                          .copyWith(color: AppColors.blackColor),
+                    ),
+                  ),
+                  getVerticalSpace(4.h),
+                  Text(
+                    'Edit Descriptions',
+                    style: CustomTextStyles.buttonTextStyle
+                        .copyWith(color: AppColors.blackColor),
+                  ),
+                  getVerticalSpace(.8.h),
+                  customTextFormField(
+                      controller: descriptionController,
+                      bgColor: const Color(0xffFAFAFA),
+                      maxLine: 3),
+                  getVerticalSpace(2.4.h),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: customElevatedButton(
+                              onTap: () {
+                                Get.back();
+                              },
+                              title: Text(
+                                'Deny',
+                                style: CustomTextStyles.buttonTextStyle
+                                    .copyWith(color: AppColors.whiteColor),
+                              ),
+                              verticalPadding: .8.h,
+                              horizentalPadding: 1.6.h,
+                              bgColor: const Color(0xffC3C3C2))),
+                      getHorizentalSpace(1.4.h),
+                      Expanded(
+                          child: Obx(
+                        () => customElevatedButton(
+                            onTap: () {
+                              if (descriptionController.text.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Please enter the description Text')));
+                              } else {
+                                posterController
+                                    .editDesign(
+                                  businessId: businessId,
+                                  designId: posterId,
+                                  comment: descriptionController.text,
+                                )
+                                    .then(
+                                  (value) {
+                                    getFcmTokenSendNotificationController
+                                        .fetchFcmToken(
+                                            loading:
+                                                getFcmTokenSendNotificationController
+                                                        .fcmToken.value ==
+                                                    null,
+                                            userId: posterId,
+                                            token: token,
+                                            title: "Request",
+                                            message:
+                                                "$currentUserName for more design",
+                                            info1: currentUserId,
+                                            info2: "");
+                                  },
+                                );
+                              }
+                            },
+                            title: posterController.editLoading.value
+                                ? spinkit
+                                : Text(
+                                    'Send',
+                                    style: CustomTextStyles.buttonTextStyle
+                                        .copyWith(color: AppColors.whiteColor),
+                                  ),
+                            bgColor: AppColors.mainColor,
+                            verticalPadding: .8.h,
+                            horizentalPadding: 1.6.h),
+                      )),
+                    ],
+                  ),
+                  getVerticalSpace(2.4.h)
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+void openCampaignFeeAdd(BuildContext context, double totalFee, Callback onTap) {
   showDialog(
     context: context,
     builder: (context) {
@@ -576,33 +721,6 @@ void openCampaignFeeAdd(BuildContext context, int coins,
                   Row(
                     children: [
                       Text(
-                        'Your balance ',
-                        style: TextStyle(
-                            fontSize: 14.px,
-                            fontFamily: 'regular',
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xff191918)),
-                      ),
-                      const Expanded(child: SizedBox()),
-                      SizedBox(
-                          height: 2.h,
-                          width: 2.h,
-                          child: const Image(
-                              image: AssetImage('assets/pngs/coins.png'))),
-                      Text(
-                        ' $coins',
-                        style: TextStyle(
-                            fontSize: 14.px,
-                            fontFamily: 'bold',
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xff191918)),
-                      ),
-                    ],
-                  ),
-                  getVerticalSpace(.8.h),
-                  Row(
-                    children: [
-                      Text(
                         'Your Campaign Fee',
                         style: TextStyle(
                             fontSize: 14.px,
@@ -611,13 +729,8 @@ void openCampaignFeeAdd(BuildContext context, int coins,
                             color: const Color(0xff191918)),
                       ),
                       const Expanded(child: SizedBox()),
-                      SizedBox(
-                          height: 2.h,
-                          width: 2.h,
-                          child: const Image(
-                              image: AssetImage('assets/pngs/coins.png'))),
                       Text(
-                        '1200',
+                        "\$$totalFee",
                         style: TextStyle(
                             fontSize: 14.px,
                             fontFamily: 'bold',
@@ -648,7 +761,23 @@ void openCampaignFeeAdd(BuildContext context, int coins,
   );
 }
 
-void openCampaignSubmit(BuildContext context, Callback onTap,int coins) {
+void openCampaignSubmit(
+  BuildContext context,
+  double totalFee, {
+  required String businessId,
+  required String businessName,
+  required String campaignName,
+  required String campaignDescription,
+  required File selectedPoster,
+  required String campaignPlatForms,
+  required String startDate,
+  required String endDate,
+  required String startTime,
+  required String endTime,
+  required String token,
+  required String clientSecretKey,
+}) {
+  log("clientSecretKey :$clientSecretKey");
   showDialog(
     context: context,
     builder: (context) {
@@ -661,7 +790,7 @@ void openCampaignSubmit(BuildContext context, Callback onTap,int coins) {
             borderRadius: BorderRadius.circular(10),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 2.h, vertical: 2.h),
-              height: 30.h,
+              height: 24.h,
               decoration: BoxDecoration(
                   color: const Color(0xffF8F9FA),
                   borderRadius: BorderRadius.circular(10)),
@@ -693,37 +822,6 @@ void openCampaignSubmit(BuildContext context, Callback onTap,int coins) {
                   Row(
                     children: [
                       Text(
-                        'Your balance ',
-                        style: TextStyle(
-                            fontSize: 14.px,
-                            fontFamily: 'regular',
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xff191918)),
-                      ),
-                      const Expanded(child: SizedBox()),
-                      SizedBox(
-                          height: 2.h,
-                          width: 2.h,
-                          child: const Image(
-                              image: AssetImage('assets/pngs/coins.png'))),
-                      Text(
-                        coins.toString(),
-                        style: TextStyle(
-                            fontSize: 14.px,
-                            fontFamily: 'bold',
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xff191918)),
-                      ),
-                    ],
-                  ),
-                  getVerticalSpace(.5.h),
-                  const Divider(
-                    color: Colors.grey,
-                  ),
-                  getVerticalSpace(.8.h),
-                  Row(
-                    children: [
-                      Text(
                         'Your Campaign Fee',
                         style: TextStyle(
                             fontSize: 14.px,
@@ -732,13 +830,8 @@ void openCampaignSubmit(BuildContext context, Callback onTap,int coins) {
                             color: const Color(0xff191918)),
                       ),
                       const Expanded(child: SizedBox()),
-                      SizedBox(
-                          height: 2.h,
-                          width: 2.h,
-                          child: const Image(
-                              image: AssetImage('assets/pngs/coins.png'))),
                       Text(
-                        '1200',
+                        "\$$totalFee",
                         style: TextStyle(
                             fontSize: 14.px,
                             fontFamily: 'bold',
@@ -753,22 +846,43 @@ void openCampaignSubmit(BuildContext context, Callback onTap,int coins) {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customElevatedButton(
-                          title: addCampaignController.isLoading.value == true
+                          title: addCampaignController
+                                      .addCampaignLoading.value
                               ? spinkit
                               : Text(
                                   'Pay Now',
                                   style: CustomTextStyles.buttonTextStyle
                                       .copyWith(color: AppColors.whiteColor),
                                 ),
-                          onTap: onTap,
+                          onTap: () async{
+                            await StripePayments.name(
+                             totalFee,
+                              context: context,
+                              clientSecretKey: clientSecretKey,
+                              token: token,
+                              businessId: businessId,
+                              businessName: businessName,
+                              campaignDescription: campaignDescription,
+                              campaignName: campaignName,
+                              campaignPlatForms: campaignPlatForms,
+                              endDate: endDate,
+                               endTime: endTime,
+                             plan: "no plan",
+                            selectedPoster: selectedPoster,
+                              startDate: startDate,
+                              startTime: startTime
+
+
+                            ).startPayment();
+
+                          },
                           bgColor: const Color(0xff34C759),
-                          verticalPadding: 1.2.h,
+                          verticalPadding: 1.h,
                           horizentalPadding: 4.8.h,
                         ),
                       ],
                     ),
                   ),
-                  getVerticalSpace(1.6.h)
                 ],
               ),
             ),
@@ -885,9 +999,13 @@ void openCampaignCancel(BuildContext context) {
   );
 }
 
-void openChooseSubscription(BuildContext context,
-     String token) {
-  final SubscriptionController subscriptionController=Get.put(SubscriptionController());
+void openChooseSubscription(
+  BuildContext context,
+  String token,
+  String clientSecretKey,
+) {
+  final SubscriptionController subscriptionController =
+      Get.put(SubscriptionController());
   final RxInt isSelected = 0.obs;
   RxList<String> titles = <String>["basic", "standard", "pro"].obs;
   RxList<String> description = <String>[
@@ -895,7 +1013,8 @@ void openChooseSubscription(BuildContext context,
     'Add up to Business only',
     'Add up to Business only'
   ].obs;
-  subscriptionController.fetchAllPlans(loading: subscriptionController.getAllPlans.isEmpty, context: context);
+  subscriptionController.fetchAllPlans(
+      loading: subscriptionController.getAllPlans.isEmpty, context: context);
   showDialog(
     context: context,
     builder: (context) {
@@ -920,132 +1039,140 @@ void openChooseSubscription(BuildContext context,
                         .copyWith(color: AppColors.blackColor),
                   ),
                   getVerticalSpace(1.6.h),
-                  Obx(() =>subscriptionController.planLoading.value?
-                  ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        itemCount: titles.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 1.6.h, horizontal: 1.9.h),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12.h, vertical: 1.h),
-                            decoration: BoxDecoration(
-                                color: AppColors.whiteColor,
-                                borderRadius: BorderRadius.circular(1.h),
-                                border: Border.all(
-                                    color: isSelected.value == index
-                                        ? AppColors.mainColor
-                                        : Colors.transparent)),
-                            child: Column(
-                              children: [
-                                Text(
-                                 "",
-                                  style: TextStyle(
-                                    color: AppColors.mainColor,
-                                    fontSize: 14.px,
-                                    fontFamily: 'bold',
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                getVerticalSpace(.9.h),
-                                Text(
-                                "",
-                                  style: TextStyle(
-                                    color: const Color(0xff444545),
-                                    fontSize: 16.px,
-                                    fontFamily: 'bold',
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                getVerticalSpace(.4.h),
-                                Text(
-                                "",
-                                  style: TextStyle(
-                                    color: const Color(0xff444545),
-                                    fontSize: 10.px,
-                                    fontFamily: 'regular',
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ):
-                  subscriptionController.getAllPlans.isEmpty?
-                  Text(
-                    'No Subscription Available',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'bold',
-                      fontSize: 14.px,
-                      color: AppColors.mainColor,
-                    ),
-                  ):
-                  ListView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.zero,
-                    itemCount: subscriptionController.getAllPlans.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          subscriptionController.getAllPlans.refresh();
-                          titles.refresh();
-                          isSelected.value = index;
-
-                        },
-                        child: Container(
-                          margin: EdgeInsets.symmetric(
-                              vertical: 1.6.h, horizontal: 1.9.h),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 12.h, vertical: 1.h),
-                          decoration: BoxDecoration(
-                              color: AppColors.whiteColor,
-                              borderRadius: BorderRadius.circular(1.h),
-                              border: Border.all(
-                                  color: isSelected.value == index
-                                      ? AppColors.mainColor
-                                      : Colors.transparent)),
-                          child: Column(
-                            children: [
-                              Text(
-                                subscriptionController.getAllPlans[index]!.name,
-                                style: TextStyle(
-                                  color: AppColors.mainColor,
-                                  fontSize: 14.px,
-                                  fontFamily: 'bold',
-                                  fontWeight: FontWeight.w400,
+                  Obx(() => subscriptionController.planLoading.value
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          itemCount: titles.length,
+                          itemBuilder: (context, index) {
+                            return Shimmer.fromColors(
+                              baseColor: AppColors.baseColor,
+                              highlightColor: AppColors.highlightColor,
+                              child: Container(
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 1.6.h, horizontal: 1.9.h),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12.h, vertical: 1.h),
+                                decoration: BoxDecoration(
+                                    color: AppColors.whiteColor,
+                                    borderRadius: BorderRadius.circular(1.h),
+                                    border: Border.all(
+                                        color: isSelected.value == index
+                                            ? AppColors.mainColor
+                                            : Colors.transparent)),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      "",
+                                      style: TextStyle(
+                                        color: AppColors.mainColor,
+                                        fontSize: 14.px,
+                                        fontFamily: 'bold',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    getVerticalSpace(.9.h),
+                                    Text(
+                                      "",
+                                      style: TextStyle(
+                                        color: const Color(0xff444545),
+                                        fontSize: 16.px,
+                                        fontFamily: 'bold',
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    getVerticalSpace(.4.h),
+                                    Text(
+                                      "",
+                                      style: TextStyle(
+                                        color: const Color(0xff444545),
+                                        fontSize: 10.px,
+                                        fontFamily: 'regular',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              getVerticalSpace(.9.h),
-                              Text(
-                                subscriptionController.getAllPlans[index]!.price.toString(),
-                                style: TextStyle(
-                                  color: const Color(0xff444545),
-                                  fontSize: 16.px,
-                                  fontFamily: 'bold',
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            );
+                          },
+                        )
+                      : subscriptionController.getAllPlans.isEmpty
+                          ? Text(
+                              'No Subscription Available',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'bold',
+                                fontSize: 14.px,
+                                color: AppColors.mainColor,
                               ),
-                              getVerticalSpace(.4.h),
-                              Text(
-                                "${description[index]}${subscriptionController.getAllPlans[index]!.businessLimit}",
-                                style: TextStyle(
-                                  color: const Color(0xff444545),
-                                  fontSize: 10.px,
-                                  fontFamily: 'regular',
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  )
-                  ),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              itemCount:
+                                  subscriptionController.getAllPlans.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    subscriptionController.getAllPlans
+                                        .refresh();
+                                    titles.refresh();
+                                    isSelected.value = index;
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 1.6.h, horizontal: 1.9.h),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 12.h, vertical: 1.h),
+                                    decoration: BoxDecoration(
+                                        color: AppColors.whiteColor,
+                                        borderRadius:
+                                            BorderRadius.circular(1.h),
+                                        border: Border.all(
+                                            color: isSelected.value == index
+                                                ? AppColors.mainColor
+                                                : Colors.transparent)),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          subscriptionController
+                                              .getAllPlans[index]!.name,
+                                          style: TextStyle(
+                                            color: AppColors.mainColor,
+                                            fontSize: 14.px,
+                                            fontFamily: 'bold',
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                        getVerticalSpace(.9.h),
+                                        Text(
+                                          subscriptionController
+                                              .getAllPlans[index]!.price
+                                              .toString(),
+                                          style: TextStyle(
+                                            color: const Color(0xff444545),
+                                            fontSize: 16.px,
+                                            fontFamily: 'bold',
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        getVerticalSpace(.4.h),
+                                        Text(
+                                          "${description[index]}${subscriptionController.getAllPlans[index]!.businessLimit}",
+                                          style: TextStyle(
+                                            color: const Color(0xff444545),
+                                            fontSize: 10.px,
+                                            fontFamily: 'regular',
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            )),
                   getVerticalSpace(2.4.h),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 1.h),
@@ -1067,20 +1194,43 @@ void openChooseSubscription(BuildContext context,
                         ),
                         getHorizentalSpace(1.2.h),
                         Expanded(
-                          child: Obx(() =>
-                        customElevatedButton(
-                                onTap: () {
-                                  subscriptionController.chooseSubscriptionPlan(
-                                      token: token,
-                                      planType:subscriptionController.getAllPlans[isSelected.value]!.name
-                                      , context: context);
-
+                          child: Obx(
+                            () => customElevatedButton(
+                                onTap: () async {
+                                  if (clientSecretKey.isEmpty) {
+                                    log("please wait for key");
+                                    log(clientSecretKey);
+                                  } else {
+                                    await StripePayments.name(
+                                        subscriptionController
+                                            .getAllPlans[isSelected.value]!.price
+                                            .toDouble(),
+                                        context: context,
+                                        clientSecretKey: clientSecretKey,
+                                        token: token,
+                                        businessId: "",
+                                        businessName: "",
+                                        campaignDescription: "",
+                                        campaignName: "",
+                                        campaignPlatForms: "",
+                                        endDate: "",
+                                        endTime: "",
+                                        plan:subscriptionController
+                                            .getAllPlans[isSelected.value]!.name,
+                                        selectedPoster: File(""),
+                                        startDate: "",
+                                        startTime: ""
+                                    ).startPayment();
+                                  }
                                 },
-                                title:subscriptionController.isLoading.value?spinkit: Text(
-                                  'Pay now',
-                                  style: CustomTextStyles.buttonTextStyle
-                                      .copyWith(color: AppColors.whiteColor),
-                                ),
+                                title: subscriptionController.isLoading.value
+                                    ? spinkit
+                                    : Text(
+                                        'Pay now',
+                                        style: CustomTextStyles.buttonTextStyle
+                                            .copyWith(
+                                                color: AppColors.whiteColor),
+                                      ),
                                 bgColor: AppColors.mainColor,
                                 verticalPadding: .6.h,
                                 horizentalPadding: 1.6.h),
@@ -1098,6 +1248,7 @@ void openChooseSubscription(BuildContext context,
     },
   );
 }
+
 void logoutPopUp(BuildContext context) {
   showDialog(
     context: context,
@@ -1139,7 +1290,7 @@ void logoutPopUp(BuildContext context) {
                             width: 3.h,
                             child: const Image(
                                 image:
-                                AssetImage('assets/pngs/crossicon.png'))),
+                                    AssetImage('assets/pngs/crossicon.png'))),
                       ),
                     ],
                   ),
@@ -1206,5 +1357,118 @@ void logoutPopUp(BuildContext context) {
         ),
       );
     },
+  );
+}
+
+void openBottomSheet(
+  BuildContext context,
+) {
+  final AddCardController addCardController = Get.put(AddCardController());
+
+  Get.bottomSheet(
+    SizedBox(
+      height: 60.h,
+      width: MediaQuery.of(context).size.width,
+      child: Padding(
+        padding: EdgeInsets.all(20.px),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              ListTile(
+                leading: const Image(
+                    image: AssetImage('assets/pngs/addpayment.png')),
+                title: Text(
+                  'Add card',
+                  style: TextStyle(
+                      fontSize: 16.px,
+                      fontFamily: 'bold',
+                      color: const Color(0xff292D32),
+                      fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  'Streamline your checkout process by adding a new card for future transactions. Your card information is secured with advanced encryption technology.',
+                  style: TextStyle(
+                      fontSize: 12.px,
+                      fontFamily: 'bold',
+                      color: const Color(0xffA9ACB4),
+                      fontWeight: FontWeight.w500),
+                ),
+              ),
+              getVerticalSpace(1.h),
+              const Divider(
+                color: Color(0xffCBD0DC),
+              ),
+              getVerticalSpace(3.4.h),
+              customTextFormField(
+                  keyboardType: TextInputType.number,
+                  title: '0000 0000 0000',
+                  errorText: 'Card Number',
+                  bgColor: Colors.transparent,
+                  borderColor: const Color(0xffCBD0DC),
+                  focusBorderColor: AppColors.mainColor,
+                  prefix: '4966 |'),
+              getVerticalSpace(3.2.h),
+              Row(
+                children: [
+                  Obx(
+                    () => Expanded(
+                      child: customTextFormField(
+                        onTap: () {
+                          addCardController.datePicker(context);
+                        },
+                        readOnly: true,
+                        keyboardType: TextInputType.number,
+                        title: addCardController.selectedDate.value
+                            .format(pattern: 'yyyy-MM-dd'),
+                        errorText: 'Expiry Date',
+                        bgColor: Colors.transparent,
+                        borderColor: const Color(0xffCBD0DC),
+                        focusBorderColor: AppColors.mainColor,
+                      ),
+                    ),
+                  ),
+                  getHorizentalSpace(2.h),
+                  Expanded(
+                    child: customTextFormField(
+                      keyboardType: TextInputType.number,
+                      title: '•••',
+                      errorText: 'CVV',
+                      bgColor: Colors.transparent,
+                      borderColor: const Color(0xffCBD0DC),
+                      focusBorderColor: AppColors.mainColor,
+                    ),
+                  )
+                ],
+              ),
+              getVerticalSpace(3.2.h),
+              customTextFormField(
+                keyboardType: TextInputType.number,
+                title: 'Enter cardholder’s full name',
+                errorText: 'Cardholder’s Name',
+                bgColor: Colors.transparent,
+                borderColor: const Color(0xffCBD0DC),
+                focusBorderColor: AppColors.mainColor,
+              ),
+              getVerticalSpace(3.6.h),
+              customElevatedButton(
+                  title: Text(
+                    'Buy',
+                    style: CustomTextStyles.buttonTextStyle
+                        .copyWith(color: AppColors.whiteColor),
+                  ),
+                  onTap: () {
+                    // Get.to(() => CampaignName());
+                  },
+                  bgColor: AppColors.mainColor,
+                  titleColor: AppColors.whiteColor,
+                  verticalPadding: .9.h,
+                  horizentalPadding: 5.h),
+            ],
+          ),
+        ),
+      ),
+    ),
+    backgroundColor: Colors.white,
+    isScrollControlled: true,
   );
 }

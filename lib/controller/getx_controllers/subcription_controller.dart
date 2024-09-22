@@ -10,11 +10,18 @@ class SubscriptionController extends GetxController {
   Future<void> chooseSubscriptionPlan(
       {required String token,
       required String planType,
+      required double price,
+      required String clientSecretKey,
       required context}) async {
     try {
       isLoading.value = true;
       await SubscriptionApi(context: context)
-          .subscriptionPlan(token: token, planType: planType, context: context)
+          .subscriptionPlan(
+          token: token,
+          planType: planType,
+          context: context,
+        clientSecretKey: clientSecretKey,price: price
+      )
           .then(
             (value) => isLoading.value = false,
           );
@@ -35,6 +42,7 @@ class SubscriptionController extends GetxController {
       allCoins.value = data.coinBalance;
     }
   }
+
   RxBool planLoading = false.obs;
 
   RxList<GetAllPlansModel?> getAllPlans = <GetAllPlansModel>[].obs;
@@ -61,8 +69,30 @@ class SubscriptionController extends GetxController {
       log("Unexpected error occurred :${e.toString()}");
       planLoading.value = false;
       log("when data clear :$getAllPlans");
-
     }
   }
 
+// Confirm Payment
+  RxBool paymentLoading = false.obs;
+  Future<void> confirmPayment({
+    required BuildContext context,
+    required String plan,
+    required String token,
+  }) async {
+    try {
+      paymentLoading.value = true;
+      await SubscriptionApi(context: context)
+          .confirmPaymentApiMethod( plan: plan,token:token)
+          .then(
+        (value) {
+          paymentLoading.value = false;
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("unexpected error occurred :${e.toString()}")));
+      }
+    }
+  }
 }

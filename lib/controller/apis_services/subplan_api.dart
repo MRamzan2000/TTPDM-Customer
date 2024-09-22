@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:ttpdm/controller/utils/apis_constant.dart';
+import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
+import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/models/get_all_plans_model.dart';
 import 'package:ttpdm/models/getall_coins_model.dart';
 
@@ -15,6 +16,8 @@ class SubscriptionApi {
   Future<void> subscriptionPlan(
       {required String token,
       required String planType,
+      required String clientSecretKey,
+      required double price,
       required BuildContext context}) async {
     final url = Uri.parse("$baseUrl/$subscriptionEp");
     final headers = {
@@ -25,13 +28,14 @@ class SubscriptionApi {
     final response = await http.post(url, body: body, headers: headers);
     try {
       if (response.statusCode == 200) {
-        Map<String,dynamic>responseBody=jsonDecode(response.body);
-        log("response body:$responseBody");
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('please pay your payment')));
-          Get.back();
-        }
+        Map<String, dynamic> responseBody = jsonDecode(response.body);
+        // await StripePayments.name(
+        //     price,
+        //     clientSecretKey,context,
+        //     token, planType,responseBody["sessionId"]
+        // )
+        //     .startPayment();
+
       } else if (response.statusCode == 400) {
         if (context.mounted) {
           ScaffoldMessenger.of(context)
@@ -70,6 +74,7 @@ class SubscriptionApi {
       return null;
     }
   }
+
   //Get All Plans Api Methods
   Future<List<GetAllPlansModel>?> getAllPlans() async {
     final url = Uri.parse("$baseUrl/$getAllSubPlanEP");
@@ -91,5 +96,28 @@ class SubscriptionApi {
       }
     }
     return null;
+  }
+  //confirm payment
+  Future<void> confirmPaymentApiMethod({
+    required String plan,
+    required String token,
+  }) async {
+    final url = Uri.parse(
+        "$baseUrl/$confirmSubscriptionPaymentEp$plan");
+    final headers = {
+      "Content-Type": "application/json",
+      "Authorization":"Bearer $token"
+    };
+
+    http.Response response = await http.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("payment Confirmed Successfully")));
+      MySharedPreferences.setString(subscription,data['subscription']["expiryDate"]);
+
+      log("Payment confirmed: $data");
+    } else {
+      log("Error: ${response.statusCode} - ${response.body}");
+    }
   }
 }

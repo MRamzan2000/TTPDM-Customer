@@ -2,7 +2,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
-
 const baseUrl='https://advyro-efeje5atfcd3hrbq.canadacentral-01.azurewebsites.net/';
 const signUpEndP="user/register";
 const signInEndP="user/login";
@@ -19,7 +18,7 @@ const getCampaignByStatusEp="midAdmin/campaigns";
 const campaignFeeEp="campaign/pay-fee";
 const cancelCampaignEp="campaign/cancel";
 const subscriptionEp="business/select-plan";
-const confirmSubscriptionPaymentEp="business/payment-success?session_id=";
+const confirmSubscriptionPaymentEp="business/payment-success?plan=";
 const getAllDesignsEP="campaign/allDesigns";
 const getAllCoinsEP="coin/coin-balance";
 const getAllCoinsPlanEP="superAdmin/allCoins";
@@ -27,10 +26,13 @@ const purchaseCoinsEP="coin/purchase-coins";
 const resetPasswordEp="user/reset-password";
 const getUserProfileEp="user";
 const updateUserProfileEp="user/profile-pic";
+const deleteUserProfileEp="user/delUser";
 const getAllSubPlanEP="superAdmin/allPlans";
 const likeDesignEp="campaign/";
 const getFcmTokenEP="fcm-token";
 const sendNotificationEp="user/send-notification";
+const getStripeKeyEp="stripe/get";
+const editDesignEp="campaign/editDesign";
 
 
 

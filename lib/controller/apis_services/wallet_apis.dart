@@ -1,15 +1,14 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/models/getdesigns_model.dart';
 import 'package:http/http.dart' as http;
 
-class PosterApis {
+class WalletApis {
   final BuildContext context;
-  PosterApis({required this.context});
+  WalletApis({required this.context});
   //Get All design
   Future<GetAllDesignsModel?> getAllDesigns() async {
     final url = Uri.parse("$baseUrl/$getAllDesignsEP");
@@ -109,9 +108,7 @@ class PosterApis {
     final response = await http.post(url, headers: headers, body: body);
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Edit Design Request successfully")));
       log("Edit Design Request successfully");
-      Get.back();
     } else {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
       log("${responseBody["message"]}");

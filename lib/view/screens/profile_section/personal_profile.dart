@@ -38,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         token: token.value,
         context: context,
         loading: businessProfileController.allBusinessProfiles.isEmpty).then((value) {
-          log("Business profile is :${businessProfileController.allBusinessProfiles.length}");
+          log("function called");
         },);
   }
 
@@ -175,7 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     itemBuilder: (context, index) {
                       final business =
                           businessProfileController.approvedProfiles[index];
-                      if (business!.status == 'accepted') {
+                      if (business!.status == 'Approved') {
                         return GestureDetector(
                           onTap: () {
                             log('logo detail ${businessProfileController.approvedProfiles[index]!.logo}');
