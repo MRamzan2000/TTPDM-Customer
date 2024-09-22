@@ -8,7 +8,9 @@ import 'package:ttpdm/models/getbusiness_profile_model.dart';
 
 class BusinessProfileController extends GetxController {
   final BuildContext context;
+
   BusinessProfileController({required this.context});
+
   final RxBool isLoading2 = false.obs;
   final RxBool isLoading1 = false.obs;
 
@@ -45,7 +47,8 @@ class BusinessProfileController extends GetxController {
         logo: logo,
         tiktokUrl: tiktokUrl,
         token: token,
-        context: context, fullname: fullname,
+        context: context,
+        fullname: fullname,
       )
           .then(
         (value) {
@@ -69,8 +72,7 @@ class BusinessProfileController extends GetxController {
     required BuildContext context,
   }) async {
     isLoading2.value = loading;
-    final data =
-        await BusinessApis().getBusinessProfile(context: context, token: token);
+    final data = await BusinessApis().getBusinessProfile(context: context, token: token);
     if (data != null) {
       allBusinessProfiles.value = data.businesses;
       categorizeProfiles();
@@ -79,15 +81,9 @@ class BusinessProfileController extends GetxController {
   }
 
   void categorizeProfiles() {
-    approvedProfiles.value = allBusinessProfiles
-        .where((profile) => profile?.status == 'accepted')
-        .toList();
-    rejectedProfiles.value = allBusinessProfiles
-        .where((profile) => profile?.status == 'rejected')
-        .toList();
-    pendingProfiles.value = allBusinessProfiles
-        .where((profile) => profile?.status == 'pending')
-        .toList();
+    approvedProfiles.value = allBusinessProfiles.where((profile) => profile?.status == 'accepted').toList();
+    rejectedProfiles.value = allBusinessProfiles.where((profile) => profile?.status == 'rejected').toList();
+    pendingProfiles.value = allBusinessProfiles.where((profile) => profile?.status == 'pending').toList();
   }
 
   //Delete Business profile
@@ -98,10 +94,7 @@ class BusinessProfileController extends GetxController {
   }) async {
     try {
       isLoading1.value = true;
-      await BusinessApis()
-          .deleteBusinessProfile(
-              businessId: businessId, context: context, token: token)
-          .then(
+      await BusinessApis().deleteBusinessProfile(businessId: businessId, context: context, token: token).then(
             (value) => isLoading1.value = false,
           );
     } catch (e) {
@@ -125,7 +118,9 @@ class BusinessProfileController extends GetxController {
       required String tiktokUrl,
       required String logo,
       required List<String> gallery,
-      required String token, // Corrected list<File> to List<File>}
+        required List<String> removeGalleryItems,
+      required String token,
+      required bool newLogo,
       required BuildContext context}) async {
     try {
       isLoading1.value = true;
@@ -146,7 +141,8 @@ class BusinessProfileController extends GetxController {
         tiktokUrl: tiktokUrl,
         token: token,
         context: context,
-        removeGallery: gallery,
+        removeGalleryItems: removeGalleryItems,
+        newLogo: newLogo,
       )
           .then(
         (value) {
