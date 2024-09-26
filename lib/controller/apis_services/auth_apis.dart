@@ -109,14 +109,15 @@ class AuthApis {
 
     });
     Response response = await post(url, headers: headers, body: body);
+    log("before hit :${response.body}");
+    log("before hit :${response.statusCode}");
     if (response.statusCode == 200) {
       final  Map<String, dynamic> responseBody = jsonDecode(response.body);
-      log('token is that ${responseBody['token']}');
       if (context.mounted) {
         MySharedPreferences.setString(authToken,responseBody['token']);
         MySharedPreferences.setString(userId,responseBody["user"]['_id']);
         MySharedPreferences.setString(userName,responseBody["user"]['fullname']);
-        MySharedPreferences.setString(subscription,responseBody["user"]['subscription']["expiryDate"]);
+        MySharedPreferences.setString(subscription,responseBody["user"]['subscription']["expiryDate"]??"");
         MySharedPreferences.setBool(isLoggedInKey, true);
 
         ScaffoldMessenger.of(context).showSnackBar(

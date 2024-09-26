@@ -8,9 +8,7 @@ import 'package:ttpdm/models/getbusiness_profile_model.dart';
 
 class BusinessProfileController extends GetxController {
   final BuildContext context;
-
   BusinessProfileController({required this.context});
-
   final RxBool isLoading2 = false.obs;
   final RxBool isLoading1 = false.obs;
 
@@ -47,8 +45,7 @@ class BusinessProfileController extends GetxController {
         logo: logo,
         tiktokUrl: tiktokUrl,
         token: token,
-        context: context,
-        fullname: fullname,
+        context: context, fullname: fullname,
       )
           .then(
         (value) {
@@ -72,7 +69,8 @@ class BusinessProfileController extends GetxController {
     required BuildContext context,
   }) async {
     isLoading2.value = loading;
-    final data = await BusinessApis().getBusinessProfile(context: context, token: token);
+    final data =
+        await BusinessApis().getBusinessProfile(context: context, token: token);
     if (data != null) {
       allBusinessProfiles.value = data.businesses;
       categorizeProfiles();
@@ -94,7 +92,10 @@ class BusinessProfileController extends GetxController {
   }) async {
     try {
       isLoading1.value = true;
-      await BusinessApis().deleteBusinessProfile(businessId: businessId, context: context, token: token).then(
+      await BusinessApis()
+          .deleteBusinessProfile(
+              businessId: businessId, context: context, token: token)
+          .then(
             (value) => isLoading1.value = false,
           );
     } catch (e) {

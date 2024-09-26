@@ -39,36 +39,40 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
   RxString fullname = "".obs;
   RxString id = "".obs;
 
-  bool _isValidUrl(String url) {
-    final Uri uri = Uri.tryParse(url) ?? Uri();
-    return uri.hasAbsolutePath && (uri.hasScheme && uri.hasAuthority);
-  }
+
+
+
+
 
   void validateFields() {
     final List<String> errorMessages = [];
-
     // Logo is required
     if (addCampaignController.image.value == null) {
       errorMessages.add('Logo is required.');
     }
+    if(locationController.text.isEmpty){
+      errorMessages.add("Location are required! please enter location");
+    }else if(targetController.text.isEmpty){
+      errorMessages.add("Target Map area required! please enter Target Map area");
+    }else
     if(descriptionController.text.length<50){
      errorMessages.add("Description length At least 50 character");
     }
 
     // Other fields are optional, but validate URLs if provided
-    if (webUrlController.text.isNotEmpty && !_isValidUrl(webUrlController.text)) {
+    if (webUrlController.text.isNotEmpty && !webUrlController.text.contains(".")) {
       errorMessages.add('Please enter a valid website URL.');
     }
-    if (facebookUrlController.text.isNotEmpty && !_isValidUrl(facebookUrlController.text)) {
+    if (facebookUrlController.text.isNotEmpty && !facebookUrlController.text.contains(".")) {
       errorMessages.add('Please enter a valid Facebook URL.');
     }
-    if (instagramUrlController.text.isNotEmpty && !_isValidUrl(instagramUrlController.text)) {
+    if (instagramUrlController.text.isNotEmpty && !instagramUrlController.text.contains(".")) {
       errorMessages.add('Please enter a valid Instagram URL.');
     }
-    if (tikTokUrlController.text.isNotEmpty && !_isValidUrl(tikTokUrlController.text)) {
+    if (tikTokUrlController.text.isNotEmpty && !tikTokUrlController.text.contains(".")) {
       errorMessages.add('Please enter a valid TikTok URL.');
     }
-    if (linkdinUrlController.text.isNotEmpty && !_isValidUrl(linkdinUrlController.text)) {
+    if (linkdinUrlController.text.isNotEmpty && !linkdinUrlController.text.contains(".")) {
       errorMessages.add('Please enter a valid LinkedIn URL.');
     }
 

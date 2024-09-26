@@ -77,6 +77,16 @@ class _PosterScreenState extends State<PosterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: GestureDetector(
+          onTap: () {
+            Get.back();
+          },
+          child: Icon(
+            Icons.arrow_back_ios_outlined,
+            size: 2.4.h,
+            color: const Color(0xff191918),
+          ),
+        ),
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,
         automaticallyImplyLeading: false,
@@ -187,12 +197,9 @@ class _PosterScreenState extends State<PosterScreen> {
                                   getVerticalSpace(.8.h),
                                   GestureDetector(
                                     onTap: () {
-                                      // Update local state
                                       likedPosters[poster.id] = true;
                                       dislikedPosters[poster.id] =
-                                          false; // Reset dislike
-
-                                      // Call the API to like the poster in the background
+                                          false;
                                       handleLikePoster(poster.id);
                                     },
                                     child: SizedBox(
@@ -203,7 +210,7 @@ class _PosterScreenState extends State<PosterScreen> {
                                             'assets/pngs/like.png'),
                                         color: hasLiked
                                             ? AppColors.mainColor
-                                            : Colors.white,
+                                            :const Color(0xffFAFAFA),
                                       ),
                                     ),
                                   ),
@@ -225,7 +232,7 @@ class _PosterScreenState extends State<PosterScreen> {
                                             'assets/pngs/dislike.png'),
                                         color: hasDisliked
                                             ? AppColors.mainColor
-                                            : Colors.white,
+                                            : const Color(0xffFAFAFA),
                                       ),
                                     ),
                                   ),

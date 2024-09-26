@@ -10,7 +10,6 @@ import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/view/screens/profile_section/add_business.dart';
 import 'package:ttpdm/view/screens/profile_section/business_profile.dart';
-
 import '../../../controller/custom_widgets/app_colors.dart';
 import '../../../controller/custom_widgets/custom_text_styles.dart';
 import 'settng_screen.dart';
@@ -19,7 +18,6 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
     super.key,
   });
-
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
@@ -28,18 +26,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final BusinessProfileController businessProfileController =
       Get.find(tag: 'business');
   RxString token = "".obs;
-
   @override
   void initState() {
     super.initState();
-
     token.value = MySharedPreferences.getString(authToken);
     businessProfileController.fetchBusiness(
         token: token.value,
         context: context,
-        loading: businessProfileController.allBusinessProfiles.isEmpty).then((value) {
-          log("function called");
-        },);
+        loading: businessProfileController.allBusinessProfiles.isEmpty);
   }
 
   RxBool hasDisplayedNoProfileMessage = false.obs;
@@ -110,8 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: businessProfileController.approvedProfiles
-                        .length, // Number of shimmer items you want to display
+                    itemCount: 1,
                     itemBuilder: (context, index) {
                       return Shimmer.fromColors(
                         baseColor: AppColors.baseColor,
@@ -173,9 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     itemCount:
                         businessProfileController.approvedProfiles.length,
                     itemBuilder: (context, index) {
-                      final business =
-                          businessProfileController.approvedProfiles[index];
-                      if (business!.status == 'Approved') {
+                      {
                         return GestureDetector(
                           onTap: () {
                             log('logo detail ${businessProfileController.approvedProfiles[index]!.logo}');
@@ -207,8 +198,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       .approvedProfiles[index]!.tiktokUrl!,
                                   webUrl: businessProfileController
                                       .approvedProfiles[index]!.websiteUrl!,
-                              status: businessProfileController
-                                  .approvedProfiles[index]!.status,
+                                  status: businessProfileController
+                                      .approvedProfiles[index]!.status,
                                 ));
                           },
                           child: Container(
@@ -224,7 +215,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  business.name,
+                                  businessProfileController
+                                      .approvedProfiles[index]!.name,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontFamily: 'bold',
@@ -241,27 +233,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                         );
-                      } else {
-                        return SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              getVerticalSpace(2.h),
-                              Text(
-                                'No Business Profile Approved',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'bold',
-                                  fontSize: 14.px,
-                                  color: const Color(0xff282827),
-                                ),
-                              ),
-                              getVerticalSpace(2.h)
-                            ],
-                          ),
-                        ); // Empty widget for non-approved profiles
                       }
                     },
                   ),
@@ -270,7 +241,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Row(
                     children: [
                       Text(
-                        'Pending Approval',
+                        'Pending',
                         style: TextStyle(
                           fontFamily: 'regular',
                           color: const Color(0xff007AFF),
@@ -290,9 +261,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 3,
-                    // businessProfileController.businessProfiles
-                    //     .length, // Number of shimmer items you want to display
+                    itemCount: 1,
                     itemBuilder: (context, index) {
                       return Shimmer.fromColors(
                         baseColor: AppColors.baseColor,
@@ -355,7 +324,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     itemBuilder: (context, index) {
                       final business =
                           businessProfileController.pendingProfiles[index];
-                      if (business!.status == 'pending') {
+                      {
                         return GestureDetector(
                           onTap: () {
                             Get.to(() => BusinessProfile(
@@ -386,8 +355,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       .pendingProfiles[index]!.tiktokUrl!,
                                   webUrl: businessProfileController
                                       .pendingProfiles[index]!.websiteUrl!,
-                              status: businessProfileController
-                                  .pendingProfiles[index]!.status,
+                                  status: businessProfileController
+                                      .pendingProfiles[index]!.status,
                                 ));
                           },
                           child: Container(
@@ -403,7 +372,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  business.name,
+                                  business!.name,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontFamily: 'bold',
@@ -420,27 +389,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                         );
-                      } else {
-                        return SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              getVerticalSpace(2.h),
-                              Text(
-                                'No Business Profile Pending',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'bold',
-                                  fontSize: 14.px,
-                                  color: const Color(0xff282827),
-                                ),
-                              ),
-                              getVerticalSpace(2.h)
-                            ],
-                          ),
-                        ); // Empty widget for non-approved profiles
                       }
                     },
                   ),
@@ -469,8 +417,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: businessProfileController.rejectedProfiles
-                        .length, // Number of shimmer items you want to display
+                    itemCount: 1, // Number of shimmer items you want to display
                     itemBuilder: (context, index) {
                       return Shimmer.fromColors(
                         baseColor: AppColors.baseColor,
@@ -534,7 +481,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     itemBuilder: (context, index) {
                       final business =
                           businessProfileController.rejectedProfiles[index];
-                      if (business!.status == 'Rejected') {
+                      {
                         return GestureDetector(
                           onTap: () {
                             Get.to(() => BusinessProfile(
@@ -564,8 +511,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   tiktok: businessProfileController
                                       .rejectedProfiles[index]!.tiktokUrl!,
                                   webUrl: businessProfileController
-                                      .rejectedProfiles[index]!.websiteUrl!, status:businessProfileController
-                                .rejectedProfiles[index]!.status ,
+                                      .rejectedProfiles[index]!.websiteUrl!,
+                                  status: businessProfileController
+                                      .rejectedProfiles[index]!.status,
                                 ));
                           },
                           child: Container(
@@ -581,7 +529,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  business.name,
+                                  business!.name,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontFamily: 'bold',
@@ -598,27 +546,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                         );
-                      } else {
-                        return SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              getVerticalSpace(2.h),
-                              Text(
-                                'No Business Profile Rejected',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'bold',
-                                  fontSize: 14.px,
-                                  color: const Color(0xff282827),
-                                ),
-                              ),
-                              getVerticalSpace(2.h)
-                            ],
-                          ),
-                        ); // Empty widget for non-approved profiles
                       }
                     },
                   ),

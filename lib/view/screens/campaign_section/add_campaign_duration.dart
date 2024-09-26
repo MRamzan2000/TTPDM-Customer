@@ -38,6 +38,16 @@ class AddCampaignDuration extends StatelessWidget {
     log('selectedPoster $selectedPoster');
     return Scaffold(
       appBar: AppBar(
+        leading: GestureDetector(
+          onTap: () {
+            Get.back();
+          },
+          child: Icon(
+            Icons.arrow_back_ios_outlined,
+            size: 2.4.h,
+            color: const Color(0xff191918),
+          ),
+        ),
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,
         automaticallyImplyLeading: false,
