@@ -1233,10 +1233,8 @@ void openChooseSubscription(
                                               campaignPlatForms: "",
                                               endDate: "",
                                               endTime: "",
-                                              plan: subscriptionController
-                                                  .getAllPlans[
-                                                      isSelected.value]!
-                                                  .name,
+                                              plan:  isSelected.value==0?"pro": isSelected.value==1?"standard":"pro",
+
                                               selectedPoster: File(""),
                                               startDate: "",
                                               startTime: "",
