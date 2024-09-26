@@ -24,8 +24,7 @@ Future<void> main() async {
   Stripe.merchantIdentifier = 'any string works';
   await Stripe.instance.applySettings();
   await Firebase.initializeApp();
-  Get.put(ConnectivityController()); // Ensure ConnectivityController is initialized
-
+  Get.put(ConnectivityController());
   runApp(const MyApp());
 }
 
@@ -50,27 +49,8 @@ class _MyAppState extends State<MyApp> {
     return ResponsiveSizer(
       builder: (context, orientation, screenType) => const GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        home: ConnectivityWrapper(child: SplashScreen()), // Wrap your initial screen
+        home: SplashScreen(), // Wrap your initial screen
       ),
     );
   }
 }
-
-class ConnectivityWrapper extends StatelessWidget {
-  final Widget child;
-
-  const ConnectivityWrapper({super.key, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    final ConnectivityController connectivityController = Get.find();
-    return Obx(() {
-      if (connectivityController.isConnected.value) {
-        return child;
-      } else {
-        return const ConnectivityScreen();
-      }
-    });
-  }
-}
-

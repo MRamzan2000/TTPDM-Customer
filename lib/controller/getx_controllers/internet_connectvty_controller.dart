@@ -17,7 +17,7 @@ class ConnectivityController extends GetxController {
     InternetConnectionChecker().onStatusChange.listen((status) {
       isConnected.value = status == InternetConnectionStatus.connected;
       if (!isConnected.value) {
-        Get.to(() => const ConnectivityScreen(), transition: Transition.fadeIn);
+        Get.offAll(() => const ConnectivityScreen(), transition: Transition.fadeIn);
       } else {
         Get.back();
       }
