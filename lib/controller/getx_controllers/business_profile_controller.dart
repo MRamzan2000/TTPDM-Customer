@@ -45,7 +45,8 @@ class BusinessProfileController extends GetxController {
         logo: logo,
         tiktokUrl: tiktokUrl,
         token: token,
-        context: context, fullname: fullname,
+        context: context,
+        fullname: fullname,
       )
           .then(
         (value) {
@@ -74,6 +75,10 @@ class BusinessProfileController extends GetxController {
     if (data != null) {
       allBusinessProfiles.value = data.businesses;
       categorizeProfiles();
+      log("allBusinessProfiles :$allBusinessProfiles");
+      log("approvedProfiles :$approvedProfiles");
+      log("rejectedProfiles :$rejectedProfiles");
+      log("pendingProfiles :$pendingProfiles");
       isLoading2.value = false;
     }
   }
@@ -83,7 +88,7 @@ class BusinessProfileController extends GetxController {
         .where((profile) => profile?.status == 'accepted')
         .toList();
     rejectedProfiles.value = allBusinessProfiles
-        .where((profile) => profile?.status == 'rejected')
+        .where((profile) => profile?.status == 'cancelled')
         .toList();
     pendingProfiles.value = allBusinessProfiles
         .where((profile) => profile?.status == 'pending')
