@@ -176,19 +176,19 @@ class _PosterScreenState extends State<PosterScreen> {
                                   GestureDetector(
                                     onTap: () {
                                       Get.to(() => AddCampaignDuration(
-                                            businessId: widget.businessId,
-                                            campaignDescription:
-                                                widget.campaignDescription,
-                                            campaignName: widget.campaignName,
-                                            selectedPoster:
-                                                File(poster.fileUrl),
-                                            businessName: widget.businessName,
-                                            token: widget.token,
-                                          ));
+                                        businessId: widget.businessId,
+                                        campaignDescription:
+                                        widget.campaignDescription,
+                                        campaignName: widget.campaignName,
+                                        selectedPoster:
+                                        File(poster.fileUrl),
+                                        businessName: widget.businessName,
+                                        token: widget.token,
+                                      ));
                                     },
                                     child: SizedBox(
-                                      height: 6.h,
-                                      width: 5.h,
+                                      height: 7.h,
+                                      width: 6.h,
                                       child: const Image(
                                           image: AssetImage(
                                               'assets/pngs/select.png')),
@@ -199,18 +199,26 @@ class _PosterScreenState extends State<PosterScreen> {
                                     onTap: () {
                                       likedPosters[poster.id] = true;
                                       dislikedPosters[poster.id] =
-                                          false;
+                                      false;
                                       handleLikePoster(poster.id);
                                     },
-                                    child: SizedBox(
-                                      height: 6.h,
-                                      width: 5.h,
-                                      child: Image(
+                                    child:hasLiked? SizedBox(
+                                      height: 7.h,
+                                      width: 6.h,
+                                      child:  Image(
                                         image: const AssetImage(
                                             'assets/pngs/like.png'),
-                                        color: hasLiked
-                                            ? AppColors.mainColor
-                                            :const Color(0xffFAFAFA),
+                                          color: AppColors.mainColor
+
+                                      ),
+                                    ):SizedBox(
+                                      height: 7.h,
+                                      width: 6.h,
+                                      child:  const Image(
+                                          image: AssetImage(
+                                              'assets/pngs/like.png'),
+
+
                                       ),
                                     ),
                                   ),
@@ -219,20 +227,29 @@ class _PosterScreenState extends State<PosterScreen> {
                                     onTap: () {
                                       dislikedPosters[poster.id] = true;
                                       likedPosters[poster.id] =
-                                          false; // Reset like
+                                      false; // Reset like
 
                                       // Call the API to dislike the poster in the background
                                       handleDisLikePoster(poster.id);
                                     },
-                                    child: SizedBox(
-                                      height: 6.h,
-                                      width: 5.h,
+                                    child:hasDisliked?SizedBox(
+                                      height: 7.h,
+                                      width: 6.h,
                                       child: Image(
                                         image: const AssetImage(
                                             'assets/pngs/dislike.png'),
-                                        color: hasDisliked
-                                            ? AppColors.mainColor
-                                            : const Color(0xffFAFAFA),
+                                        color:
+                                            AppColors.mainColor
+
+                                      ),
+                                    ): SizedBox(
+                                      height: 7.h,
+                                      width: 6.h,
+                                      child: const Image(
+                                        image: AssetImage(
+                                            'assets/pngs/dislike.png'),
+
+
                                       ),
                                     ),
                                   ),
@@ -249,13 +266,14 @@ class _PosterScreenState extends State<PosterScreen> {
                                       );
                                     },
                                     child: SizedBox(
-                                      height: 6.h,
-                                      width: 5.h,
+                                      height: 7.h,
+                                      width: 6.h,
                                       child: const Image(
                                           image: AssetImage(
                                               "assets/pngs/edit.png")),
                                     ),
                                   ),
+
                                 ],
                               ),
                             ),

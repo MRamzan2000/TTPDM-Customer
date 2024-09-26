@@ -1024,6 +1024,8 @@ void openChooseSubscription(
       Get.put(SubscriptionController());
   final RxInt isSelected = 0.obs;
   RxList<String> titles = <String>["basic", "standard", "pro"].obs;
+  RxInt isPressedCount = 0.obs;
+
   RxList<String> description = <String>[
     'Add Business only',
     'Add up to Business only',
@@ -1217,33 +1219,37 @@ void openChooseSubscription(
                                   if (clientSecretKey.isEmpty) {
                                   } else {
                                     if (isPressed.value == true) {
-                                      await StripePayments.name(
-                                              subscriptionController
-                                                  .getAllPlans[
-                                                      isSelected.value]!
-                                                  .price
-                                                  .toDouble(),
-                                              context: context,
-                                              clientSecretKey: clientSecretKey,
-                                              token: token,
-                                              businessId: "",
-                                              businessName: "",
-                                              campaignDescription: "",
-                                              campaignName: "",
-                                              campaignPlatForms: "",
-                                              endDate: "",
-                                              endTime: "",
-                                              plan:  isSelected.value==0?"pro": isSelected.value==1?"standard":"pro",
+                                      isPressedCount.value = isPressedCount.value + 1;
+                                      if (isPressedCount.value == 1){
+                                        await StripePayments.name(
+                                            subscriptionController
+                                                .getAllPlans[
+                                            isSelected.value]!
+                                                .price
+                                                .toDouble(),
+                                            context: context,
+                                            clientSecretKey: clientSecretKey,
+                                            token: token,
+                                            businessId: "",
+                                            businessName: "",
+                                            campaignDescription: "",
+                                            campaignName: "",
+                                            campaignPlatForms: "",
+                                            endDate: "",
+                                            endTime: "",
+                                            plan:  isSelected.value==0?"pro": isSelected.value==1?"standard":"pro",
 
-                                              selectedPoster: File(""),
-                                              startDate: "",
-                                              startTime: "",
-                                              cost: '')
-                                          .startPayment();
+                                            selectedPoster: File(""),
+                                            startDate: "",
+                                            startTime: "",
+                                            cost: '')
+                                            .startPayment();
+                                      }
+
                                     }
                                   }
                                 },
-                                title: subscriptionController.isLoading.value
+                                title: isPressedCount.value == 1
                                     ? spinkit
                                     : Text(
                                         'Pay now',
@@ -1355,7 +1361,6 @@ void logoutPopUp(BuildContext context) {
                         child: customElevatedButton(
                             onTap: () {
                               MySharedPreferences.setBool(isLoggedInKey, false);
-
                               Get.off(() => const LoginScreen());
                             },
                             title: Text(

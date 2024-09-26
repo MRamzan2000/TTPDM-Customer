@@ -15,61 +15,82 @@ import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import 'reset_otp.dart';
 
 class LoginScreen extends StatefulWidget {
-    const LoginScreen({super.key});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-   final TextEditingController emailController=TextEditingController();
+  final TextEditingController emailController = TextEditingController();
 
-   final TextEditingController passwordController=TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-    late LoginUserController loginUserController;
-   late WebViewControllerPlus _controler;
-   bool isCaptchaVerified = false;
-   double webViewHeight = 400; // Initial height for WebView
+  late LoginUserController loginUserController;
+  late WebViewControllerPlus _controler;
+  bool isCaptchaVerified = false;
+  double webViewHeight = 400;
 
-
-   @override
+  @override
   void initState() {
     super.initState();
-    loginUserController =Get.put(LoginUserController(context: context));
+    loginUserController = Get.put(LoginUserController(context: context));
     _controler = WebViewControllerPlus()
       ..loadFlutterAssetServer('assets/webpages/index.html')
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..enableZoom(false)
       ..setBackgroundColor(const Color(0x00000000))
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageFinished: (url) {
-            _controler.getWebViewHeight().then((value) {
-              var height = int.parse(value.toString()).toDouble();
-              if (height != 20.0) {
-                setState(() {
-                  // Set the WebView height based on the content
-                });
-              }
-            });
-          },
-        ));
-  }
-RxString fcmToken="".obs;
-    void getToken()async{
-      FirebaseMessaging.instance.getToken().then((String? token) {
-        if (token != null) {
-          fcmToken.value=token;
-          log("Push Messaging token: ${fcmToken.value}");
+      ..setNavigationDelegate(NavigationDelegate(
+        onPageFinished: (url) {
+          _controler.getWebViewHeight().then((value) {
+            var height = int.parse(value.toString()).toDouble();
+            if (height != 20.0) {
+              setState(() {
+                // Set the WebView height based on the content
+              });
+            }
+          });
+        },
+      ));
+    _controler.addJavaScriptChannel(
+      'Captcha',
+      onMessageReceived: (message) {
+        final token = message.message;
+        if (token.isNotEmpty) {
+          log('Received reCAPTCHA token: $token');
+          setState(() {
+            isCaptchaVerified = true; // Update your verification state
+          });
         }
-      }).catchError((error) {
-        log("Error getting push messaging token: $error");
-      });
-    }
+      },
+    );
 
-    @override
+    _controler.addJavaScriptChannel(
+      'Captcha',
+      onMessageReceived: (message) {
+        if (message.message == 'verified') {
+          setState(() {
+            isCaptchaVerified = true;
+          });
+        }
+      },
+    );
+  }
+
+  RxString fcmToken = "".obs;
+  void getToken() async {
+    FirebaseMessaging.instance.getToken().then((String? token) {
+      if (token != null) {
+        fcmToken.value = token;
+        log("Push Messaging token: ${fcmToken.value}");
+      }
+    }).catchError((error) {
+      log("Error getting push messaging token: $error");
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SizedBox(
@@ -103,9 +124,7 @@ RxString fcmToken="".obs;
                       .copyWith(color: const Color(0xff000000)),
                 ),
                 getVerticalSpace(.4.h),
-                customTextFormField(
-                  controller: emailController
-                ),
+                customTextFormField(controller: emailController),
                 getVerticalSpace(1.6.h),
                 Text(
                   'Password',
@@ -113,15 +132,14 @@ RxString fcmToken="".obs;
                       .copyWith(color: const Color(0xff000000)),
                 ),
                 getVerticalSpace(.4.h),
-                customTextFormField(
-                  controller: passwordController
-                ),
+                customTextFormField(controller: passwordController),
                 getVerticalSpace(.6.h),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: GestureDetector(onTap: (){
-                    Get.to(()=> ResetOtpScreen());
-                  },
+                  child: GestureDetector(
+                    onTap: () {
+                      Get.to(() => ResetOtpScreen());
+                    },
                     child: Text(
                       'Forgot Password',
                       style: TextStyle(
@@ -143,31 +161,39 @@ RxString fcmToken="".obs;
                   ),
                 ),
                 getVerticalSpace(4.4.h),
-                Obx(() =>
-                   Row(mainAxisAlignment: MainAxisAlignment.center,
+                Obx(
+                  () => Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       customElevatedButton(
                         title: loginUserController.isLoading.value == true
                             ? spinkit
                             : Text(
-                          'Login ',
-                          style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
-                        ),
+                                'Login ',
+                                style: CustomTextStyles.buttonTextStyle
+                                    .copyWith(color: AppColors.whiteColor),
+                              ),
                         onTap: () {
                           if (emailController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Please enter the email')),
+                              const SnackBar(
+                                  content: Text('Please enter the email')),
                             );
-                          }  else if(passwordController.text.isEmpty) {
+                          } else if (passwordController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Please enter the password')),
+                              const SnackBar(
+                                  content: Text('Please enter the password')),
                             );
-                          }  else {
+                          } else if (!isCaptchaVerified) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Please complete the CAPTCHA')),
+                            );
+                          } else {
                             loginUserController.userLogin(
                                 email: emailController.text,
                                 password: passwordController.text,
-                                fcmToken: fcmToken.value
-                            );
+                                fcmToken: fcmToken.value);
                           }
                         },
                         bgColor: AppColors.mainColor,
@@ -182,7 +208,7 @@ RxString fcmToken="".obs;
                   alignment: Alignment.bottomCenter,
                   child: GestureDetector(
                     onTap: () {
-                      Get.to(() =>  RegisterScreen());
+                      Get.to(() => RegisterScreen());
                     },
                     child: RichText(
                         text: TextSpan(children: [
