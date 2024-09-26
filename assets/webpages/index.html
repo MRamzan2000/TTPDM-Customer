@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>reCAPTCHA</title>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+<form action="?" method="POST">
+<div class="g-recaptcha"
+data-sitekey="6Le7nx4qAAAAAEEME6ITeoOsN5Tru6DOz0a79vck"
+data-callback="captchaCallback"></div>
+</form>
+<script>
+function captchaCallback(response){
+window.isCaptchaVerified = true; // Set global variable when verified
+if (typeof Captcha !== "undefined") {
+Captcha.postMessage('verified'); // Send verification message
+}
+}
+</script>
+</body>
+</html>

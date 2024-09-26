@@ -60,6 +60,7 @@ dependencies:
   flutter_local_notifications: ^17.2.2
   firebase_auth: ^5.2.0
   fl_chart: ^0.69.0
+  webview_flutter_plus: ^0.4.7
   internet_connection_checker: ^2.0.0
 
 
@@ -92,6 +93,7 @@ flutter:
     - assets/
     - assets/pngs/
     - assets/svgs/
+    - assets/webpages/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

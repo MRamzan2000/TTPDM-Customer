@@ -51,6 +51,11 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
     if (addCampaignController.image.value == null) {
       errorMessages.add('Logo is required.');
     }
+    if(locationController.text.isEmpty){
+      errorMessages.add("Location are required! please enter location");
+    }else if(targetController.text.isEmpty){
+      errorMessages.add("Target Map area required! please enter Target Map area");
+    }else
     if(descriptionController.text.length<50){
      errorMessages.add("Description length At least 50 character");
     }

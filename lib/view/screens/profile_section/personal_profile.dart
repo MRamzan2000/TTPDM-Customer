@@ -270,7 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Row(
                     children: [
                       Text(
-                        'Pending Approval',
+                        'Pending',
                         style: TextStyle(
                           fontFamily: 'regular',
                           color: const Color(0xff007AFF),

@@ -66,9 +66,9 @@ class ConnectivityWrapper extends StatelessWidget {
     final ConnectivityController connectivityController = Get.find();
     return Obx(() {
       if (connectivityController.isConnected.value) {
-        return child; // Show the child widget if connected
+        return child;
       } else {
-        return const ConnectivityScreen(); // Show ConnectivityScreen if disconnected
+        return const ConnectivityScreen();
       }
     });
   }

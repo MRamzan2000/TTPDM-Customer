@@ -40,6 +40,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
     RxInt isSelectedIndex = 0.obs;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       extendBody: true,
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.mainColor,

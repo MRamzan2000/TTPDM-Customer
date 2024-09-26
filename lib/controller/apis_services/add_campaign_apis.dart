@@ -9,12 +9,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:ttpdm/models/getdesigns_model.dart';
 
 import '../../models/get_campaigns_by_status_model.dart';
 
 class AddCampaignApis {
-  //final AddCampaign Api
   Future<void> addCampaignApi({
     required String businessId,
     required String adsName,
@@ -26,17 +24,14 @@ class AddCampaignApis {
     required String endTime,
     required String adBannerUrl,
     required String token,
+    required String cost,
     required BuildContext context,
   }) async {
     try {
-      // Define the file name based on the URL or a unique identifier
       const fileName =
-          'adBanner.png'; // or extract it from the URL if it has a different extension
-
-      // Download the file from the URL
+          'adBanner.png';
       final downloadedFile = await downloadFile(adBannerUrl, fileName);
 
-      // Upload the downloaded file
       final url = Uri.parse("$baseUrl/$addCampaignEp");
       final request = http.MultipartRequest('POST', url);
       request.fields["businessId"] = businessId;
@@ -47,6 +42,7 @@ class AddCampaignApis {
       request.fields["endDate"] = endDate;
       request.fields["startTime"] = startTime;
       request.fields["endTime"] = endTime;
+      request.fields["cost"] = cost;
       request.files.add(await http.MultipartFile.fromPath(
         'adBanner',
         downloadedFile.path,

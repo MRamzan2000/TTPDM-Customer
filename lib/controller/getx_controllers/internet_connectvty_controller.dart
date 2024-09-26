@@ -19,7 +19,6 @@ class ConnectivityController extends GetxController {
       if (!isConnected.value) {
         Get.to(() => const ConnectivityScreen(), transition: Transition.fadeIn);
       } else {
-        // Optionally, navigate back to the previous screen
         Get.back();
       }
     });

@@ -3,8 +3,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:get/get.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
-
+RxBool isNotificationReceived=false.obs;
 class NotificationServices {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
@@ -35,18 +36,18 @@ class NotificationServices {
       if (message.notification != null) {
         showNotification(message);
         MySharedPreferences().saveNotification(message);
+        isNotificationReceived.value=true;
+
       }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // Handle notification tap
-      // _handleNotificationTap(message.data);
+
     });
 
     _firebaseMessaging.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
-        // Handle notification tap
-        // _handleNotificationTap(message.data);
+
       }
     });
   }

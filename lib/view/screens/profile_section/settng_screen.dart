@@ -31,10 +31,28 @@ class _LogOutScreenState extends State<LogOutScreen> {
     super.initState();
     userProfileController = Get.put(UserProfileController(context: context));
     getStripeKeyController = Get.put(GetStripeKeyController(context: context));
+
     token.value = MySharedPreferences.getString(authToken);
     subscriptionEnd.value = MySharedPreferences.getString(subscription);
-     dateTime = DateTime.parse(subscriptionEnd.value);
-     formattedDate = DateFormat('dd MMMM').format(dateTime);
+
+    // Debugging output
+    print("Subscription End Value: ${subscriptionEnd.value}");
+
+    // Check if subscriptionEnd is not null or empty
+    if (subscriptionEnd.value != null && subscriptionEnd.value!.isNotEmpty) {
+      try {
+        dateTime = DateTime.parse(subscriptionEnd.value!);
+        formattedDate = DateFormat('dd MMMM').format(dateTime);
+      } catch (e) {
+        print("Error parsing date: $e");
+        // Handle the error, e.g., set a default date or show an error message
+      }
+    } else {
+      // Handle the case where subscriptionEnd is null or empty
+      print("Invalid subscription end date");
+      // You can set a default value for dateTime or handle it accordingly
+    }
+
     getStripeKeyController.fetchStripeKey(loading: true).then((_) {
       getStripeKeyController.keyLoading.value = false; // Update loading state
     });

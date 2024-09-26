@@ -10,6 +10,7 @@ import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/login_user_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/view/screens/auth_section/register_screen.dart';
+import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import 'reset_otp.dart';
 
@@ -26,11 +27,33 @@ class _LoginScreenState extends State<LoginScreen> {
    final TextEditingController passwordController=TextEditingController();
 
     late LoginUserController loginUserController;
-    @override
+   late WebViewControllerPlus _controler;
+   bool isCaptchaVerified = false;
+   double webViewHeight = 400; // Initial height for WebView
+
+
+   @override
   void initState() {
     super.initState();
     loginUserController =Get.put(LoginUserController(context: context));
-    getToken();
+    _controler = WebViewControllerPlus()
+      ..loadFlutterAssetServer('assets/webpages/index.html')
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..enableZoom(false)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (url) {
+            _controler.getWebViewHeight().then((value) {
+              var height = int.parse(value.toString()).toDouble();
+              if (height != 20.0) {
+                setState(() {
+                  // Set the WebView height based on the content
+                });
+              }
+            });
+          },
+        ));
   }
 RxString fcmToken="".obs;
     void getToken()async{
@@ -110,15 +133,13 @@ RxString fcmToken="".obs;
                   ),
                 ),
                 getVerticalSpace(1.6.h),
-                Container(
-                  width: 24.2.h,
-                  height: 6.2.h,
-                  decoration: BoxDecoration(
-                    color: AppColors.textFieldGreyColor.withOpacity(0.2),
-                  ),
-                  child: Image.asset(
-                    'assets/pngs/capcha.png',
-                    fit: BoxFit.cover,
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: SizedBox(
+                    height: 180,
+                    child: WebViewWidget(
+                      controller: _controler,
+                    ),
                   ),
                 ),
                 getVerticalSpace(4.4.h),

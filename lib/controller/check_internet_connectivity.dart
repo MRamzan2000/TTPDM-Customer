@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/view/screens/splash_screen.dart';
-
 import '../controller/getx_controllers/internet_connectvty_controller.dart';
 
 class ConnectivityScreen extends StatelessWidget {
@@ -16,7 +15,7 @@ class ConnectivityScreen extends StatelessWidget {
     return Scaffold(
       body: Obx(() {
         if (connectivityController.isConnected.value) {
-          return const SplashScreen(); // or your main content widget
+          return const SplashScreen();
         } else {
           return SizedBox(
             height: MediaQuery.of(context).size.height,

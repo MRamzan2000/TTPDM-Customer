@@ -11,6 +11,7 @@ import 'package:ttpdm/controller/getx_controllers/user_profile_controller.dart';
 import 'package:ttpdm/controller/utils/alert_box.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
+import 'package:ttpdm/controller/utils/push_notification.dart';
 import 'package:ttpdm/models/get_campaigns_by_status_model.dart';
 import 'package:ttpdm/view/screens/campaign_section/campaign_name.dart';
 import 'package:ttpdm/view/screens/notification_section/notification_screen.dart';
@@ -85,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ].obs;
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -159,11 +161,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           Get.to(()=>const NotiFicationScreen());
                         },
-                        child: SizedBox(
-                            height: 4.8.h,
-                            width: 4.8.h,
-                            child: svgImage(
-                                'assets/svgs/midadminnotification.svg')),
+                        // child: SizedBox(
+                        //     height: 4.8.h,
+                        //     width: 4.8.h,
+                        //     child: const Image(image: AssetImage("assets/pngs/notificationicon.png"))),
                       ),
                     )
                         : ListTile(
@@ -212,11 +213,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           Get.to(()=>const NotiFicationScreen());
 
                         },
-                        child: SizedBox(
-                            height: 4.8.h,
-                            width: 4.8.h,
-                            child: svgImage(
-                                'assets/svgs/midadminnotification.svg')),
+                        child:Stack(alignment: Alignment.topRight,
+                          children: [
+                          SizedBox(
+                              height: 3.h,
+                              width: 3.h,
+                              child: Icon(Icons.notifications_none_sharp,color: AppColors.textFieldTextColor,)),
+                            isNotificationReceived.value? Container(height: 1.h,width: 1.h,decoration: const BoxDecoration(
+                               shape: BoxShape.circle,
+                               color: Colors.red
+                             ),):const SizedBox.shrink()
+                        ],)
                       ),
                     ),
                     getVerticalSpace(1.h),
@@ -480,7 +487,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         campaign.startTime,
                                                         endTime:
                                                         campaign.endTime,
-                                                        status: campaign.status, analysis: [],
+                                                        status: campaign.status, analysis: const [],
                                                       ));
                                                     }
                                                   },

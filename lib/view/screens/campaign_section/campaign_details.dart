@@ -79,14 +79,8 @@ class _CampaignDetailsState extends State<CampaignDetails> {
         (dayFee * totalDays) +
         (hourFee * numberOfHours) ;
 
-    log("platform:${widget.campaignPlatForms}");
-    log("totalDays:$totalDays");
-    log("numberOfHours:$numberOfHours");
-    // Round off total fee to 2 decimal places
     totalFee = double.parse(totalFee!.toStringAsFixed(2));
 
-    // Debug output
-    log('Total fee: $totalFee');
   }
 
   @override
@@ -95,6 +89,16 @@ class _CampaignDetailsState extends State<CampaignDetails> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: GestureDetector(
+          onTap: () {
+            Get.back();
+          },
+          child: Icon(
+            Icons.arrow_back_ios_outlined,
+            size: 2.4.h,
+            color: const Color(0xff191918),
+          ),
+        ),
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,
         automaticallyImplyLeading: false,

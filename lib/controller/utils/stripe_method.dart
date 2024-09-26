@@ -26,6 +26,7 @@ class StripePayments {
    String endDate;
    String startTime;
    String endTime;
+   String cost;
 
   StripePayments.name(this.amount,
   {
@@ -43,6 +44,7 @@ class StripePayments {
   required   this.campaignName,
    required  this.endDate,
   required   this.selectedPoster,
+  required   this.cost,
   }
       );
 
@@ -103,7 +105,6 @@ class StripePayments {
       await Stripe.instance.presentPaymentSheet();
       log("Payment successful!");
 
-      // Call confirmPayment only after successful payment
       if(plan=="no plan"){
        await addCampaignController
             .submitCampaign(
@@ -117,6 +118,7 @@ class StripePayments {
             endTime: endTime,
             adBanner: selectedPoster.path,
             token: token,
+            cost: cost,
             context: context)
             .then(
               (value) {

@@ -191,6 +191,7 @@ class AddCampaignController extends GetxController {
       required String endTime,
       required String adBanner,
       required String token,
+      required String cost,
       required BuildContext context // Corrected list<File> to List<File>}
       }) async {
     try {
@@ -207,7 +208,9 @@ class AddCampaignController extends GetxController {
               endTime: endTime,
               token: token,
               context: context,
-              adBannerUrl: adBanner)
+              adBannerUrl: adBanner,
+        cost: cost
+      )
           .then(
         (value) {
           return addCampaignLoading.value = false;

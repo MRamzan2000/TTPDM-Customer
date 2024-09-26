@@ -433,7 +433,6 @@ void openCampaignPoster(
   final GetFcmTokenSendNotificationController
       getFcmTokenSendNotificationController =
       Get.put(GetFcmTokenSendNotificationController(context: context));
-
   showDialog(
     context: context,
     builder: (context) {
@@ -479,7 +478,7 @@ void openCampaignPoster(
                                 Get.back();
                               },
                               title: Text(
-                                'Deny',
+                                'Cancel',
                                 style: CustomTextStyles.buttonTextStyle
                                     .copyWith(color: AppColors.whiteColor),
                               ),
@@ -777,6 +776,18 @@ void openCampaignSubmit(
   required String token,
   required String clientSecretKey,
 }) {
+  RxInt isPressedCount = 0.obs;
+  log("businessId:$businessId");
+  log("businessName:$businessName");
+  log("campaignName:$campaignName");
+  log("campaignDescription:$campaignDescription");
+  log("selectedPoster:$selectedPoster");
+  log("campaignPlatForms:$campaignPlatForms");
+  log("startDate:$startDate");
+  log("endDate :$endDate");
+  log("startTime :$startTime");
+  log("endTime :$endTime");
+  log("token :$token");
   log("clientSecretKey :$clientSecretKey");
   showDialog(
     context: context,
@@ -846,35 +857,39 @@ void openCampaignSubmit(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customElevatedButton(
-                          title: addCampaignController
-                                      .addCampaignLoading.value
+                          title: isPressedCount.value == 1
                               ? spinkit
                               : Text(
                                   'Pay Now',
                                   style: CustomTextStyles.buttonTextStyle
                                       .copyWith(color: AppColors.whiteColor),
                                 ),
-                          onTap: () async{
-                            await StripePayments.name(
-                             totalFee,
-                              context: context,
-                              clientSecretKey: clientSecretKey,
-                              token: token,
-                              businessId: businessId,
-                              businessName: businessName,
-                              campaignDescription: campaignDescription,
-                              campaignName: campaignName,
-                              campaignPlatForms: campaignPlatForms,
-                              endDate: endDate,
-                               endTime: endTime,
-                             plan: "no plan",
-                            selectedPoster: selectedPoster,
-                              startDate: startDate,
-                              startTime: startTime
-
-
-                            ).startPayment();
-
+                          onTap: () async {
+                            isPressedCount.value = isPressedCount.value + 1;
+                            if (isPressedCount.value == 1) {
+                              await StripePayments.name(totalFee,
+                                      context: context,
+                                      clientSecretKey: clientSecretKey,
+                                      token: token,
+                                      businessId: businessId,
+                                      businessName: businessName,
+                                      campaignDescription: campaignDescription,
+                                      campaignName: campaignName,
+                                      campaignPlatForms: campaignPlatForms,
+                                      endDate: endDate,
+                                      endTime: endTime,
+                                      plan: "no plan",
+                                      selectedPoster: selectedPoster,
+                                      startDate: startDate,
+                                      startTime: startTime,
+                                      cost: totalFee.toString())
+                                  .startPayment()
+                                  .then(
+                                (value) {
+                                  isPressedCount.value = 2;
+                                },
+                              );
+                            }
                           },
                           bgColor: const Color(0xff34C759),
                           verticalPadding: 1.h,
@@ -1004,6 +1019,7 @@ void openChooseSubscription(
   String token,
   String clientSecretKey,
 ) {
+  RxBool isPressed = false.obs;
   final SubscriptionController subscriptionController =
       Get.put(SubscriptionController());
   final RxInt isSelected = 0.obs;
@@ -1197,30 +1213,36 @@ void openChooseSubscription(
                           child: Obx(
                             () => customElevatedButton(
                                 onTap: () async {
+                                  isPressed.value = true;
                                   if (clientSecretKey.isEmpty) {
-                                    log("please wait for key");
-                                    log(clientSecretKey);
                                   } else {
-                                    await StripePayments.name(
-                                        subscriptionController
-                                            .getAllPlans[isSelected.value]!.price
-                                            .toDouble(),
-                                        context: context,
-                                        clientSecretKey: clientSecretKey,
-                                        token: token,
-                                        businessId: "",
-                                        businessName: "",
-                                        campaignDescription: "",
-                                        campaignName: "",
-                                        campaignPlatForms: "",
-                                        endDate: "",
-                                        endTime: "",
-                                        plan:subscriptionController
-                                            .getAllPlans[isSelected.value]!.name,
-                                        selectedPoster: File(""),
-                                        startDate: "",
-                                        startTime: ""
-                                    ).startPayment();
+                                    if (isPressed.value == true) {
+                                      await StripePayments.name(
+                                              subscriptionController
+                                                  .getAllPlans[
+                                                      isSelected.value]!
+                                                  .price
+                                                  .toDouble(),
+                                              context: context,
+                                              clientSecretKey: clientSecretKey,
+                                              token: token,
+                                              businessId: "",
+                                              businessName: "",
+                                              campaignDescription: "",
+                                              campaignName: "",
+                                              campaignPlatForms: "",
+                                              endDate: "",
+                                              endTime: "",
+                                              plan: subscriptionController
+                                                  .getAllPlans[
+                                                      isSelected.value]!
+                                                  .name,
+                                              selectedPoster: File(""),
+                                              startDate: "",
+                                              startTime: "",
+                                              cost: '')
+                                          .startPayment();
+                                    }
                                   }
                                 },
                                 title: subscriptionController.isLoading.value
@@ -1470,5 +1492,201 @@ void openBottomSheet(
     ),
     backgroundColor: Colors.white,
     isScrollControlled: true,
+  );
+}
+
+
+
+void withdrawRequest(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      final screenHeight = MediaQuery.of(context).size.height;
+      final screenWidth = MediaQuery.of(context).size.width;
+
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05), // 5% of screen width
+          child: Material(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06, vertical: screenHeight * 0.05), // Adjust for screen size
+              height: screenHeight * 0.6,
+              decoration: BoxDecoration(
+                color: const Color(0xffF8F9FA),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Expanded(child: SizedBox()),
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Withdraw Request',
+                          style: CustomTextStyles.buttonTextStyle.copyWith(
+                            color: AppColors.blackColor,
+                            fontFamily: 'bold',
+                            fontSize: screenHeight * 0.025, // Responsive font size
+                          ),
+                        ),
+                        getVerticalSpace(1.2.h),
+                        Text(
+                          '\$23.0',
+                          style: CustomTextStyles.buttonTextStyle.copyWith(
+                            color: AppColors.mainColor,
+                            fontFamily: 'bold',
+                            fontSize: screenHeight * 0.025,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  getVerticalSpace(1.2.h),
+                  Text(
+                    "Bank Name",
+                    style: CustomTextStyles.buttonTextStyle.copyWith(
+                      color: const Color(0xff454544),
+                      fontFamily: 'bold',
+                      fontSize: screenHeight * 0.018,
+                    ),
+                  ),
+                  getVerticalSpace(0.8.h),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.whiteColor,
+                      borderRadius: BorderRadius.circular(1.h),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.blackColor.withOpacity(0.1),
+                          offset: const Offset(0, 2),
+                          blurRadius: 8,
+                          spreadRadius: 0,
+                        ),
+                      ],
+                    ),
+                    child: customTextFormField(
+                      bgColor: AppColors.whiteColor,
+                    ),
+                  ),
+                  getVerticalSpace(1.6.h),
+                  Text(
+                    "Account Title",
+                    style: CustomTextStyles.buttonTextStyle.copyWith(
+                      color: const Color(0xff454544),
+                      fontFamily: 'bold',
+                      fontSize: screenHeight * 0.018,
+                    ),
+                  ),
+                  getVerticalSpace(0.8.h),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.whiteColor,
+                      borderRadius: BorderRadius.circular(1.h),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.blackColor.withOpacity(0.1),
+                          offset: const Offset(0, 2),
+                          blurRadius: 8,
+                          spreadRadius: 0,
+                        ),
+                      ],
+                    ),
+                    child: customTextFormField(
+                      bgColor: AppColors.whiteColor,
+                    ),
+                  ),
+                  getVerticalSpace(1.6.h),
+                  RichText(
+                    text: TextSpan(children: [
+                      TextSpan(
+                        text: "IBAN",
+                        style: CustomTextStyles.buttonTextStyle.copyWith(
+                          color: const Color(0xff454544),
+                          fontFamily: 'bold',
+                          fontSize: screenHeight * 0.018,
+                        ),
+                      ),
+                      TextSpan(
+                        text: " (International Bank Account Number)",
+                        style: CustomTextStyles.buttonTextStyle.copyWith(
+                          color: const Color(0xff454544),
+                          fontWeight: FontWeight.w300,
+                          fontFamily: 'bold',
+                          fontSize: screenHeight * 0.014,
+                        ),
+                      ),
+                    ]),
+                  ),
+                  getVerticalSpace(0.8.h),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.whiteColor,
+                      borderRadius: BorderRadius.circular(1.h),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.blackColor.withOpacity(0.1),
+                          offset: const Offset(0, 2),
+                          blurRadius: 8,
+                          spreadRadius: 0,
+                        ),
+                      ],
+                    ),
+                    child: customTextFormField(
+                      bgColor: AppColors.whiteColor,
+                    ),
+                  ),
+                  getVerticalSpace(4.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: customElevatedButton(
+                          onTap: () {
+                            Get.back();
+                          },
+                          title: Text(
+                            'Cancel',
+                            style: CustomTextStyles.buttonTextStyle.copyWith(
+                              color: AppColors.whiteColor,
+                              fontFamily: 'bold',
+                            ),
+                          ),
+                          bgColor: const Color(0xffC3C3C2),
+                          verticalPadding: screenHeight * 0.01, // Responsive padding
+                          horizentalPadding: screenWidth * 0.04, // Responsive padding
+                        ),
+                      ),
+                      getHorizentalSpace(1.6.h),
+                      Expanded(
+                        child: customElevatedButton(
+                          onTap: () {
+                            MySharedPreferences.setBool(isLoggedInKey, false);
+                            Get.off(() => const LoginScreen());
+                          },
+                          title: Text(
+                            'Send',
+                            style: CustomTextStyles.buttonTextStyle.copyWith(
+                              color: AppColors.whiteColor,
+                              fontFamily: 'bold',
+                            ),
+                          ),
+                          bgColor: AppColors.mainColor,
+                          verticalPadding: screenHeight * 0.01, // Responsive padding
+                          horizentalPadding: screenWidth * 0.04, // Responsive padding
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
   );
 }
