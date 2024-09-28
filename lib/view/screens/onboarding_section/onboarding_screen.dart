@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
+import 'package:ttpdm/view/screens/auth_section/login_screen.dart';
 import 'package:ttpdm/view/screens/auth_section/register_screen.dart';
 
 import '../../../controller/custom_widgets/widgets.dart';
@@ -18,6 +19,7 @@ class OnBoardingScreen extends StatelessWidget {
       keepPage: true,
     );
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
@@ -165,7 +167,7 @@ class OnBoardingScreen extends StatelessWidget {
                           style: CustomTextStyles.buttonTextStyle.copyWith(color:AppColors.whiteColor ),
                         ),
                         onTap: () {
-                          Get.to(()=> RegisterScreen());
+                          Get.to(()=> const LoginScreen());
 
                         },
                         bgColor: AppColors.mainColor,
@@ -175,7 +177,7 @@ class OnBoardingScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           GestureDetector(onTap: (){
-                            Get.to(()=> RegisterScreen());
+                            Get.to(()=> const LoginScreen());
                           },
                             child: Text(
                               'SKIP',

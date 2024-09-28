@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:ttpdm/view/screens/splash_screen.dart';
 
 import '../check_internet_connectivity.dart';
 
@@ -19,7 +20,7 @@ class ConnectivityController extends GetxController {
       if (!isConnected.value) {
         Get.offAll(() => const ConnectivityScreen(), transition: Transition.fadeIn);
       } else {
-        Get.back();
+        Get.off(() => const SplashScreen());
       }
     });
   }

@@ -32,6 +32,7 @@ final AddCampaignController addCampaignController=Get.put(AddCampaignController(
     Rx<DateTime> endTime = DateTime(2023, 01, 01, 16).obs; // Default end time: 4:00 PM (16:00)
 
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
         body: SizedBox(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,

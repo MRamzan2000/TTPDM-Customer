@@ -23,7 +23,7 @@ class RegisterScreen extends StatelessWidget {
 
     final SignUpController signUpController=Get.put(SignUpController(context: context));
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xfff8f9fa),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,

@@ -80,6 +80,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
     ];
 
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
         appBar: AppBar(
           leading: GestureDetector(
             onTap: () {

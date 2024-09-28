@@ -17,6 +17,7 @@ final RxString otpCode=''.obs;
   Widget build(BuildContext context) {
     final VerifyOtpController verifyOtpController=Get.put(VerifyOtpController(context:context));
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,

@@ -88,6 +88,7 @@ class _CampaignDetailsState extends State<CampaignDetails> {
     String range = '';
 
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {

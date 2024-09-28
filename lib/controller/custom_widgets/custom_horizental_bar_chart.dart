@@ -13,6 +13,7 @@ class HorizentalBarChart extends StatelessWidget {
     RxList<double> valuesList=<double>[63,47,52,81].obs;
 
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       body: Stack(
         children: [
           Column(

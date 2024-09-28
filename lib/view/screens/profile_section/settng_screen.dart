@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -35,16 +37,16 @@ class _LogOutScreenState extends State<LogOutScreen> {
     // Initialize token and subscriptionEnd
     token.value = MySharedPreferences.getString(authToken);
     subscriptionEnd.value = MySharedPreferences.getString(subscription);
+    log("subscriptionEnd.value :${subscriptionEnd.value}");
 
-    if (subscriptionEnd.value != null && subscriptionEnd.value!.isNotEmpty) {
+    if (subscriptionEnd.value.isNotEmpty) {
       try {
-        dateTime = DateTime.parse(subscriptionEnd.value!);
+        dateTime = DateTime.parse(subscriptionEnd.value);
         formattedDate = DateFormat('dd MMMM').format(dateTime);
       } catch (e) {
-        print("Error parsing date: $e");
+        log("Error parsing date: $e");
       }
     }
-
     // Fetch Stripe key
     getStripeKeyController.fetchStripeKey(loading: true).then((_) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -56,6 +58,7 @@ class _LogOutScreenState extends State<LogOutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {

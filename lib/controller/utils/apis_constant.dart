@@ -33,9 +33,8 @@ const getFcmTokenEP="fcm-token";
 const sendNotificationEp="user/send-notification";
 const getStripeKeyEp="stripe/get";
 const editDesignEp="campaign/editDesign";
-
-
-
+const walletDetailsEP="wallet";
+const walletWithdrawRequestEP="wallet/withdraw";
 
 final spinkit = Container(
   alignment: Alignment.centerLeft,
@@ -62,6 +61,7 @@ final spinkit = Container(
   )
   ,
 );
+
 final internetLoading =  Center(
   child: SpinKitRotatingCircle(
     color: AppColors.mainColor,
