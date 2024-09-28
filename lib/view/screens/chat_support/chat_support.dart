@@ -125,11 +125,8 @@ class _ChatSupportScreenState extends State<ChatSupportScreen> {
                                 var message = chatController.fetchChatDetail[index];
 
                                 bool isUser = message!.sender.toString().toLowerCase().contains('admin');
-
-                                return Column(
-                                  children: [
-                                    if (message.messageType.toString().toLowerCase().contains('with')) ...[
-                                      Column(
+                                return message.messageType.toString().toLowerCase().contains('with')
+                                    ? Column(
                                         crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
                                           Container(
@@ -219,8 +216,7 @@ class _ChatSupportScreenState extends State<ChatSupportScreen> {
                                           ),
                                         ],
                                       )
-                                    ] else ...[
-                                      Align(
+                                    : Align(
                                         alignment: !isUser ? Alignment.centerRight : Alignment.centerLeft,
                                         child: Column(
                                           crossAxisAlignment: isUser ? CrossAxisAlignment.start : CrossAxisAlignment.end,
@@ -250,10 +246,7 @@ class _ChatSupportScreenState extends State<ChatSupportScreen> {
                                             ),
                                           ],
                                         ),
-                                      )
-                                    ],
-                                  ],
-                                );
+                                      );
                               },
                             ),
                           ),
@@ -267,7 +260,6 @@ class _ChatSupportScreenState extends State<ChatSupportScreen> {
                       child: TextField(
                         controller: messageController,
                         decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.attach_file),
                           hintText: 'Type your message...',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
