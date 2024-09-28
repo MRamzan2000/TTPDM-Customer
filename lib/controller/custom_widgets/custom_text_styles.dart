@@ -23,4 +23,16 @@ class CustomTextStyles {
       fontFamily: 'regular',
       color: AppColors.textFieldTextColor,
       fontWeight: FontWeight.w400);
+
+  static TextStyle customTitleTextStyle = TextStyle(
+      fontSize: 16.px,
+      fontFamily: 'regular',
+      color: AppColors.blackColor,
+      fontWeight: FontWeight.w600);
+
+  static TextStyle customSubTitleTextStyle = TextStyle(
+      fontSize: 14.px,
+      fontFamily: 'regular',
+      color: AppColors.blackColor,
+      fontWeight: FontWeight.normal);
 }

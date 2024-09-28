@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart' hide Response;
 import 'package:http/http.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
@@ -13,7 +14,9 @@ import '../../view/screens/bottom_navigationbar.dart';
 
 class AuthApis {
   final BuildContext context;
+
   AuthApis({required this.context});
+
   Future<void> signUPApis({
     required String fullName,
     required String email,
@@ -60,9 +63,7 @@ class AuthApis {
         Map<String, dynamic> responseBody = jsonDecode(response.body);
         if (responseBody.containsKey('errors')) {
           if (context.mounted) {
-            String errorMessage = responseBody['errors'].isNotEmpty
-                ? responseBody['errors'].first['msg']
-                : 'An error occurred';
+            String errorMessage = responseBody['errors'].isNotEmpty ? responseBody['errors'].first['msg'] : 'An error occurred';
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(errorMessage)),
             );
@@ -70,9 +71,7 @@ class AuthApis {
         } else {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content:
-                      Text('An unexpected error occurred: ${response.body}')),
+              SnackBar(content: Text('An unexpected error occurred: ${response.body}')),
             );
           }
         }
@@ -97,7 +96,6 @@ class AuthApis {
     required email,
     required password,
     required fcmToken,
-
   }) async {
     final url = Uri.parse("$baseUrl/$signInEndP");
     final headers = {"Content-Type": "application/json"};
@@ -105,19 +103,17 @@ class AuthApis {
       "email": email,
       "password": password,
       "fcmToken": fcmToken,
-
-
     });
     Response response = await post(url, headers: headers, body: body);
     log("before hit :${response.body}");
     log("before hit :${response.statusCode}");
     if (response.statusCode == 200) {
-      final  Map<String, dynamic> responseBody = jsonDecode(response.body);
+      final Map<String, dynamic> responseBody = jsonDecode(response.body);
       if (context.mounted) {
-        MySharedPreferences.setString(authToken,responseBody['token']);
-        MySharedPreferences.setString(userId,responseBody["user"]['_id']);
-        MySharedPreferences.setString(userName,responseBody["user"]['fullname']);
-        MySharedPreferences.setString(subscription,responseBody["user"]['subscription']["expiryDate"]??"");
+        MySharedPreferences.setString(authToken, responseBody['token']);
+        MySharedPreferences.setString(userIdKey, responseBody["user"]['_id']);
+        MySharedPreferences.setString(userName, responseBody["user"]['fullname']);
+        MySharedPreferences.setString(subscription, responseBody["user"]['subscription']["expiryDate"] ?? "");
         MySharedPreferences.setBool(isLoggedInKey, true);
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -125,18 +121,17 @@ class AuthApis {
         );
       }
       if (context.mounted) {
+        Get.offAll(const CustomBottomNavigationBar());
         Navigator.push(context, MaterialPageRoute(
           builder: (context) {
-            return  const CustomBottomNavigationBar();
+            return const CustomBottomNavigationBar();
           },
         ));
       }
     } else if (response.statusCode == 404) {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
       if (context.mounted) {
-        String errorMessage = responseBody['message'].isNotEmpty
-            ? responseBody['message']
-            : 'An error occurred';
+        String errorMessage = responseBody['message'].isNotEmpty ? responseBody['message'] : 'An error occurred';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMessage)),
         );
@@ -200,7 +195,6 @@ class AuthApis {
     required email,
     required otp,
     required title,
-
   }) async {
     final url = Uri.parse("$baseUrl/$verifyOtpEp");
     final headers = {"Content-Type": "application/json"};
@@ -214,24 +208,22 @@ class AuthApis {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('OTP verified successfully')),
         );
-
-
       }
-      Map<String,dynamic>responseBody=jsonDecode(response.body);
-      MySharedPreferences.setString(authToken,responseBody['token']);
-      if(title=="newUser"){
+      Map<String, dynamic> responseBody = jsonDecode(response.body);
+      MySharedPreferences.setString(authToken, responseBody['token']);
+      if (title == "newUser") {
         if (context.mounted) {
           Navigator.push(context, MaterialPageRoute(
             builder: (context) {
-              return   const LoginScreen();
+              return const LoginScreen();
             },
           ));
         }
-      }else{
+      } else {
         if (context.mounted) {
           Navigator.push(context, MaterialPageRoute(
             builder: (context) {
-              return  const CreateNewPassword();
+              return const CreateNewPassword();
             },
           ));
         }
@@ -244,16 +236,11 @@ class AuthApis {
       }
     }
   }
+
   //Reset Your Password Api
-  Future<void> resetPassword(
-      {required String newPassword,
-        required String confirmPassword,
-        required String token}) async {
+  Future<void> resetPassword({required String newPassword, required String confirmPassword, required String token}) async {
     final url = Uri.parse("$baseUrl/$resetPasswordEp");
-    final headers = {
-      "Content-Type": "application/json",
-      "Authorization":"Bearer $token"
-    };
+    final headers = {"Content-Type": "application/json", "Authorization": "Bearer $token"};
     final body = jsonEncode({
       "newPassword": newPassword,
       "confirmPassword": confirmPassword,
@@ -268,7 +255,7 @@ class AuthApis {
       if (context.mounted) {
         Navigator.push(context, MaterialPageRoute(
           builder: (context) {
-            return  LoginScreen();
+            return LoginScreen();
           },
         ));
       }

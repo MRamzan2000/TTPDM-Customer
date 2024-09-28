@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     userProfileController = Get.put(UserProfileController(context: context));
     token.value = MySharedPreferences.getString(authToken);
-    String id = MySharedPreferences.getString(userId);
+    String id = MySharedPreferences.getString(userIdKey);
 
     log("Auth Token :${token.value}");
     log("id :$id");

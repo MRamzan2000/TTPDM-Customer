@@ -13,6 +13,7 @@ import 'package:ttpdm/controller/getx_controllers/user_profile_controller.dart';
 import 'package:ttpdm/controller/utils/alert_box.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
+import 'package:ttpdm/view/screens/chat_support/chat_support.dart';
 
 class LogOutScreen extends StatefulWidget {
   const LogOutScreen({super.key});
@@ -110,17 +111,7 @@ class _LogOutScreenState extends State<LogOutScreen> {
               getVerticalSpace(1.6.h),
               // Use Obx to make it reactive
               Obx(() {
-                return getStripeKeyController.keyLoading.value
-                    ? Shimmer.fromColors(
-                  baseColor: AppColors.baseColor,
-                  highlightColor: AppColors.highlightColor,
-                  child: Container(
-                    height: 50,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(2.h)),
-                  ),
-                )
-                    : GestureDetector(
+                return GestureDetector(
                   onTap: () {
                     openChooseSubscription(
                       context,
@@ -142,7 +133,7 @@ class _LogOutScreenState extends State<LogOutScreen> {
                         ),
                       ),
                       Text(
-                        formattedDate.isEmpty?"No Plan Buy" : 'expire on $formattedDate',
+                        getStripeKeyController.keyLoading.value ? "Loading..." : formattedDate.isEmpty?"No Plan Buy" : 'Expire on $formattedDate',
                         style: TextStyle(
                           fontWeight: FontWeight.w400,
                           fontFamily: 'bold',
@@ -157,13 +148,22 @@ class _LogOutScreenState extends State<LogOutScreen> {
               getVerticalSpace(.8.h),
               const Divider(color: Color(0xff6E6E6D)),
               getVerticalSpace(1.h),
-              Text(
-                'Terms and conditions',
-                style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  fontFamily: 'bold',
-                  color: const Color(0xff191918),
-                  fontSize: 14.px,
+              GestureDetector(
+                onTap: () {
+                  Get.to(const ChatSupportScreen());
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      'Chat Support',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'bold',
+                        color: const Color(0xff191918),
+                        fontSize: 14.px,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               getVerticalSpace(.8.h),

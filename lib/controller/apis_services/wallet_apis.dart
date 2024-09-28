@@ -17,7 +17,7 @@ class WalletApis {
   WalletApis({required this.context});
 
   Future<WalletDetailsModel?> getWalletDetailsApi() async {
-    final url = Uri.parse("$baseUrl/$walletDetailsEP/${MySharedPreferences.getString(userId)}");
+    final url = Uri.parse("$baseUrl/$walletDetailsEP/${MySharedPreferences.getString(userIdKey)}");
     final headers = {
       "Content-Type": "application/json",
     };
@@ -40,7 +40,7 @@ class WalletApis {
     };
 
     final body = {
-        "userId": MySharedPreferences.getString(userId),
+        "userId": MySharedPreferences.getString(userIdKey),
         "bank_name": bankName,
         "account_title": accountTitle,
         "IBAN": iban,

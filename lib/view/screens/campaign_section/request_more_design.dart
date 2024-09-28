@@ -26,7 +26,7 @@ class _RequestMoreDesignState extends State<RequestMoreDesign> {
   void initState() {
     super.initState();
     token.value = MySharedPreferences.getString(authToken);
-    currentUserId.value = MySharedPreferences.getString(userId);
+    currentUserId.value = MySharedPreferences.getString(userIdKey);
     currentUserName.value = MySharedPreferences.getString(userName);
   }
 
