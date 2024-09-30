@@ -2,116 +2,66 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
+import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/models/getdesigns_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:ttpdm/models/wallet_details_model.dart';
+
+import '../utils/my_shared_prefrence.dart';
 
 class WalletApis {
   final BuildContext context;
+
   WalletApis({required this.context});
-  //Get All design
-  Future<GetAllDesignsModel?> getAllDesigns() async {
-    final url = Uri.parse("$baseUrl/$getAllDesignsEP");
-    final headers = {
-      'Content-Type': 'application/json',
-    };
-    try {
-      final response = await http.get(url, headers: headers);
 
-      // Debug prints
-      log('Response status: ${response.statusCode}');
-      log('Response body: ${response.body}');
-      if (response.statusCode == 200) {
-        return GetAllDesignsModel.fromJson(jsonDecode(response.body));
-      } else {
-        log('Error fetching business profiles: ${response.body}');
-        return null;
-      }
-    } catch (e) {
-      log('UnExpected Error fetching business profiles: ${e.toString()}');
-      return null;
-    }
-  }
-
-  //like poster
-  Future<void> likeDesignApi({
-    required String designId,
-    required String token,
-  }) async {
-    final url = Uri.parse("$baseUrl/$likeDesignEp/$designId/like");
-    final headers = {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
-    };
-
-    try {
-      final response = await http.post(url, headers: headers);
-      if (response.statusCode == 200) {
-        log("Design liked successfully");
-      } else if (response.statusCode == 401) {
-        log("Unauthorized. Please check your token.");
-      } else if (response.statusCode == 400) {
-        log("Bad request. Please check the request parameters.");
-      } else if (response.statusCode == 404) {
-        log("Design not found.");
-      } else {
-        log("Failed to like design. Status code: ${response.statusCode}");
-      }
-    } catch (e) {
-      log("An error occurred: $e");
-    }
-  }
-
-//dislike poster
-  Future<void> dislikeDesignApi({
-    required String designId,
-    required String token,
-  }) async {
-    final url = Uri.parse("$baseUrl/$likeDesignEp/$designId/dislike");
-    final headers = {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
-    };
-
-    try {
-      final response = await http.post(url, headers: headers);
-
-      if (response.statusCode == 200) {
-        log("Design Disliked successfully");
-      } else if (response.statusCode == 401) {
-        log("Unauthorized. Please check your token.");
-      } else if (response.statusCode == 400) {
-        log("Bad request. Please check the request parameters.");
-      } else if (response.statusCode == 404) {
-        log("Design not found.");
-      } else {
-        log("Failed to like design. Status code: ${response.statusCode}");
-      }
-    } catch (e) {
-      log("An error occurred: $e");
-    }
-  }
-
-  //edit poster
-  Future<void> editPosterRequestApi({
-    required String designId,
-    required String businessId,
-    required String comment,
-  }) async {
-    final url = Uri.parse("$baseUrl/$editDesignEp");
+  Future<WalletDetailsModel?> getWalletDetailsApi() async {
+    final url = Uri.parse("$baseUrl/$walletDetailsEP/${MySharedPreferences.getString(userIdKey)}");
     final headers = {
       "Content-Type": "application/json",
     };
-    final body = jsonEncode(
-        {"businessId": businessId, "designId": designId, "comment": comment});
 
-    final response = await http.post(url, headers: headers, body: body);
-
+    final response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
-      log("Edit Design Request successfully");
+      log("Get Wallet Details");
+      return walletDetailsModelFromJson(response.body);
     } else {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
       log("${responseBody["message"]}");
     }
+    return null;
+  }
+
+  Future<bool> addWalletRequestApi({required String bankName, required String accountTitle, required String iban, required double amount}) async {
+    final url = Uri.parse("$baseUrl/$walletWithdrawRequestEP");
+    final headers = {
+      "Content-Type": "application/json",
+    };
+
+    final body = {
+        "userId": MySharedPreferences.getString(userIdKey),
+        "bank_name": bankName,
+        "account_title": accountTitle,
+        "IBAN": iban,
+        "amount": amount
+    };
+
+    final response = await http.post(url, headers: headers, body: jsonEncode(body));
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Withdraw Request added')),
+      );
+      return true;
+    } else {
+      Map<String, dynamic> responseBody = jsonDecode(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(responseBody["message"].toString())),
+      );
+      log("${responseBody["message"]}");
+    }
+    return false;
   }
 }

@@ -46,7 +46,7 @@ class _PosterScreenState extends State<PosterScreen> {
   void initState() {
     super.initState();
     posterController = Get.put(PosterController(context: context));
-    id.value = MySharedPreferences.getString(userId);
+    id.value = MySharedPreferences.getString(userIdKey);
     name.value = MySharedPreferences.getString(userName);
     posterController
         .fetchPosters(
@@ -76,6 +76,7 @@ class _PosterScreenState extends State<PosterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {

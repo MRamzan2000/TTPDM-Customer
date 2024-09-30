@@ -18,28 +18,25 @@ class CustomBottomNavigationBar extends StatefulWidget {
   const CustomBottomNavigationBar({super.key});
 
   @override
-  State<CustomBottomNavigationBar> createState() =>
-      _CustomBottomNavigationBarState();
+  State<CustomBottomNavigationBar> createState() => _CustomBottomNavigationBarState();
 }
 
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
-  final BusinessProfileController businessProfileController =
-  Get.find(tag: 'business');
-  RxString token="".obs;
+  final BusinessProfileController businessProfileController = Get.find(tag: 'business');
+  RxString token = "".obs;
 
   @override
   void initState() {
     super.initState();
-    token.value=MySharedPreferences.getString(authToken);
+    token.value = MySharedPreferences.getString(authToken);
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     RxInt isSelectedIndex = 0.obs;
 
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       resizeToAvoidBottomInset: false,
       extendBody: true,
       floatingActionButton: FloatingActionButton(
@@ -51,8 +48,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
         onPressed: () {
           log('is this token $token');
 
-            Get.to(() => AddNewCampaign(token: token.value));
-
+          Get.to(() => AddNewCampaign(token: token.value));
         },
         child: Icon(
           Icons.add,
@@ -62,122 +58,115 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Obx(
-            () => BottomAppBar(
-          padding: EdgeInsets.symmetric(horizontal: 2.h, vertical: 1.h),
-          color: AppColors.whiteColor,
+        () => BottomAppBar(
+          color: Colors.white,
           shape: const CircularNotchedRectangle(),
           notchMargin: 5,
           child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              GestureDetector(
-                onTap: () {
-                  isSelectedIndex.value = 0;
-                },
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 3.5.h,
-                      child: Image(
-                        image: const AssetImage('assets/pngs/homeicon.png'),
-                        color: isSelectedIndex.value == 0
-                            ? AppColors.mainColor
-                            : const Color(0xff999999),
+              Expanded(
+                flex: 5,
+                child: GestureDetector(
+                  onTap: () {
+                    isSelectedIndex.value = 0;
+                  },
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 3.5.h,
+                        child: Image(
+                          image: const AssetImage('assets/pngs/homeicon.png'),
+                          color: isSelectedIndex.value == 0 ? AppColors.mainColor : const Color(0xff999999),
+                        ),
                       ),
-                    ),
-                    Text(
-                      'Home',
-                      style: CustomTextStyles.buttonTextStyle.copyWith(
-                        fontSize: 14.px,
-                        color: isSelectedIndex.value == 0
-                            ? AppColors.mainColor
-                            : const Color(0xff999999),
+                      Text(
+                        'Home',
+                        style: CustomTextStyles.buttonTextStyle.copyWith(
+                          fontSize: 12.px,
+                          color: isSelectedIndex.value == 0 ? AppColors.mainColor : const Color(0xff999999),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  isSelectedIndex.value = 1;
-                },
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 3.5.h,
-                      child: Image(
-                        image: const AssetImage('assets/pngs/wallet.png'),
-                        color: isSelectedIndex.value == 1
-                            ? AppColors.mainColor
-                            : const Color(0xff999999),
+              Expanded(
+                flex: 8,
+                child: GestureDetector(
+                  onTap: () {
+                    isSelectedIndex.value = 1;
+                  },
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 3.5.h,
+                        child: Image(
+                          image: const AssetImage('assets/pngs/wallet.png'),
+                          color: isSelectedIndex.value == 1 ? AppColors.mainColor : const Color(0xff999999),
+                        ),
                       ),
-                    ),
-                    Text(
-                      'Wallet ',
-                      style: CustomTextStyles.buttonTextStyle.copyWith(
-                        fontSize: 14.px,
-                        color: isSelectedIndex.value == 1
-                            ? AppColors.mainColor
-                            : const Color(0xff999999),
+                      Text(
+                        'Wallet ',
+                        style: CustomTextStyles.buttonTextStyle.copyWith(
+                          fontSize: 12.px,
+                          color: isSelectedIndex.value == 1 ? AppColors.mainColor : const Color(0xff999999),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              SizedBox(width: 3.h),
-              GestureDetector(
-                onTap: () {
-                  isSelectedIndex.value = 2;
-                },
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 3.5.h,
-                      child: Image(
-                        image: const AssetImage('assets/pngs/notificationicon.png'),
-                        color: isSelectedIndex.value == 2
-                            ? AppColors.mainColor
-                            : const Color(0xff999999),
+              Expanded(
+                flex: 9,
+                child: GestureDetector(
+                  onTap: () {
+                    isSelectedIndex.value = 2;
+                  },
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 3.5.h,
+                        child: Image(
+                          image: const AssetImage('assets/pngs/notificationicon.png'),
+                          color: isSelectedIndex.value == 2 ? AppColors.mainColor : const Color(0xff999999),
+                        ),
                       ),
-                    ),
-                    Text(
-                      'Notification ',
-                      style: CustomTextStyles.buttonTextStyle.copyWith(
-                        fontSize: 14.px,
-                        color: isSelectedIndex.value == 2
-                            ? AppColors.mainColor
-                            : const Color(0xff999999),
+                      Text(
+                        'Notification ',
+                        style: CustomTextStyles.buttonTextStyle.copyWith(
+                          fontSize: 12.px,
+                          color: isSelectedIndex.value == 2 ? AppColors.mainColor : const Color(0xff999999),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  isSelectedIndex.value = 3;
-                },
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 3.5.h,
-                      child: Image(
-                        image: const AssetImage('assets/pngs/profileicon.png'),
-                        color: isSelectedIndex.value == 3
-                            ? AppColors.mainColor
-                            : const Color(0xff999999),
+              Expanded(
+                flex: 5,
+                child: GestureDetector(
+                  onTap: () {
+                    isSelectedIndex.value = 3;
+                  },
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 3.5.h,
+                        child: Image(
+                          image: const AssetImage('assets/pngs/profileicon.png'),
+                          color: isSelectedIndex.value == 3 ? AppColors.mainColor : const Color(0xff999999),
+                        ),
                       ),
-                    ),
-                    Text(
-                      'Profile ',
-                      style: CustomTextStyles.buttonTextStyle.copyWith(
-                        fontSize: 14.px,
-                        color: isSelectedIndex.value == 3
-                            ? AppColors.mainColor
-                            : const Color(0xff999999),
+                      Text(
+                        'Profile ',
+                        style: CustomTextStyles.buttonTextStyle.copyWith(
+                          fontSize: 12.px,
+                          color: isSelectedIndex.value == 3 ? AppColors.mainColor : const Color(0xff999999),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -185,16 +174,16 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
         ),
       ),
       body: Obx(
-            () => Column(
+        () => Column(
           children: [
             Expanded(
               child: isSelectedIndex.value == 0
                   ? const HomeScreen()
                   : isSelectedIndex.value == 1
-                  ? Subscription(token: token.value)
-                  : isSelectedIndex.value == 2
-                  ? const NotiFicationScreen()
-                  : const ProfileScreen(),
+                      ? WalletScreen()
+                      : isSelectedIndex.value == 2
+                          ? const NotiFicationScreen()
+                          : const ProfileScreen(),
             ),
             SizedBox(height: 8.h), // Adjust the height as needed
           ],

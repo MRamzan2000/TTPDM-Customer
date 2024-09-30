@@ -45,8 +45,7 @@ class BusinessProfileController extends GetxController {
         logo: logo,
         tiktokUrl: tiktokUrl,
         token: token,
-        context: context,
-        fullname: fullname,
+        context: context, fullname: fullname,
       )
           .then(
         (value) {
@@ -75,24 +74,14 @@ class BusinessProfileController extends GetxController {
     if (data != null) {
       allBusinessProfiles.value = data.businesses;
       categorizeProfiles();
-      log("allBusinessProfiles :$allBusinessProfiles");
-      log("approvedProfiles :$approvedProfiles");
-      log("rejectedProfiles :$rejectedProfiles");
-      log("pendingProfiles :$pendingProfiles");
       isLoading2.value = false;
     }
   }
 
   void categorizeProfiles() {
-    approvedProfiles.value = allBusinessProfiles
-        .where((profile) => profile?.status == 'accepted')
-        .toList();
-    rejectedProfiles.value = allBusinessProfiles
-        .where((profile) => profile?.status == 'cancelled')
-        .toList();
-    pendingProfiles.value = allBusinessProfiles
-        .where((profile) => profile?.status == 'pending')
-        .toList();
+    approvedProfiles.value = allBusinessProfiles.where((profile) => profile?.status == 'accepted').toList();
+    rejectedProfiles.value = allBusinessProfiles.where((profile) => profile?.status == 'rejected').toList();
+    pendingProfiles.value = allBusinessProfiles.where((profile) => profile?.status == 'pending').toList();
   }
 
   //Delete Business profile
@@ -130,7 +119,9 @@ class BusinessProfileController extends GetxController {
       required String tiktokUrl,
       required String logo,
       required List<String> gallery,
-      required String token, // Corrected list<File> to List<File>}
+        required List<String> removeGalleryItems,
+      required String token,
+      required bool newLogo,
       required BuildContext context}) async {
     try {
       isLoading1.value = true;
@@ -151,7 +142,8 @@ class BusinessProfileController extends GetxController {
         tiktokUrl: tiktokUrl,
         token: token,
         context: context,
-        removeGallery: gallery,
+        removeGalleryItems: removeGalleryItems,
+        newLogo: newLogo,
       )
           .then(
         (value) {

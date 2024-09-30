@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +15,7 @@ import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../view/screens/bottom_navigationbar.dart';
+import '../getx_controllers/add_campaign_controller.dart';
 
 class BusinessApis {
 //Create Business Profile
@@ -205,55 +207,86 @@ class BusinessApis {
     required String logo,
     required BuildContext context,
     required List<String> gallery,
-    required List<String> removeGallery, // Assuming removeGallery contains URLs or IDs of images to be removed
+    required List<String> removeGalleryItems,
+    required bool newLogo,
   }) async {
-    const fileName = 'adBanner.png'; // or extract it from the URL if it has a different extension
-
-    final downloadedFile = await downloadFile(logo, fileName);
-
-    final url = Uri.parse("$baseUrl/$editBusinessProfileEp"); // Ensure this is the correct URL
-    final request = http.MultipartRequest('PUT', url); // Change method to PUT
-
-    // Add fields
-    request.fields['businessId'] = businessId;
-    request.fields['name'] = name;
-    request.fields['phone'] = phone;
-    request.fields['location'] = location;
-    request.fields['targetMapArea'] = targetMapArea;
-    request.fields['description'] = description;
-    request.fields['websiteUrl'] = websiteUrl;
-    request.fields['facebookUrl'] = facebookUrl;
-    request.fields['instagramUrl'] = instagramUrl;
-    request.fields['linkedinUrl'] = linkedinUrl;
-    request.fields['tiktokUrl'] = tiktokUrl;
-
-    // Add logo file with MIME type
-    request.files.add(await http.MultipartFile.fromPath(
-      'logo',
-      downloadedFile.path,
-      contentType: MediaType('image', 'jpeg'), // Adjust MIME type if necessary
-    ));
-
-    // Download and add gallery images
-    for (var i = 0; i < gallery.length; i++) {
-      final galleryUrl = gallery[i];
-      final fileName = 'gallery_$i.png'; // Create unique file name
-      final galleryFile = await downloadFile(galleryUrl, fileName);
-
-      request.files.add(await http.MultipartFile.fromPath(
-        'gallery',
-        galleryFile.path,
-        contentType: MediaType('image', 'png'), // Adjust MIME type if necessary
-      ));
-    }
-
-    // Add removeGallery field with URLs or IDs to be removed
-    request.fields['removeGallery'] = json.encode(removeGallery); // Adjust if the API requires different handling
-
-    // Set headers, including Authorization header
-    request.headers['Authorization'] = 'Bearer $token';
+    List<Map<String, dynamic>> pickedMediaList = Get.put(AddCampaignController()).pickedMediaList;
+    log("newLogo: $newLogo, gallery count: ${gallery.length}, removeGallery count: ${removeGalleryItems.length}, pickedMedia count: ${pickedMediaList.length}");
 
     try {
+      final url = Uri.parse("$baseUrl/$editBusinessProfileEp");
+      final request = http.MultipartRequest('PUT', url); // Change method to PUT
+      log("Created multipart request to URL: $url");
+
+      // Add fields
+      log("Adding fields to request");
+      request.fields['businessId'] = businessId;
+      request.fields['name'] = name;
+      request.fields['phone'] = phone;
+      request.fields['location'] = location;
+      request.fields['targetMapArea'] = targetMapArea;
+      request.fields['description'] = description;
+      request.fields['websiteUrl'] = websiteUrl;
+      request.fields['facebookUrl'] = facebookUrl;
+      request.fields['instagramUrl'] = instagramUrl;
+      request.fields['linkedinUrl'] = linkedinUrl;
+      request.fields['tiktokUrl'] = tiktokUrl;
+
+      // Handle the logo (upload only if newLogo is true)
+      if (newLogo) {
+        log("Adding new logo file to request");
+        request.files.add(await http.MultipartFile.fromPath(
+          'logo',
+          logo, // This should be the local file path from the new image
+          contentType: MediaType('image', 'jpeg'), // Adjust MIME type as necessary
+        ));
+      } else {
+        log("Using existing logo URL: $logo");
+        request.fields['logo'] = logo; // Send the URL as a regular field if it's an existing logo
+      }
+
+      // Filter out gallery items that are listed in removeGalleryItems
+      final filteredGallery = gallery.where((item) => !removeGalleryItems.contains(item)).toList();
+
+      // Add filtered gallery images (URLs)
+      log("Adding filtered gallery images to request");
+      for (var i = 0; i < filteredGallery.length; i++) {
+        final galleryUrl = filteredGallery[i];
+        final fileName = 'gallery_$i.png'; // Create unique file name
+        log("Downloading gallery image $i from $galleryUrl");
+        final galleryFile = await downloadFile(galleryUrl, fileName);
+        log("Gallery image $i downloaded: ${galleryFile.path}");
+
+        request.files.add(await http.MultipartFile.fromPath(
+          'gallery',
+          galleryFile.path,
+          contentType: MediaType('image', 'png'),
+        ));
+      }
+
+      // Add newly picked media files from pickedMediaList
+      log("Adding new media files to request");
+      for (var i = 0; i < pickedMediaList.length; i++) {
+        final media = pickedMediaList[i];
+        final mediaFilePath = media['path'];
+        log("Adding media file to request: $mediaFilePath");
+
+        request.files.add(await http.MultipartFile.fromPath(
+          'gallery',
+          mediaFilePath,
+          contentType: MediaType.parse(media['type']), // Use MIME type from the picked media
+        ));
+      }
+
+      // Add removeGalleryItems field with URLs or IDs to be removed
+      log("Adding removeGalleryItems data to request");
+      request.fields['removeGalleryItems'] = json.encode(removeGalleryItems);
+
+      // Set headers, including Authorization header
+      log("Setting Authorization header");
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // Send the request
       log("Sending request to: $url");
       final response = await request.send();
       final responseData = await response.stream.toBytes();
@@ -262,27 +295,30 @@ class BusinessApis {
       log("Response Status Code: ${response.statusCode}");
       log("Response Body: $responseString");
 
+      // Handle response
       if (context.mounted) {
         if (response.statusCode == 200) {
+          log("Business profile updated successfully");
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Business profile updated successfully')),
+            const SnackBar(content: Text('Business profile updated successfully')),
           );
-          // Assuming you need to refresh the profile or navigate back
-          getBusinessProfile(context: context, token: token).then((_) => Navigator.of(context).pop());
+          log("Refreshing business profile");
+          await getBusinessProfile(context: context, token: token);
+          Navigator.of(context).pop();
         } else if (response.statusCode == 401) {
+          log("Authentication token error");
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Authentication token is required')),
+            const SnackBar(content: Text('Authentication token is required')),
           );
         } else {
+          log("Unexpected status code: ${response.statusCode}");
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Unexpected status code: $responseString')),
           );
         }
       }
     } catch (e) {
-      log("Exception: $e");
+      log("Exception occurred: $e");
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
@@ -292,22 +328,26 @@ class BusinessApis {
   }
   //convert path
   Future<String> getLocalFilePath(String fileName) async {
-    final directory = await getTemporaryDirectory(); // Use getApplicationDocumentsDirectory() if you need persistence
+    final directory = await getTemporaryDirectory();
     return '${directory.path}/$fileName';
   }
 
-  Future<File> downloadFile(String url, String fileName) async {
+  Future<File> downloadFile(String localFilePath, String fileName) async {
     final filePath = await getLocalFilePath(fileName);
 
     try {
-      final dio = Dio();
-      await dio.download(url, filePath);
-      return File(filePath);
+      final file = File(localFilePath);
+
+      // Check if the source file exists
+      if (await file.exists()) {
+        // Copy the file to the new destination
+        final newFile = await file.copy(filePath);
+        return newFile;
+      } else {
+        throw Exception('Source file does not exist: $localFilePath');
+      }
     } catch (e) {
-      throw Exception('Failed to download file: $e');
+      throw Exception('Failed to copy local file: $e');
     }
   }
-
-
-
 }

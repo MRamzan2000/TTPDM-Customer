@@ -39,6 +39,7 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       appBar: AppBar(
         leading:  GestureDetector(
           onTap: () {

@@ -15,6 +15,7 @@ class NotiFicationScreen extends StatelessWidget {
     final NotificationController notificationController = Get.put(NotificationController());
 
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,

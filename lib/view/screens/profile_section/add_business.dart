@@ -133,7 +133,7 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
   void initState() {
     super.initState();
     getFcmTokenSendNotificationController = Get.put(GetFcmTokenSendNotificationController(context: context));
-    id.value = MySharedPreferences.getString(userId);
+    id.value = MySharedPreferences.getString(userIdKey);
     token.value = MySharedPreferences.getString(authToken);
     fullname.value = MySharedPreferences.getString(userName);
   }
@@ -141,6 +141,7 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {

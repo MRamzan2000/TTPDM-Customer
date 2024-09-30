@@ -20,6 +20,7 @@ class CurrentAdds extends StatelessWidget {
     final RxList tabBarItems =
         ['Previous ads', 'Current ads', 'Upcoming ads', 'Creative'].obs;
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       body: Column(
         children: [
           Row(

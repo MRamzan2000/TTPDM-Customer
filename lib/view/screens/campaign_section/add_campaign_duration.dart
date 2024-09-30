@@ -37,6 +37,7 @@ class AddCampaignDuration extends StatelessWidget {
     log('businessId $businessId');
     log('selectedPoster $selectedPoster');
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {

@@ -10,3 +10,4 @@ extension DateFormate on DateTime {
     return formatter.format(this);
   }
 }
+String formatDate(String apiDate) => DateFormat('hh:mm a, dd MMM yyyy').format(DateTime.parse(apiDate).toLocal());

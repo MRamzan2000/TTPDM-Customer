@@ -26,13 +26,14 @@ class _RequestMoreDesignState extends State<RequestMoreDesign> {
   void initState() {
     super.initState();
     token.value = MySharedPreferences.getString(authToken);
-    currentUserId.value = MySharedPreferences.getString(userId);
+    currentUserId.value = MySharedPreferences.getString(userIdKey);
     currentUserName.value = MySharedPreferences.getString(userName);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,

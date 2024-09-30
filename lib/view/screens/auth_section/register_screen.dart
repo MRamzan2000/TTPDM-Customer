@@ -23,7 +23,7 @@ class RegisterScreen extends StatelessWidget {
 
     final SignUpController signUpController=Get.put(SignUpController(context: context));
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xfff8f9fa),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
@@ -113,17 +113,6 @@ class RegisterScreen extends StatelessWidget {
                     controller: confirmPasswordController,
                     keyboardType: TextInputType.visiblePassword),
                 getVerticalSpace(1.6.h),
-                // Container(
-                //   width: 24.2.h,
-                //   height: 6.2.h,
-                //   decoration: BoxDecoration(
-                //     color: AppColors.textFieldGreyColor.withOpacity(0.2),
-                //   ),
-                //   child: Image.asset(
-                //     'assets/pngs/capcha.png',
-                //     fit: BoxFit.cover,
-                //   ),
-                // ),
                 getVerticalSpace(2.4.h),
                 Obx(() =>
                     Row(mainAxisAlignment: MainAxisAlignment.center,

@@ -13,6 +13,7 @@ class ConnectivityScreen extends StatelessWidget {
     final ConnectivityController connectivityController = Get.find();
 
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
       body: Obx(() {
         if (connectivityController.isConnected.value) {
           return const SplashScreen();

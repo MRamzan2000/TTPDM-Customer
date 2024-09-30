@@ -30,6 +30,7 @@ class EditProfile extends StatefulWidget {
   final String insta;
   final String tiktok;
   final String linkdin;
+
   const EditProfile(
       {super.key,
       required this.title,
@@ -53,8 +54,7 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  final AddCampaignController addCampaignController =
-      Get.put(AddCampaignController());
+  final AddCampaignController addCampaignController = Get.put(AddCampaignController());
 
   final TextEditingController bsNameController = TextEditingController();
 
@@ -75,55 +75,53 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController linkdinUrlController = TextEditingController();
 
   final TextEditingController tikTokUrlController = TextEditingController();
-  RxList<String> networkImagesList =
-      <String>[].obs; // This should be populated with the URLs or IDs of network images.
+  RxList<String> networkImagesList = <String>[].obs;
+  RxList<String> removeGalleryItems = <String>[].obs; // This should be populated with the URLs or IDs of network images.
 
   void submitForm() {
-    if(addCampaignController.image.value!.path.isEmpty){
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Logo is required")));
-    }else{
-      businessProfileController.editBusinessProfile(
-          name: bsNameController.text,
-          phone: phoneNumberController.text,
-          location: locationController.text,
-          targetMapArea: targetController.text,
-          description: descriptionController.text,
-          gallery:networkImagesList,
-          token: token.value,
-          websiteUrl: webUrlController.text,
-          tiktokUrl: tikTokUrlController.text,
-          linkedinUrl: linkdinUrlController.text,
-          instagramUrl: instagramUrlController.text,
-          facebookUrl: facebookUrlController.text,
-          logo: addCampaignController.image.value?.path??widget.logo,
-          context: context,
-          businessId: widget.businessId);
+    businessProfileController.editBusinessProfile(
+        name: bsNameController.text,
+        phone: phoneNumberController.text,
+        location: locationController.text,
+        targetMapArea: targetController.text,
+        description: descriptionController.text,
+        gallery: networkImagesList,
+        token: token.value,
+        websiteUrl: webUrlController.text,
+        tiktokUrl: tikTokUrlController.text,
+        linkedinUrl: linkdinUrlController.text,
+        instagramUrl: instagramUrlController.text,
+        facebookUrl: facebookUrlController.text,
+        logo: addCampaignController.image.value?.path ?? widget.logo,
+        context: context,
+        businessId: widget.businessId,
+        newLogo: addCampaignController.image.value != null,
+        removeGalleryItems: removeGalleryItems);
+  }
 
-    }
-    }
-
-  final BusinessProfileController businessProfileController =
-      Get.find(tag: 'business');
-  RxString token="".obs;
+  final BusinessProfileController businessProfileController = Get.find(tag: 'business');
+  RxString token = "".obs;
 
   @override
   void initState() {
     super.initState();
-    token.value=MySharedPreferences.getString(authToken);
-
+    token.value = MySharedPreferences.getString(authToken);
   }
 
-
+  @override
+  void dispose() {
+    addCampaignController.image.value = null;
+    addCampaignController.pickedMediaList.length = 0;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xfff8f9fa),
         appBar: AppBar(
           leading: GestureDetector(
             onTap: () {
-              addCampaignController.image.value = null;
-              addCampaignController.pickedMediaList.length = 0;
-
               Get.back();
             },
             child: Icon(
@@ -137,10 +135,7 @@ class _EditProfileState extends State<EditProfile> {
           automaticallyImplyLeading: false,
           title: Text(
             'Edit Business Profile',
-            style: CustomTextStyles.buttonTextStyle.copyWith(
-                fontSize: 20.px,
-                fontWeight: FontWeight.w600,
-                color: AppColors.mainColor),
+            style: CustomTextStyles.buttonTextStyle.copyWith(fontSize: 20.px, fontWeight: FontWeight.w600, color: AppColors.mainColor),
           ),
           actions: [
             GestureDetector(
@@ -153,11 +148,7 @@ class _EditProfileState extends State<EditProfile> {
                   padding: EdgeInsets.only(right: 2.h),
                   child: Text(
                     'Save',
-                    style: TextStyle(
-                        fontSize: 16.px,
-                        color: const Color(0xff34C759),
-                        fontFamily: 'bold',
-                        fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 16.px, color: const Color(0xff34C759), fontFamily: 'bold', fontWeight: FontWeight.w600),
                   )),
             )
           ],
@@ -172,379 +163,277 @@ class _EditProfileState extends State<EditProfile> {
                     padding: EdgeInsets.symmetric(horizontal: 2.4.h),
                     child: SingleChildScrollView(
                       child: Obx(
-                        () => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              getVerticalSpace(2.4.h),
-                              Align(
-                                alignment: Alignment.topCenter,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    GestureDetector(
-                                        onTap: () {
-                                          addCampaignController
-                                              .pickImage(ImageSource.gallery);
-                                        },
-                                        child:
-                                            addCampaignController.image.value !=
-                                                    null
-                                                ? ClipOval(
-                                                    child: addCampaignController
-                                                                .image.value !=
-                                                            null
-                                                        ? Image.file(
-                                                            addCampaignController
-                                                                .image.value!,
-                                                            fit: BoxFit.cover,
-                                                            width: 4.2.h *
-                                                                2, // Adjust width to match CircleAvatar's diameter
-                                                            height: 4.2.h *
-                                                                2, // Adjust height to match CircleAvatar's diameter
-                                                          )
-                                                        : SvgPicture.asset(
-                                                            "assets/svgs/myprofile.svg",
-                                                            fit: BoxFit.cover,
-                                                            width: 4.2.h *
-                                                                2, // Adjust width to match CircleAvatar's diameter
-                                                            height: 4.2.h *
-                                                                2, // Adjust height to match CircleAvatar's diameter
-                                                          ),
-                                                  )
-                                                : widget.logo.isEmpty
-                                                    ? CircleAvatar(
-                                                        radius: 4.2.h,
-                                                        child: const Icon(
-                                                            Icons.add_a_photo),
-                                                      )
-                                                    : ClipOval(
-                                                        child: Image.network(
-                                                          widget.logo,
-                                                          fit: BoxFit.cover,
-                                                          width: 4.2.h *
-                                                              2, // Adjust width to match CircleAvatar's diameter
-                                                          height: 4.2.h *
-                                                              2, // Adjust height to match CircleAvatar's diameter
-                                                        ),
-                                                      )),
-                                    getVerticalSpace(.8.h),
-                                    Text(
-                                      'Logo',
-                                      style: TextStyle(
-                                          fontSize: 14.px,
-                                          color: const Color(0xff454544),
-                                          fontFamily: 'regular',
-                                          fontWeight: FontWeight.w400),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              getVerticalSpace(4.h),
-                              Text(
-                                'Business Name',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: 'bold',
-                                    color: const Color(0xff454544),
-                                    fontSize: 14.px),
-                              ),
-                              getVerticalSpace(.8.h),
-                              customTextFormField(
-                                  title: widget.businessName,
-                                  controller: bsNameController,
-                                  bgColor: AppColors.whiteColor),
-                              getVerticalSpace(1.6.h),
-                              Text(
-                                'Phone Number',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: 'bold',
-                                    color: const Color(0xff454544),
-                                    fontSize: 14.px),
-                              ),
-                              getVerticalSpace(.8.h),
-                              customTextFormField(
-                                  title: widget.phoneNumber,
-                                  controller: phoneNumberController,
-                                  keyboardType: TextInputType.number,
-                                  bgColor: AppColors.whiteColor),
-                              getVerticalSpace(1.6.h),
-                              Text(
-                                'Location',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: 'bold',
-                                    color: const Color(0xff454544),
-                                    fontSize: 14.px),
-                              ),
-                              getVerticalSpace(.8.h),
-                              customTextFormField(
-                                  title: widget.location,
-                                  controller: locationController,
-                                  keyboardType: TextInputType.text,
-                                  bgColor: AppColors.whiteColor),
-                              getVerticalSpace(1.6.h),
-                              Text(
-                                'Target Map Area',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: 'bold',
-                                    color: const Color(0xff454544),
-                                    fontSize: 14.px),
-                              ),
-                              getVerticalSpace(.8.h),
-                              customTextFormField(
-                                  title: widget.targetArea,
-                                  controller: targetController,
-                                  keyboardType: TextInputType.text,
-                                  bgColor: AppColors.whiteColor),
-                              getVerticalSpace(1.6.h),
-                              Text(
-                                "What’s your website URL?",
-                                style: CustomTextStyles.onBoardingHeading
-                                    .copyWith(
-                                        color: const Color(0xff191918),
-                                        fontSize: 14.px,
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: 'bold'),
-                              ),
-                              getVerticalSpace(.8.h),
-                              Text(
-                                "This could be a web page or social media page",
-                                style: CustomTextStyles.onBoardingHeading
-                                    .copyWith(
-                                        color: const Color(0xff6E6E6D),
-                                        fontSize: 12.px,
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: 'regular'),
-                              ),
-                              getVerticalSpace(.8.h),
-                              customTextFormField(
-                                  title: widget.webUrl,
-                                  controller: webUrlController,
-                                  bgColor: AppColors.whiteColor),
-                              getVerticalSpace(1.6.h),
-                              Text(
-                                "Facebook",
-                                style: CustomTextStyles.onBoardingHeading
-                                    .copyWith(
-                                        color: const Color(0xff191918),
-                                        fontSize: 14.px,
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: 'bold'),
-                              ),
-                              getVerticalSpace(.8.h),
-                              customTextFormField(
-                                controller: facebookUrlController,
-                                bgColor: AppColors.whiteColor,
-                                title: widget.fb,
-                              ),
-                              getVerticalSpace(1.6.h),
-                              Text(
-                                "Instagram",
-                                style: CustomTextStyles.onBoardingHeading
-                                    .copyWith(
-                                        color: const Color(0xff191918),
-                                        fontSize: 14.px,
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: 'bold'),
-                              ),
-                              getVerticalSpace(.8.h),
-                              customTextFormField(
-                                  controller: instagramUrlController,
-                                  bgColor: AppColors.whiteColor,
-                                  title: widget.insta),
-                              getVerticalSpace(1.6.h),
-                              Text(
-                                "Tiktok",
-                                style: CustomTextStyles.onBoardingHeading
-                                    .copyWith(
-                                        color: const Color(0xff191918),
-                                        fontSize: 14.px,
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: 'bold'),
-                              ),
-                              getVerticalSpace(.8.h),
-                              customTextFormField(
-                                  controller: tikTokUrlController,
-                                  bgColor: AppColors.whiteColor,
-                                  title: widget.tiktok),
-                              getVerticalSpace(1.6.h),
-                              Text(
-                                "Linkedin",
-                                style: CustomTextStyles.onBoardingHeading
-                                    .copyWith(
-                                        color: const Color(0xff191918),
-                                        fontSize: 14.px,
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: 'bold'),
-                              ),
-                              getVerticalSpace(.8.h),
-                              customTextFormField(
-                                  controller: linkdinUrlController,
-                                  bgColor: AppColors.whiteColor,
-                                  title: "Enter your linkedin Account"),
-                              getVerticalSpace(1.6.h),
-                              Text(
-                                'Business description',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: 'bold',
-                                    color: const Color(0xff454544),
-                                    fontSize: 14.px),
-                              ),
-                              getVerticalSpace(.8.h),
-                              customTextFormField(
-                                  controller: descriptionController,
-                                  maxLine: 4,
-                                  keyboardType: TextInputType.text,
-                                  title: widget.description,
-                                  bgColor: AppColors.whiteColor),
-                              getVerticalSpace(1.6.h),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Gallery',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: 'bold',
-                                        fontSize: 14.px,
-                                        color: const Color(0xff282827)),
-                                  ),
-                                  GestureDetector(
+                        () => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          getVerticalSpace(2.4.h),
+                          Align(
+                            alignment: Alignment.topCenter,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                GestureDetector(
                                     onTap: () {
-                                      addCampaignController.pickMedia();
+                                      addCampaignController.pickImage(ImageSource.gallery);
                                     },
-                                    child: Text(
-                                      'Upload',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontFamily: 'bold',
-                                          fontSize: 14.px,
-                                          color: const Color(0xff007AFF)),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              getVerticalSpace(1.2.h),
-                              if (widget.imagesList.isEmpty)
-                                const SizedBox.shrink()
-                              else
-                                SizedBox(
-                                  height: 32.3.h,
-                                  child: GridView.builder(
-                                    padding: EdgeInsets.zero,
-                                    itemCount: widget.imagesList.length,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 3,
-                                            mainAxisSpacing: 2.1.h,
-                                            crossAxisSpacing: 1.6.h),
-                                    itemBuilder: (context, index) {
-                                      return Container(
-                                          alignment: Alignment.center,
-                                          height: 11.3.h,
-                                          width: 11.6.h,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(1.h),
-                                              color: AppColors.whiteColor,
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                  widget.imagesList[index],
-                                                ),
+                                    child: ClipOval(
+                                        child: addCampaignController.image.value != null
+                                            ? Image.file(
+                                                addCampaignController.image.value!,
                                                 fit: BoxFit.cover,
-                                              ),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                    offset: Offset(0, 1),
-                                                    spreadRadius: 0,
-                                                    blurRadius: 8,
-                                                    color: Color(0xffFFE4EA))
-                                              ]),
-                                          child: Align(
-                                              alignment: Alignment.topRight,
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  widget.imagesList
-                                                      .removeAt(index);
-                                                  widget.imagesList.refresh();
-                                                  log("imagesLength :${widget.imagesList}");
-                                                  networkImagesList.addAll(widget.imagesList);
-                                                },
-                                                child: SvgPicture.asset(
-                                                    "assets/svgs/crossicon.svg",
-                                                  fit: BoxFit.cover,),
-
-                                              )));
-                                    },
+                                                width: 4.2.h * 2, // Adjust width to match CircleAvatar's diameter
+                                                height: 4.2.h * 2, // Adjust height to match CircleAvatar's diameter
+                                              )
+                                            : widget.logo.isNotEmpty
+                                                ? ClipOval(
+                                                    child: Image.network(
+                                                      widget.logo,
+                                                      fit: BoxFit.cover,
+                                                      width: 4.2.h * 2, // Adjust width to match CircleAvatar's diameter
+                                                      height: 4.2.h * 2, // Adjust height to match CircleAvatar's diameter
+                                                    ),
+                                                  )
+                                                : CircleAvatar(
+                                                    radius: 4.2.h,
+                                                    child: const Icon(Icons.add_a_photo),
+                                                  ))),
+                                getVerticalSpace(.8.h),
+                                Text(
+                                  'Logo',
+                                  style:
+                                      TextStyle(fontSize: 14.px, color: const Color(0xff454544), fontFamily: 'regular', fontWeight: FontWeight.w400),
+                                )
+                              ],
+                            ),
+                          ),
+                          getVerticalSpace(4.h),
+                          Text(
+                            'Business Name',
+                            style: TextStyle(fontWeight: FontWeight.w400, fontFamily: 'bold', color: const Color(0xff454544), fontSize: 14.px),
+                          ),
+                          getVerticalSpace(.8.h),
+                          customTextFormField(title: widget.businessName, controller: bsNameController, bgColor: AppColors.whiteColor),
+                          getVerticalSpace(1.6.h),
+                          Text(
+                            'Phone Number',
+                            style: TextStyle(fontWeight: FontWeight.w400, fontFamily: 'bold', color: const Color(0xff454544), fontSize: 14.px),
+                          ),
+                          getVerticalSpace(.8.h),
+                          customTextFormField(
+                              title: widget.phoneNumber,
+                              controller: phoneNumberController,
+                              keyboardType: TextInputType.number,
+                              bgColor: AppColors.whiteColor),
+                          getVerticalSpace(1.6.h),
+                          Text(
+                            'Location',
+                            style: TextStyle(fontWeight: FontWeight.w400, fontFamily: 'bold', color: const Color(0xff454544), fontSize: 14.px),
+                          ),
+                          getVerticalSpace(.8.h),
+                          customTextFormField(
+                              title: widget.location,
+                              controller: locationController,
+                              keyboardType: TextInputType.text,
+                              bgColor: AppColors.whiteColor),
+                          getVerticalSpace(1.6.h),
+                          Text(
+                            'Target Map Area',
+                            style: TextStyle(fontWeight: FontWeight.w400, fontFamily: 'bold', color: const Color(0xff454544), fontSize: 14.px),
+                          ),
+                          getVerticalSpace(.8.h),
+                          customTextFormField(
+                              title: widget.targetArea,
+                              controller: targetController,
+                              keyboardType: TextInputType.text,
+                              bgColor: AppColors.whiteColor),
+                          getVerticalSpace(1.6.h),
+                          Text(
+                            "What’s your website URL?",
+                            style: CustomTextStyles.onBoardingHeading
+                                .copyWith(color: const Color(0xff191918), fontSize: 14.px, fontWeight: FontWeight.w500, fontFamily: 'bold'),
+                          ),
+                          getVerticalSpace(.8.h),
+                          Text(
+                            "This could be a web page or social media page",
+                            style: CustomTextStyles.onBoardingHeading
+                                .copyWith(color: const Color(0xff6E6E6D), fontSize: 12.px, fontWeight: FontWeight.w500, fontFamily: 'regular'),
+                          ),
+                          getVerticalSpace(.8.h),
+                          customTextFormField(title: widget.webUrl, controller: webUrlController, bgColor: AppColors.whiteColor),
+                          getVerticalSpace(1.6.h),
+                          Text(
+                            "Facebook",
+                            style: CustomTextStyles.onBoardingHeading
+                                .copyWith(color: const Color(0xff191918), fontSize: 14.px, fontWeight: FontWeight.w500, fontFamily: 'bold'),
+                          ),
+                          getVerticalSpace(.8.h),
+                          customTextFormField(
+                            controller: facebookUrlController,
+                            bgColor: AppColors.whiteColor,
+                            title: widget.fb,
+                          ),
+                          getVerticalSpace(1.6.h),
+                          Text(
+                            "Instagram",
+                            style: CustomTextStyles.onBoardingHeading
+                                .copyWith(color: const Color(0xff191918), fontSize: 14.px, fontWeight: FontWeight.w500, fontFamily: 'bold'),
+                          ),
+                          getVerticalSpace(.8.h),
+                          customTextFormField(controller: instagramUrlController, bgColor: AppColors.whiteColor, title: widget.insta),
+                          getVerticalSpace(1.6.h),
+                          Text(
+                            "Tiktok",
+                            style: CustomTextStyles.onBoardingHeading
+                                .copyWith(color: const Color(0xff191918), fontSize: 14.px, fontWeight: FontWeight.w500, fontFamily: 'bold'),
+                          ),
+                          getVerticalSpace(.8.h),
+                          customTextFormField(controller: tikTokUrlController, bgColor: AppColors.whiteColor, title: widget.tiktok),
+                          getVerticalSpace(1.6.h),
+                          Text(
+                            "Linkedin",
+                            style: CustomTextStyles.onBoardingHeading
+                                .copyWith(color: const Color(0xff191918), fontSize: 14.px, fontWeight: FontWeight.w500, fontFamily: 'bold'),
+                          ),
+                          getVerticalSpace(.8.h),
+                          customTextFormField(controller: linkdinUrlController, bgColor: AppColors.whiteColor, title: "Enter your linkedin Account"),
+                          getVerticalSpace(1.6.h),
+                          Text(
+                            'Business description',
+                            style: TextStyle(fontWeight: FontWeight.w400, fontFamily: 'bold', color: const Color(0xff454544), fontSize: 14.px),
+                          ),
+                          getVerticalSpace(.8.h),
+                          customTextFormField(
+                              controller: descriptionController,
+                              maxLine: 4,
+                              keyboardType: TextInputType.text,
+                              title: widget.description,
+                              bgColor: AppColors.whiteColor),
+                          getVerticalSpace(1.6.h),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Gallery',
+                                style: TextStyle(fontWeight: FontWeight.w500, fontFamily: 'bold', fontSize: 14.px, color: const Color(0xff282827)),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  addCampaignController.pickMedia();
+                                },
+                                child: Text(
+                                  'Upload',
+                                  style: TextStyle(fontWeight: FontWeight.w500, fontFamily: 'bold', fontSize: 14.px, color: const Color(0xff007AFF)),
+                                ),
+                              ),
+                            ],
+                          ),
+                          getVerticalSpace(1.2.h),
+                          if (widget.imagesList.isEmpty)
+                            const SizedBox.shrink()
+                          else
+                            SizedBox(
+                              height: 32.3.h,
+                              child: GridView.builder(
+                                padding: EdgeInsets.zero,
+                                itemCount: widget.imagesList.length,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, mainAxisSpacing: 2.1.h, crossAxisSpacing: 1.6.h),
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                      alignment: Alignment.center,
+                                      height: 11.3.h,
+                                      width: 11.6.h,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(1.h),
+                                          color: AppColors.whiteColor,
+                                          image: DecorationImage(
+                                            image: NetworkImage(
+                                              widget.imagesList[index],
+                                            ),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          boxShadow: const [
+                                            BoxShadow(offset: Offset(0, 1), spreadRadius: 0, blurRadius: 8, color: Color(0xffFFE4EA))
+                                          ]),
+                                      child: Align(
+                                          alignment: Alignment.topRight,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              removeGalleryItems.add(widget.imagesList[index]);
+                                              widget.imagesList.removeAt(index);
+                                              widget.imagesList.refresh();
+                                            },
+                                            child: SvgPicture.asset(
+                                              "assets/svgs/crossicon.svg",
+                                              fit: BoxFit.cover,
+                                            ),
+                                          )));
+                                },
+                              ),
+                            ),
+                          addCampaignController.pickedMediaList.isEmpty
+                              ? Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Text(
+                                    'You can upload your business images and videos',
+                                    style: TextStyle(
+                                        fontSize: 12.px, color: const Color(0xff7C7C7C), fontFamily: 'regular', fontWeight: FontWeight.w400),
+                                  ),
+                                )
+                              : SizedBox(
+                                  height: 32.3.h,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Newly Added',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500, fontFamily: 'bold', fontSize: 14.px, color: const Color(0xff282827)),
+                                      ),
+                                      getVerticalSpace(1.2.h),
+                                      Expanded(
+                                        child: GridView.builder(
+                                          padding: EdgeInsets.zero,
+                                          itemCount: addCampaignController.pickedMediaList.length,
+                                          physics: const NeverScrollableScrollPhysics(),
+                                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 3, mainAxisSpacing: 2.1.h, crossAxisSpacing: 1.6.h),
+                                          itemBuilder: (context, index) {
+                                            return Container(
+                                                alignment: Alignment.center,
+                                                height: 11.3.h,
+                                                width: 11.6.h,
+                                                decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(1.h),
+                                                    color: AppColors.whiteColor,
+                                                    image: DecorationImage(
+                                                      image: FileImage(
+                                                        File(addCampaignController.pickedMediaList[index]['path']!),
+                                                      ),
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                    boxShadow: const [
+                                                      BoxShadow(offset: Offset(0, 1), spreadRadius: 0, blurRadius: 8, color: Color(0xffFFE4EA))
+                                                    ]),
+                                                child: Align(
+                                                    alignment: Alignment.topRight,
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        addCampaignController.pickedMediaList.removeAt(index);
+                                                        addCampaignController.pickedMediaList.refresh();
+                                                      },
+                                                      child: SvgPicture.asset(
+                                                        "assets/svgs/crossicon.svg",
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    )));
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              addCampaignController.pickedMediaList.isEmpty
-                                  ? Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: Text(
-                                        'You can upload your business images and videos',
-                                        style: TextStyle(
-                                            fontSize: 12.px,
-                                            color: const Color(0xff7C7C7C),
-                                            fontFamily: 'regular',
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    )
-                                  : SizedBox(
-                                      height: 40.3.h,
-                                      child: GridView.builder(
-                                        padding: EdgeInsets.zero,
-                                        itemCount: addCampaignController
-                                            .pickedMediaList.length,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        gridDelegate:
-                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                                crossAxisCount:
-                                                    addCampaignController
-                                                        .pickedMediaList.length,
-                                                mainAxisSpacing: 2.1.h,
-                                                crossAxisSpacing: 1.6.h),
-                                        itemBuilder: (context, index) {
-                                          return Stack(children: [
-                                            Container(
-                                              alignment: Alignment.center,
-                                              height: 11.3.h,
-                                              width: 11.6.h,
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          1.h),
-                                                  color: AppColors.whiteColor,
-                                                  image: DecorationImage(
-                                                    image: FileImage(File(
-                                                        addCampaignController
-                                                                .pickedMediaList[
-                                                            index]['path']!),
-                                                    ),
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                  boxShadow: const [
-                                                    BoxShadow(
-                                                        offset: Offset(0, 1),
-                                                        spreadRadius: 0,
-                                                        blurRadius: 8,
-                                                        color:
-                                                            Color(0xffFFE4EA))
-                                                  ]),
-                                            ),
-                                          ]);
-                                        },
-                                      ),
-                                    ),
-                              getVerticalSpace(2.h),
-                            ]),
+                          getVerticalSpace(2.h),
+                        ]),
                       ),
                     ),
                   )),

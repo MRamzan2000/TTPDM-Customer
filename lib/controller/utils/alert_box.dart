@@ -18,6 +18,7 @@ import 'package:ttpdm/controller/getx_controllers/get_fcm_token_send_notificatio
 import 'package:ttpdm/controller/getx_controllers/image_picker_controller.dart';
 import 'package:ttpdm/controller/getx_controllers/poster_controller.dart';
 import 'package:ttpdm/controller/getx_controllers/subcription_controller.dart';
+import 'package:ttpdm/controller/getx_controllers/wallet_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/controller/utils/stripe_method.dart';
@@ -1500,8 +1501,20 @@ void openBottomSheet(
 
 
 
-void withdrawRequest(BuildContext context) {
-  showDialog(
+Future<bool> withdrawRequest(BuildContext context, double amount) async {
+  // Flag to store API call success
+  bool isRequestSuccessful = false;
+
+  // Controllers for text fields
+  final TextEditingController bankNameController = TextEditingController();
+  final TextEditingController accountTitleController = TextEditingController();
+  final TextEditingController ibanController = TextEditingController();
+
+  // Get the WalletController instance
+  final WalletController walletController = Get.put(WalletController(context: context));
+
+  // Show the dialog
+  await showDialog(
     context: context,
     builder: (context) {
       final screenHeight = MediaQuery.of(context).size.height;
@@ -1509,17 +1522,20 @@ void withdrawRequest(BuildContext context) {
 
       return Center(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05), // 5% of screen width
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
           child: Material(
             borderRadius: BorderRadius.circular(10),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06, vertical: screenHeight * 0.05), // Adjust for screen size
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.06,
+                vertical: screenHeight * 0.05,
+              ),
               height: screenHeight * 0.6,
               decoration: BoxDecoration(
                 color: const Color(0xffF8F9FA),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Column(
+              child: Obx(() => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Expanded(child: SizedBox()),
@@ -1534,12 +1550,12 @@ void withdrawRequest(BuildContext context) {
                           style: CustomTextStyles.buttonTextStyle.copyWith(
                             color: AppColors.blackColor,
                             fontFamily: 'bold',
-                            fontSize: screenHeight * 0.025, // Responsive font size
+                            fontSize: screenHeight * 0.025,
                           ),
                         ),
                         getVerticalSpace(1.2.h),
                         Text(
-                          '\$23.0',
+                          '\$$amount',
                           style: CustomTextStyles.buttonTextStyle.copyWith(
                             color: AppColors.mainColor,
                             fontFamily: 'bold',
@@ -1550,146 +1566,129 @@ void withdrawRequest(BuildContext context) {
                     ),
                   ),
                   getVerticalSpace(1.2.h),
-                  Text(
-                    "Bank Name",
-                    style: CustomTextStyles.buttonTextStyle.copyWith(
-                      color: const Color(0xff454544),
-                      fontFamily: 'bold',
-                      fontSize: screenHeight * 0.018,
-                    ),
-                  ),
-                  getVerticalSpace(0.8.h),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.whiteColor,
-                      borderRadius: BorderRadius.circular(1.h),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.blackColor.withOpacity(0.1),
-                          offset: const Offset(0, 2),
-                          blurRadius: 8,
-                          spreadRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: customTextFormField(
-                      bgColor: AppColors.whiteColor,
-                    ),
-                  ),
+                  buildInputLabel("Bank Name", screenHeight),
+                  buildInputField(bankNameController),
                   getVerticalSpace(1.6.h),
-                  Text(
-                    "Account Title",
-                    style: CustomTextStyles.buttonTextStyle.copyWith(
-                      color: const Color(0xff454544),
-                      fontFamily: 'bold',
-                      fontSize: screenHeight * 0.018,
-                    ),
-                  ),
-                  getVerticalSpace(0.8.h),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.whiteColor,
-                      borderRadius: BorderRadius.circular(1.h),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.blackColor.withOpacity(0.1),
-                          offset: const Offset(0, 2),
-                          blurRadius: 8,
-                          spreadRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: customTextFormField(
-                      bgColor: AppColors.whiteColor,
-                    ),
-                  ),
+                  buildInputLabel("Account Title", screenHeight),
+                  buildInputField(accountTitleController),
                   getVerticalSpace(1.6.h),
-                  RichText(
-                    text: TextSpan(children: [
-                      TextSpan(
-                        text: "IBAN",
-                        style: CustomTextStyles.buttonTextStyle.copyWith(
-                          color: const Color(0xff454544),
-                          fontFamily: 'bold',
-                          fontSize: screenHeight * 0.018,
-                        ),
-                      ),
-                      TextSpan(
-                        text: " (International Bank Account Number)",
-                        style: CustomTextStyles.buttonTextStyle.copyWith(
-                          color: const Color(0xff454544),
-                          fontWeight: FontWeight.w300,
-                          fontFamily: 'bold',
-                          fontSize: screenHeight * 0.014,
-                        ),
-                      ),
-                    ]),
-                  ),
-                  getVerticalSpace(0.8.h),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.whiteColor,
-                      borderRadius: BorderRadius.circular(1.h),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.blackColor.withOpacity(0.1),
-                          offset: const Offset(0, 2),
-                          blurRadius: 8,
-                          spreadRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: customTextFormField(
-                      bgColor: AppColors.whiteColor,
-                    ),
-                  ),
+                  buildInputLabel("IBAN", screenHeight),
+                  buildInputField(ibanController),
                   getVerticalSpace(4.h),
                   Row(
                     children: [
                       Expanded(
                         child: customElevatedButton(
                           onTap: () {
+                            walletController.requestLoading.value = false;
                             Get.back();
                           },
-                          title: Text(
-                            'Cancel',
-                            style: CustomTextStyles.buttonTextStyle.copyWith(
-                              color: AppColors.whiteColor,
-                              fontFamily: 'bold',
-                            ),
-                          ),
+                          title: buildButtonText('Cancel', AppColors.whiteColor),
                           bgColor: const Color(0xffC3C3C2),
-                          verticalPadding: screenHeight * 0.01, // Responsive padding
-                          horizentalPadding: screenWidth * 0.04, // Responsive padding
+                          verticalPadding: screenHeight * 0.01,
+                          horizentalPadding: screenWidth * 0.04,
                         ),
                       ),
                       getHorizentalSpace(1.6.h),
                       Expanded(
                         child: customElevatedButton(
-                          onTap: () {
-                            MySharedPreferences.setBool(isLoggedInKey, false);
-                            Get.off(() => const LoginScreen());
+                          onTap: () async {
+                            if(!walletController.requestLoading.value)
+                            // Validate fields before proceeding
+                            {
+                              if (bankNameController.text.isEmpty ||
+                                  accountTitleController.text.isEmpty ||
+                                  ibanController.text.isEmpty) {
+                                // Show validation error message (Snackbar or Alert)
+                                Get.snackbar(
+                                  'Error',
+                                  'Please fill in all fields.',
+                                  backgroundColor: Colors.red,
+                                  colorText: Colors.white,
+                                );
+                                return;
+                              }
+
+                              // Call the API after validation
+                              bool result = await walletController.addWalletRequest(
+                                context: context,
+                                loading: true,
+                                bankName: bankNameController.text,
+                                accountTitle: accountTitleController.text,
+                                iban: ibanController.text,
+                                amount: amount,
+                              );
+
+                              // Set the success status
+                              isRequestSuccessful = result;
+
+                              // Close the dialog
+                              Get.back();
+                              walletController.getWalletDetails(context: context, loading: true);
+                            }
                           },
-                          title: Text(
-                            'Send',
-                            style: CustomTextStyles.buttonTextStyle.copyWith(
-                              color: AppColors.whiteColor,
-                              fontFamily: 'bold',
-                            ),
-                          ),
+                          title: walletController.requestLoading.value
+                              ? spinkit : buildButtonText('Send', AppColors.whiteColor),
                           bgColor: AppColors.mainColor,
-                          verticalPadding: screenHeight * 0.01, // Responsive padding
-                          horizentalPadding: screenWidth * 0.04, // Responsive padding
+                          verticalPadding: screenHeight * 0.01,
+                          horizentalPadding: screenWidth * 0.04,
                         ),
                       ),
                     ],
                   ),
                 ],
-              ),
+              )),
             ),
           ),
         ),
       );
     },
+  );
+
+  // Return the success status of the request
+  return isRequestSuccessful;
+}
+
+// Helper methods to simplify UI creation
+
+Widget buildInputLabel(String label, double screenHeight) {
+  return Text(
+    label,
+    style: CustomTextStyles.buttonTextStyle.copyWith(
+      color: const Color(0xff454544),
+      fontFamily: 'bold',
+      fontSize: screenHeight * 0.018,
+    ),
+  );
+}
+
+Widget buildInputField(TextEditingController controller) {
+  return Container(
+    decoration: BoxDecoration(
+      color: AppColors.whiteColor,
+      borderRadius: BorderRadius.circular(1.h),
+      boxShadow: [
+        BoxShadow(
+          color: AppColors.blackColor.withOpacity(0.1),
+          offset: const Offset(0, 2),
+          blurRadius: 8,
+          spreadRadius: 0,
+        ),
+      ],
+    ),
+    child: customTextFormField(
+      bgColor: AppColors.whiteColor,
+      controller: controller,
+    ),
+  );
+}
+
+Widget buildButtonText(String text, Color color) {
+  return Text(
+    text,
+    style: CustomTextStyles.buttonTextStyle.copyWith(
+      color: color,
+      fontFamily: 'bold',
+    ),
   );
 }

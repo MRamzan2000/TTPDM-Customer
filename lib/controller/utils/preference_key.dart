@@ -1,5 +1,5 @@
 const isLoggedInKey = "isLoggedIn";
-const userId = "userId";
+const userIdKey = "userId";
 const userName = "userName";
 const authToken = "authToken";
 const role = "role";
