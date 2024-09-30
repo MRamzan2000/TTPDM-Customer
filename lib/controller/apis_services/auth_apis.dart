@@ -10,6 +10,7 @@ import 'package:ttpdm/view/screens/auth_section/create_new_password.dart';
 import 'package:ttpdm/view/screens/auth_section/login_screen.dart';
 import 'package:ttpdm/view/screens/auth_section/otp_verification.dart';
 
+import '../../main.dart';
 import '../../view/screens/bottom_navigationbar.dart';
 
 class AuthApis {
@@ -95,14 +96,13 @@ class AuthApis {
   Future<void> loginApis({
     required email,
     required password,
-    required fcmToken,
   }) async {
     final url = Uri.parse("$baseUrl/$signInEndP");
     final headers = {"Content-Type": "application/json"};
     final body = jsonEncode({
       "email": email,
       "password": password,
-      "fcmToken": fcmToken,
+      "fcmToken": await notificationServices.getDeviceToken(),
     });
     Response response = await post(url, headers: headers, body: body);
     log("before hit :${response.body}");

@@ -77,18 +77,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  RxString fcmToken = "".obs;
-  void getToken() async {
-    FirebaseMessaging.instance.getToken().then((String? token) {
-      if (token != null) {
-        fcmToken.value = token;
-        log("Push Messaging token: ${fcmToken.value}");
-      }
-    }).catchError((error) {
-      log("Error getting push messaging token: $error");
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -192,8 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           } else {
                             loginUserController.userLogin(
                                 email: emailController.text,
-                                password: passwordController.text,
-                                fcmToken: fcmToken.value);
+                                password: passwordController.text);
                           }
                         },
                         bgColor: AppColors.mainColor,

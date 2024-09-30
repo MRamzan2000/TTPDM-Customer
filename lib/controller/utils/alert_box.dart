@@ -1362,7 +1362,7 @@ void logoutPopUp(BuildContext context) {
                         child: customElevatedButton(
                             onTap: () {
                               MySharedPreferences.setBool(isLoggedInKey, false);
-                              Get.off(() => const LoginScreen());
+                              Get.offAll(() => const LoginScreen());
                             },
                             title: Text(
                               'Yes',
