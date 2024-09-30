@@ -36,17 +36,18 @@ class _HomeScreenState extends State<HomeScreen> {
     userProfileController = Get.put(UserProfileController(context: context));
     token.value = MySharedPreferences.getString(authToken);
     String id = MySharedPreferences.getString(userIdKey);
+WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+  _fetchCampaignsForCurrentTab();
 
-    log("Auth Token :${token.value}");
-    log("id :$id");
-    _fetchCampaignsForCurrentTab();
+  _searchController.addListener(() {
+    _searchQuery.value = _searchController.text;
+  });
 
-    _searchController.addListener(() {
-      _searchQuery.value = _searchController.text;
-    });
+  userProfileController.fetchUserProfile(loading: userProfileController.userProfile.value == null, id: id);
 
-    userProfileController.fetchUserProfile(loading: userProfileController.userProfile.value == null, id: id);
-  }
+},);
+
+      }
 
   @override
   void dispose() {
