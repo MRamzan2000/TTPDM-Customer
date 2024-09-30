@@ -25,6 +25,8 @@ Future<void> main() async {
   await Stripe.instance.applySettings();
   await Firebase.initializeApp();
   Get.put(ConnectivityController());
+  await NotificationServices().requestNotificationPermission();
+
   runApp(const MyApp());
 }
 
