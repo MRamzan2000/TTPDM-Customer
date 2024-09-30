@@ -13,6 +13,7 @@ import 'fill_add_detail.dart';
 
 class AddNewCampaign extends StatefulWidget {
   final String token;
+
   const AddNewCampaign({super.key, required this.token});
 
   @override
@@ -23,16 +24,12 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
   final RxString businessId = ''.obs;
   final RxString businessName = ''.obs;
   final RxInt selectedIndex = 0.obs;
-  final BusinessProfileController businessProfileController =
-      Get.find<BusinessProfileController>(tag: 'business');
+  final BusinessProfileController businessProfileController = Get.find<BusinessProfileController>(tag: 'business');
 
   @override
   void initState() {
     super.initState();
-    businessProfileController.fetchBusiness(
-        token: widget.token,
-        context: context,
-        loading: businessProfileController.allBusinessProfiles.isEmpty);
+    businessProfileController.fetchBusiness(token: widget.token, context: context, loading: businessProfileController.allBusinessProfiles.isEmpty);
     log('Business are that :${businessProfileController.fetchBusiness}');
   }
 
@@ -41,7 +38,7 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
     return Scaffold(
       backgroundColor: const Color(0xfff8f9fa),
       appBar: AppBar(
-        leading:  GestureDetector(
+        leading: GestureDetector(
           onTap: () {
             Get.back();
           },
@@ -56,10 +53,7 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
         automaticallyImplyLeading: false,
         title: Text(
           'Add Campaign',
-          style: CustomTextStyles.buttonTextStyle.copyWith(
-              fontSize: 20.px,
-              fontWeight: FontWeight.w600,
-              color: AppColors.mainColor),
+          style: CustomTextStyles.buttonTextStyle.copyWith(fontSize: 20.px, fontWeight: FontWeight.w600, color: AppColors.mainColor),
         ),
       ),
       body: SizedBox(
@@ -85,10 +79,7 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
                         width: MediaQuery.of(context).size.width / 5.2 - 2.4.h,
                         height: .4.h,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(1.h),
-                            color: index == 0
-                                ? AppColors.mainColor
-                                : const Color(0xffC3C3C2)),
+                            borderRadius: BorderRadius.circular(1.h), color: index == 0 ? AppColors.mainColor : const Color(0xffC3C3C2)),
                       );
                     },
                   ),
@@ -96,18 +87,12 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
                 getVerticalSpace(2.4.h),
                 Text(
                   'Select business for campaign',
-                  style: CustomTextStyles.buttonTextStyle.copyWith(
-                      fontSize: 14.px,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.blackColor),
+                  style: CustomTextStyles.buttonTextStyle.copyWith(fontSize: 14.px, fontWeight: FontWeight.w600, color: AppColors.blackColor),
                 ),
                 getVerticalSpace(2.1.h),
                 businessProfileController.isLoading2.value
                     ? ListView.builder(
-                        itemCount: widget.token.isNotEmpty
-                            ? 3
-                            : businessProfileController.allBusinessProfiles
-                                .length, // Number of shimmer items
+                        itemCount: widget.token.isNotEmpty ? 3 : businessProfileController.allBusinessProfiles.length, // Number of shimmer items
                         shrinkWrap: true,
                         padding: EdgeInsets.zero,
                         itemBuilder: (context, index) {
@@ -115,15 +100,11 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
                             baseColor: AppColors.baseColor,
                             highlightColor: AppColors.highlightColor,
                             child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 1.6.h, vertical: 2.h),
+                              padding: EdgeInsets.symmetric(horizontal: 1.6.h, vertical: 2.h),
                               margin: EdgeInsets.symmetric(vertical: 1.6.h),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(1.h),
-                                  color: AppColors.whiteColor),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(1.h), color: AppColors.whiteColor),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
                                     padding: EdgeInsets.all(.3.h),
@@ -148,54 +129,39 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
                             ),
                           )
                         : Expanded(
-                          child: ListView.builder(
-                              itemCount: businessProfileController
-                                  .allBusinessProfiles.length,
+                            child: ListView.builder(
+                              itemCount: businessProfileController.approvedProfiles.length,
                               shrinkWrap: true,
-
                               padding: EdgeInsets.zero,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                   onTap: () {
                                     selectedIndex.value = index;
-                                    businessId.value = businessProfileController
-                                        .allBusinessProfiles[selectedIndex.value]!
-                                        .id;
-                                    businessName.value = businessProfileController
-                                        .allBusinessProfiles[selectedIndex.value]!
-                                        .name;
+                                    businessId.value = businessProfileController.approvedProfiles[selectedIndex.value]!.id;
+                                    businessName.value = businessProfileController.approvedProfiles[selectedIndex.value]!.name;
                                     if (businessId.isEmpty) {
-                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                          content: Text(
-                                              'Please Select your business for Campaign')));
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(content: Text('Please Select your business for Campaign')));
                                     } else if (businessName.isEmpty) {
-                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                          content: Text(
-                                              'Please Select your business for Campaign')));
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(content: Text('Please Select your business for Campaign')));
                                     } else {
                                       Get.to(() => FillAddDetails(
-                                        businessId: businessId.value,
-                                        businessName: businessName.value,
-                                        token: widget.token,
-                                      ));
+                                            businessId: businessId.value,
+                                            businessName: businessName.value,
+                                            token: widget.token,
+                                          ));
                                     }
                                   },
                                   child: Obx(
                                     () => Container(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 1.6.h, vertical: 2.h),
-                                      margin:
-                                          EdgeInsets.symmetric(vertical: 1.6.h),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(1.h),
-                                          color: AppColors.whiteColor),
+                                      padding: EdgeInsets.symmetric(horizontal: 1.6.h, vertical: 2.h),
+                                      margin: EdgeInsets.symmetric(vertical: 1.6.h),
+                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(1.h), color: AppColors.whiteColor),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(businessProfileController
-                                              .allBusinessProfiles[index]!.name),
+                                          Text(businessProfileController.approvedProfiles[index]!.name),
                                           Container(
                                             padding: EdgeInsets.all(.3.h),
                                             height: 2.4.h,
@@ -204,16 +170,9 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
                                                 shape: BoxShape.circle,
                                                 color: Colors.transparent,
                                                 border: Border.all(
-                                                    color: selectedIndex.value ==
-                                                            index
-                                                        ? AppColors.mainColor
-                                                        : const Color(0xff7C7C7C),
-                                                    width: 2)),
+                                                    color: selectedIndex.value == index ? AppColors.mainColor : const Color(0xff7C7C7C), width: 2)),
                                             child: CircleAvatar(
-                                              backgroundColor:
-                                                  selectedIndex.value == index
-                                                      ? AppColors.mainColor
-                                                      : Colors.transparent,
+                                              backgroundColor: selectedIndex.value == index ? AppColors.mainColor : Colors.transparent,
                                               radius: 1.h,
                                             ),
                                           )
@@ -224,7 +183,7 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
                                 );
                               },
                             ),
-                        ),
+                          ),
 
                 // customElevatedButton(
                 //     onTap: () {

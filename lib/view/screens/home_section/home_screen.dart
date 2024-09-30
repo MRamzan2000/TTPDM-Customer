@@ -143,7 +143,7 @@ WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                                 backgroundImage: const AssetImage('assets/pngs/profile.png'),
                               ),
                               title: Text(
-                                'Hello Mid Admin',
+                                'Hello',
                                 style: TextStyle(fontFamily: 'bold', fontWeight: FontWeight.w400, fontSize: 18.px, color: const Color(0xff2F3542)),
                               ),
                               subtitle: Text('Welcome Back',
@@ -151,7 +151,7 @@ WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                                       TextStyle(fontFamily: 'light', fontWeight: FontWeight.w400, fontSize: 12.px, color: const Color(0xff2F3542))),
                               trailing: GestureDetector(
                                 onTap: () {
-                                  Get.to(() => const NotiFicationScreen());
+                                  Get.to(() => const NotificationScreen());
                                 },
                                 // child: SizedBox(
                                 //     height: 4.8.h,
@@ -189,7 +189,8 @@ WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                                       TextStyle(fontFamily: 'light', fontWeight: FontWeight.w400, fontSize: 12.px, color: const Color(0xff2F3542))),
                               trailing: GestureDetector(
                                   onTap: () {
-                                    Get.to(() => const NotiFicationScreen());
+                                    isNotificationReceived.value = false;
+                                    Get.to(() => const NotificationScreen());
                                   },
                                   child: Stack(
                                     alignment: Alignment.topRight,

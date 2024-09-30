@@ -89,6 +89,7 @@ class SubscriptionController extends GetxController {
         },
       );
     } catch (e) {
+      paymentLoading.value = false;
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("unexpected error occurred :${e.toString()}")));

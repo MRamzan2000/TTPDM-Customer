@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../utils/apis_constant.dart';
 import 'app_colors.dart';
 import 'custom_text_styles.dart';
 
@@ -40,7 +41,8 @@ Widget customElevatedButton(
     double? horizentalPadding,
     double? verticalPadding,
     double? borderRadius,
-    Color? titleColor}) {
+    Color? titleColor,
+    bool? loading,}) {
   return ElevatedButton(
     onPressed: onTap,
     style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(bgColor)),
@@ -48,7 +50,9 @@ Widget customElevatedButton(
       padding: EdgeInsets.symmetric(
           horizontal: horizentalPadding ?? 6.h,
           vertical: verticalPadding ?? 1.h),
-      child: title
+      child: loading != null && loading
+          ? spinkit
+          : title
     ),
   );
 }

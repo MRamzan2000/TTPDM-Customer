@@ -34,26 +34,18 @@ class _LogOutScreenState extends State<LogOutScreen> {
     super.initState();
     userProfileController = Get.put(UserProfileController(context: context));
     getStripeKeyController = Get.put(GetStripeKeyController(context: context));
-
-    // Initialize token and subscriptionEnd
     token.value = MySharedPreferences.getString(authToken);
     subscriptionEnd.value = MySharedPreferences.getString(subscription);
-    log("subscriptionEnd.value :${subscriptionEnd.value}");
-
-    if (subscriptionEnd.value.isNotEmpty) {
-      try {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      // Initialize token and subscriptionEnd
+      log("subscriptionEnd.value :${subscriptionEnd.value}");
+      // Fetch Stripe key
+      getStripeKeyController.fetchStripeKey(loading: true).then((_) {
         dateTime = DateTime.parse(subscriptionEnd.value);
         formattedDate = DateFormat('dd MMMM').format(dateTime);
-      } catch (e) {
-        log("Error parsing date: $e");
-      }
-    }
-    // Fetch Stripe key
-    getStripeKeyController.fetchStripeKey(loading: true).then((_) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
         getStripeKeyController.keyLoading.value = false;
       });
-    });
+    },);
   }
 
   @override

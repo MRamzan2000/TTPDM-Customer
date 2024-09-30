@@ -180,9 +180,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               child: isSelectedIndex.value == 0
                   ? const HomeScreen()
                   : isSelectedIndex.value == 1
-                      ? WalletScreen()
+                      ? const WalletScreen()
                       : isSelectedIndex.value == 2
-                          ? const NotiFicationScreen()
+                          ? const NotificationScreen()
                           : const ProfileScreen(),
             ),
             SizedBox(height: 8.h), // Adjust the height as needed
