@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -35,17 +34,17 @@ class _HomeScreenState extends State<HomeScreen> {
     userProfileController = Get.put(UserProfileController(context: context));
     token.value = MySharedPreferences.getString(authToken);
     String id = MySharedPreferences.getString(userId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchCampaignsForCurrentTab();
 
-    log("Auth Token :${token.value}");
-    log("id :$id");
-    _fetchCampaignsForCurrentTab();
+      _searchController.addListener(() {
+        _searchQuery.value = _searchController.text;
+      });
 
-    _searchController.addListener(() {
-      _searchQuery.value = _searchController.text;
+      userProfileController.fetchUserProfile(
+          loading: userProfileController.userProfile.value == null, id: id);
     });
 
-    userProfileController.fetchUserProfile(
-        loading: userProfileController.userProfile.value == null, id: id);
   }
 
   @override
@@ -78,7 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
               : addCampaignController.rejectedCampaigns.value == null,
     );
   }
-
   final RxList<String> tabBarItems = [
     '   Pending   ',
     '   Approved   ',
@@ -211,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       trailing: GestureDetector(
                         onTap: () {
                           Get.to(()=>const NotiFicationScreen());
-
+                          isNotificationReceived.value=false;
                         },
                         child:Stack(alignment: Alignment.topRight,
                           children: [
