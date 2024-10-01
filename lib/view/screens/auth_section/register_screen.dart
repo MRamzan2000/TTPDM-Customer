@@ -29,6 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController passwordController = TextEditingController();
 
   final TextEditingController confirmPasswordController = TextEditingController();
+  late WebViewControllerPlus _controler;
   bool isCaptchaVerified = false;
   double webViewHeight = 400;
 
@@ -113,6 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
                               ),
                         onTap: () {
+                          showWebViewDialog(context, webViewHeight);
                           if (nameController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Please enter the name')),
@@ -143,6 +145,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             );
                           } else if (!isCaptchaVerified) {
                             showWebViewDialog(context, webViewHeight);
+
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Success')),
@@ -167,7 +170,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 getVerticalSpace(2.h),
                 GestureDetector(
                   onTap: () {
-                    Get.back();
+                    Get.to(() => const LoginScreen());
                   },
                   child: Align(
                     alignment: Alignment.bottomCenter,
@@ -192,7 +195,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void showWebViewDialog(BuildContext context, double webViewHeight) {
-    late WebViewControllerPlus controller; // Declare controller locally
+    WebViewControllerPlus controller = WebViewControllerPlus()
+      ..loadFlutterAssetServer('assets/webpages/index.html')
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..enableZoom(false)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(NavigationDelegate(
+        onPageFinished: (url) {
+          _controler.getWebViewHeight().then((value) {
+            var height = int.parse(value.toString()).toDouble();
+            if (height != 20.0) {
+              setState(() {
+                // Set the WebView height based on the content
+              });
+            }
+          });
+        },
+      ))
+      ..addJavaScriptChannel('Captcha',
+        onMessageReceived: (message) {
+          final token = message.message;
+          if (token.isNotEmpty) {
+            log('Received reCAPTCHA token: $token');
+            setState(() {
+              isCaptchaVerified = true; // Update your verification state
+            });
+          }
+        },).then((value) {
+        showWebViewDialog(context, webViewHeight, _controler);
+      },);
 
     showDialog(
       context: context,
@@ -200,38 +231,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             // Initialize the WebView controller here
-            controller = WebViewControllerPlus()
-              ..loadFlutterAssetServer('assets/webpages/index.html')
-              ..setJavaScriptMode(JavaScriptMode.unrestricted)
-              ..enableZoom(false)
-              ..setBackgroundColor(const Color(0x00000000))
-              ..setNavigationDelegate(NavigationDelegate(
-                onPageFinished: (url) {
-                  controller.getWebViewHeight().then((value) {
-                    var height = int.parse(value.toString()).toDouble();
-                    if (height != 20.0) {
-                      setState(() {
-                        // Optionally, adjust webViewHeight here if needed
-                      });
-                    }
-                  });
-                },
-              ));
-
-            // Add JavaScript channel for reCAPTCHA token
-            controller.addJavaScriptChannel(
-              'Captcha',
-              onMessageReceived: (message) {
-                final token = message.message;
-                if (token.isNotEmpty) {
-                  log('Received reCAPTCHA token: $token');
-                  setState(() {
-                    isCaptchaVerified = true;
-                  });
-                }
-              },
-            );
-
             return Dialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0),
