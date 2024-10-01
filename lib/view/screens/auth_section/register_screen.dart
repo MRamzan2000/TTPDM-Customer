@@ -8,7 +8,6 @@ import 'package:ttpdm/controller/getx_controllers/signup_user_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 
 import 'login_screen.dart';
-
 class RegisterScreen extends StatelessWidget {
    RegisterScreen({super.key});
   final TextEditingController nameController = TextEditingController();
@@ -17,7 +16,6 @@ class RegisterScreen extends StatelessWidget {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
   TextEditingController();
-
   @override
   Widget build(BuildContext context) {
 
@@ -176,7 +174,7 @@ class RegisterScreen extends StatelessWidget {
                 getVerticalSpace(2.h),
                 GestureDetector(
                   onTap: () {
-                    Get.to(() =>  LoginScreen());
+                    Get.to(() =>  const LoginScreen());
                   },
                   child: Align(
                     alignment: Alignment.bottomCenter,
