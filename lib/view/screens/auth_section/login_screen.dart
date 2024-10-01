@@ -64,17 +64,6 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       },
     );
-
-    _controler.addJavaScriptChannel(
-      'Captcha',
-      onMessageReceived: (message) {
-        if (message.message == 'verified') {
-          setState(() {
-            isCaptchaVerified = true;
-          });
-        }
-      },
-    );
   }
 
   @override
