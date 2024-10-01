@@ -114,7 +114,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
                               ),
                         onTap: () {
-                          showWebViewDialog(context, webViewHeight);
                           if (nameController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Please enter the name')),
@@ -145,19 +144,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             );
                           } else if (!isCaptchaVerified) {
                             showWebViewDialog(context, webViewHeight);
-
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Success')),
                             );
-                            // signUpController.userSignUp(
-                            //   fullName: nameController.text,
-                            //   email: emailController.text,
-                            //   phoneNumber: phoneNumber.text,
-                            //   password: passwordController.text,
-                            //   confirmPassword: confirmPasswordController.text,
-                            //   role: 'customer',
-                            // );
+                            signUpController.userSignUp(
+                              fullName: nameController.text,
+                              email: emailController.text,
+                              phoneNumber: phoneNumber.text,
+                              password: passwordController.text,
+                              confirmPassword: confirmPasswordController.text,
+                              role: 'customer',
+                            );
                           }
                         },
                         bgColor: AppColors.mainColor,
@@ -219,6 +217,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             log('Received reCAPTCHA token: $token');
             setState(() {
               isCaptchaVerified = true; // Update your verification state
+              Future.delayed(const Duration(seconds: 2), () {
+                Navigator.of(context).pop();
+              },);
             });
           }
         },).then((value) {
@@ -274,10 +275,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         );
       },
-    ).then((value) {
-      setState(() {
-        isCaptchaVerified = false; // Reset the verification state if needed
-      });
-    });
+    );
   }
 }
