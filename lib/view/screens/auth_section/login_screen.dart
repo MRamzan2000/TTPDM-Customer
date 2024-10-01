@@ -1,6 +1,3 @@
-import 'dart:developer';
-
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -10,8 +7,6 @@ import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/login_user_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/view/screens/auth_section/register_screen.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
-
 import 'reset_otp.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -27,54 +22,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
 
   late LoginUserController loginUserController;
-  late WebViewControllerPlus _controler;
-  bool isCaptchaVerified = false;
-  double webViewHeight = 400;
 
   @override
   void initState() {
     super.initState();
     loginUserController = Get.put(LoginUserController(context: context));
-    _controler = WebViewControllerPlus()
-      ..loadFlutterAssetServer('assets/webpages/index.html')
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..enableZoom(false)
-      ..setBackgroundColor(const Color(0x00000000))
-      ..setNavigationDelegate(NavigationDelegate(
-        onPageFinished: (url) {
-          _controler.getWebViewHeight().then((value) {
-            var height = int.parse(value.toString()).toDouble();
-            if (height != 20.0) {
-              setState(() {
-                // Set the WebView height based on the content
-              });
-            }
-          });
-        },
-      ));
-    _controler.addJavaScriptChannel(
-      'Captcha',
-      onMessageReceived: (message) {
-        final token = message.message;
-        if (token.isNotEmpty) {
-          log('Received reCAPTCHA token: $token');
-          setState(() {
-            isCaptchaVerified = true; // Update your verification state
-          });
-        }
-      },
-    );
-
-    _controler.addJavaScriptChannel(
-      'Captcha',
-      onMessageReceived: (message) {
-        if (message.message == 'verified') {
-          setState(() {
-            isCaptchaVerified = true;
-          });
-        }
-      },
-    );
   }
 
   @override
@@ -138,16 +90,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                getVerticalSpace(1.6.h),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: SizedBox(
-                    height: 180,
-                    child: WebViewWidget(
-                      controller: _controler,
-                    ),
-                  ),
-                ),
                 getVerticalSpace(4.4.h),
                 Obx(
                   () => Row(
@@ -171,11 +113,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content: Text('Please enter the password')),
-                            );
-                          } else if (!isCaptchaVerified) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Please complete the CAPTCHA')),
                             );
                           } else {
                             loginUserController.userLogin(
