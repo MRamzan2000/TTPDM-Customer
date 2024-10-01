@@ -11,6 +11,7 @@ import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/view/screens/bottom_navigationbar.dart';
 
+import '../../controller/getx_controllers/internet_connectvty_controller.dart';
 import 'onboarding_section/onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -36,6 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    Get.put(ConnectivityController());
     Get.put(BusinessProfileController(context: context), tag: 'business');
     navigateBasedOnLoginStatus();
 

@@ -9,6 +9,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
+import 'package:ttpdm/controller/utils/preference_key.dart';
 
 import '../../models/get_campaigns_by_status_model.dart';
 
@@ -204,8 +206,9 @@ class AddCampaignApis {
 
 
   //getCampaignByStatus
-  Future<GetCampaignsByStatusModel?> getCampaignByStatus(
-      {required String status}) async {
+  Future<GetCampaignsByStatusModel?> getCampaignByStatus({
+    required String status,
+  }) async {
     final url = Uri.parse("$baseUrl/$getCampaignByStatusEp/$status");
     final headers = {
       'Content-Type': 'application/json',
@@ -216,15 +219,27 @@ class AddCampaignApis {
       // Debug prints
       log('Response status: ${response.statusCode}');
       log('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         log('fetching campaign by status: ${response.body}');
-        return getCampaignByStatusModelFromJson(response.body);
+
+        // Parse the response into the model
+        GetCampaignsByStatusModel allCampaigns = getCampaignsByStatusModelFromJson(response.body);
+
+        // Filter the campaigns where the owner ID matches the user ID
+        String userId = MySharedPreferences.getString(userIdKey);
+        List<Campaign> filteredCampaigns = allCampaigns.campaigns.where((campaign) {
+          return campaign.business.owner.id == userId;
+        }).toList();
+
+        // Return a new model with the filtered campaigns
+        return GetCampaignsByStatusModel(campaigns: filteredCampaigns);
       } else {
-        log('Error fetching business profiles: ${response.body}');
+        log('Error fetching campaigns: ${response.body}');
         return null;
       }
     } catch (e) {
-      log('UnExpected Error fetching business profiles: ${e.toString()}');
+      log('Unexpected Error fetching campaigns: ${e.toString()}');
       return null;
     }
   }

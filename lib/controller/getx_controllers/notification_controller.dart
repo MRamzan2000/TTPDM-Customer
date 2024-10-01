@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
+import '../utils/my_shared_prefrence.dart';
 
 class NotificationController extends GetxController {
   var notifications = <Map<String, dynamic>>[].obs;

@@ -52,6 +52,19 @@ class NotificationServices {
     });
   }
 
+  Future<void> requestNotificationPermission() async {
+    await _firebaseMessaging.requestPermission(
+      alert: true,
+      announcement: true,
+      badge: true,
+      carPlay: true,
+      criticalAlert: true,
+      provisional: true,
+      sound: true,
+    );
+  }
+
+
   Future<void> showNotification(RemoteMessage message) async {
     const channelId = 'your_channel_id';
     const channelName = 'Your Channel Name';

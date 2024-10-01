@@ -109,10 +109,12 @@ class SubscriptionApi {
       "Authorization":"Bearer $token"
     };
 
+    log("$baseUrl/$confirmSubscriptionPaymentEp$plan");
+    log("$token\n$plan");
     http.Response response = await http.get(url, headers: headers);
+    log(response.body);
+    log("${response.statusCode}");
     if (response.statusCode == 200) {
-      log(response.body);
-      log("${response.statusCode}");
       final data = jsonDecode(response.body);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("payment Confirmed Successfully")));
       MySharedPreferences.setString(subscription,data['subscription']["expiryDate"]);

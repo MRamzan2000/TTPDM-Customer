@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -61,10 +60,27 @@ class MySharedPreferences {
   List<String> notifications=[];
   Future<List<Map<String, dynamic>>> getSavedNotifications() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    notifications= prefs.getStringList('notifications') ?? [];
-    log("notifications length:${notifications.length}");
-    return notifications.map((notification) {
-      return json.decode(notification) as Map<String, dynamic>; // Explicitly cast
-    }).toList();
+    List<String> notifications = prefs.getStringList('notifications') ?? [];
+    log("notifications length: ${notifications.length}");
+
+    List<Map<String, dynamic>> decodedNotifications = [];
+
+    for (var notification in notifications) {
+      // Escape any problematic characters before decoding
+      String sanitizedNotification = escapeJsonString(notification);
+
+      try {
+        decodedNotifications.add(json.decode(sanitizedNotification) as Map<String, dynamic>);
+      } catch (e) {
+        log("Error decoding notification: $sanitizedNotification, error: $e");
+      }
+    }
+
+    return decodedNotifications;
+  }
+
+  String escapeJsonString(String input) {
+    // Replace newline and carriage return characters with a space
+    return input.replaceAll(RegExp(r'[\r\n]', unicode: true), ' ');
   }
 }
