@@ -222,7 +222,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             });
           }
         },).then((value) {
-        showWebViewDialog(context, webViewHeight, _controler);
       },);
 
     showDialog(
