@@ -167,7 +167,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 getVerticalSpace(2.h),
                 GestureDetector(
                   onTap: () {
-                    Get.to(() => const LoginScreen());
+                    Get.back();
                   },
                   child: Align(
                     alignment: Alignment.bottomCenter,
