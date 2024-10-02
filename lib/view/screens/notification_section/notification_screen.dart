@@ -9,7 +9,8 @@ import '../../../controller/custom_widgets/widgets.dart';
 import '../../../controller/getx_controllers/notification_controller.dart';
 
 class NotificationScreen extends StatefulWidget {
-  const NotificationScreen({super.key});
+  final String title;
+  const NotificationScreen({super.key, required this.title});
 
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
@@ -27,7 +28,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        leading: GestureDetector(
+        leading:widget.title=="bottom"?const SizedBox.shrink(): GestureDetector(
           onTap: () {
             Get.back();
           },

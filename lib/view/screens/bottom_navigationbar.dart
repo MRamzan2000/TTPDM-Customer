@@ -182,7 +182,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                   : isSelectedIndex.value == 1
                       ? const WalletScreen()
                       : isSelectedIndex.value == 2
-                          ? const NotificationScreen()
+                          ? const NotificationScreen(title: 'bottom',)
                           : const ProfileScreen(),
             ),
             SizedBox(height: 8.h), // Adjust the height as needed
