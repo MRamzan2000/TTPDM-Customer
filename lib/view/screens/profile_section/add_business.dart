@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:ttpdm/controller/apis_services/get_fcm_send_notification_api.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
@@ -14,7 +15,7 @@ import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/view/screens/bottom_navigationbar.dart';
-
+String businessName="";
 class AddNewBusiness extends StatefulWidget {
   const AddNewBusiness({super.key});
 
@@ -85,11 +86,20 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
         ),
       );
     } else {
-      submitForm();
+      submitForm().then((value) {
+        GetFcmTokenApi(context: context).sendNotificationToAllMidAdmins(
+            token: token.value,
+            title: "Request",
+            message: "${fullname.value} added new business ($businessName)",
+            info1: id.value,
+            info2: "");
+
+      },);
     }
   }
 
   Future<void> submitForm() async {
+    businessName=bsNameController.text;
     await businessProfileController.submitBusinessProfile(
       name: bsNameController.text,
       phone: phoneNumberController.text,

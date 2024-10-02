@@ -59,20 +59,17 @@ class _BusinessProfileState extends State<BusinessProfile> {
   final BusinessProfileController businessProfileController =
       Get.find(tag: "business");
   RxString token = "".obs;
-
   @override
   void initState() {
     super.initState();
     token.value = MySharedPreferences.getString(authToken);
   }
-
   @override
   Widget build(BuildContext context) {
     log("status :${widget.status}");
     final List<String> items = [
       'Edit',
       'Delete',
-      'View Campaign ',
     ];
     final List<String> item2 = [
       'Delete',

@@ -30,10 +30,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     token.value = MySharedPreferences.getString(authToken);
-    businessProfileController.fetchBusiness(
-        token: token.value,
-        context: context,
-        loading: businessProfileController.allBusinessProfiles.isEmpty);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        businessProfileController.fetchBusiness(
+            token: token.value,
+            context: context,
+            loading: businessProfileController.allBusinessProfiles.isEmpty);
+      },
+    );
   }
 
   RxBool hasDisplayedNoProfileMessage = false.obs;

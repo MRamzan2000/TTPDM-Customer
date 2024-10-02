@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:ttpdm/controller/apis_services/poster_apis.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -13,6 +14,7 @@ import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
 
 import '../../models/get_campaigns_by_status_model.dart';
+import '../getx_controllers/get_fcm_token_send_notification_controller.dart';
 
 class AddCampaignApis {
   Future<void> addCampaignApi({
@@ -30,8 +32,7 @@ class AddCampaignApis {
     required BuildContext context,
   }) async {
     try {
-      const fileName =
-          'adBanner.png';
+      const fileName = 'adBanner.png';
       final downloadedFile = await downloadFile(adBannerUrl, fileName);
 
       final url = Uri.parse("$baseUrl/$addCampaignEp");
@@ -111,8 +112,7 @@ class AddCampaignApis {
     }
   }
 
-
-  Future<void> payCampaignFee({required context,required String token}) async {
+  Future<void> payCampaignFee({required context, required String token}) async {
     final url = Uri.parse("$baseUrl/$campaignFeeEp");
     final headers = {
       "Content-Type": "application/json",
@@ -121,10 +121,10 @@ class AddCampaignApis {
     try {
       final response = await http.post(url, headers: headers);
       if (response.statusCode == 200) {
-        Map<String ,dynamic>responseBody=jsonDecode(response.body);
+        Map<String, dynamic> responseBody = jsonDecode(response.body);
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-              content: Text(responseBody["message"])));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(responseBody["message"])));
         }
       } else if (response.statusCode == 500) {
         if (context.mounted) {
@@ -178,7 +178,7 @@ class AddCampaignApis {
     };
     final body = jsonEncode({
       "description": description,
-      "businessId":businessId,
+      "businessId": businessId,
     });
     try {
       final response = await http.post(url, headers: headers, body: body);
@@ -203,8 +203,6 @@ class AddCampaignApis {
     }
   }
 
-
-
   //getCampaignByStatus
   Future<GetCampaignsByStatusModel?> getCampaignByStatus({
     required String status,
@@ -224,11 +222,13 @@ class AddCampaignApis {
         log('fetching campaign by status: ${response.body}');
 
         // Parse the response into the model
-        GetCampaignsByStatusModel allCampaigns = getCampaignsByStatusModelFromJson(response.body);
+        GetCampaignsByStatusModel allCampaigns =
+            getCampaignsByStatusModelFromJson(response.body);
 
         // Filter the campaigns where the owner ID matches the user ID
         String userId = MySharedPreferences.getString(userIdKey);
-        List<Campaign> filteredCampaigns = allCampaigns.campaigns.where((campaign) {
+        List<Campaign> filteredCampaigns =
+            allCampaigns.campaigns.where((campaign) {
           return campaign.business.owner.id == userId;
         }).toList();
 

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import '../utils/my_shared_prefrence.dart';
 
@@ -15,6 +17,7 @@ class NotificationController extends GetxController {
 
   Future<void> loadNotifications() async {
     notifications.value = await MySharedPreferences().getSavedNotifications();
+    log("length of notification :${ notifications.length}");
     categorizeNotifications();
   }
 
