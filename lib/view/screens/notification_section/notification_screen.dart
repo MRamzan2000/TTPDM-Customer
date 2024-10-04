@@ -1,13 +1,23 @@
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../controller/custom_widgets/app_colors.dart';
 import '../../../controller/custom_widgets/custom_text_styles.dart';
 import '../../../controller/custom_widgets/widgets.dart';
 import '../../../controller/getx_controllers/notification_controller.dart';
 
-class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({super.key});
+class NotificationScreen extends StatefulWidget {
+  final String title;
+  const NotificationScreen({super.key, required this.title});
+
+  @override
+  State<NotificationScreen> createState() => _NotificationScreenState();
+}
+
+class _NotificationScreenState extends State<NotificationScreen> {
+  final NotificationController notificationController = Get.put(NotificationController());
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +28,7 @@ class NotificationScreen extends StatelessWidget {
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        leading: GestureDetector(
+        leading:widget.title=="bottom"?const SizedBox.shrink(): GestureDetector(
           onTap: () {
             Get.back();
           },
@@ -80,10 +90,10 @@ class NotificationScreen extends StatelessWidget {
 
   Widget _buildNotificationItem(Map<String, dynamic> notification) {
     final receivedTime = DateTime.parse(notification['receivedTime']);
-    final formattedTime = "${receivedTime.hour}:${receivedTime.minute.toString().padLeft(2, '0')}";
 
+    final formattedTime = DateFormat('hh:mm a').format(receivedTime);
     return Padding(
-      padding:  EdgeInsets.symmetric(vertical: 1.h),
+      padding: EdgeInsets.symmetric(vertical: 1.h),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -97,7 +107,9 @@ class NotificationScreen extends StatelessWidget {
                     fontFamily: 'bold',
                     color: const Color(0xff15141F)),
               ),
-              Text(formattedTime, style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.mainColor)),
+              Text(formattedTime, style: CustomTextStyles.buttonTextStyle.copyWith(
+                fontSize: 12.px,
+                  color: AppColors.mainColor)),
             ],
           ),
           getVerticalSpace(0.8.h),

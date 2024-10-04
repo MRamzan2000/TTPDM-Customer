@@ -1,16 +1,18 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/models/get_campaigns_by_status_model.dart';
-
 import '../../../controller/utils/alert_box.dart';
 
-class CampaignName extends StatelessWidget {
+class CampaignName extends StatefulWidget {
   final String businessId;
   final String businessName;
   final String campaignName;
@@ -23,28 +25,67 @@ class CampaignName extends StatelessWidget {
   final String startTime;
   final String endTime;
   final String status;
-  CampaignName(
-      {super.key,
-      required this.businessId,
-      required this.businessName,
-      required this.campaignName,
-      required this.campaignDescription,
-      required this.selectedPoster,
-      required this.campaignPlatForms,
-      required this.startDate,
-      required this.endDate,
-      required this.startTime,
-      required this.endTime,
-      required this.status,
-      required this.analysis,
-      });
+  const CampaignName({
+    super.key,
+    required this.businessId,
+    required this.businessName,
+    required this.campaignName,
+    required this.campaignDescription,
+    required this.selectedPoster,
+    required this.campaignPlatForms,
+    required this.startDate,
+    required this.endDate,
+    required this.startTime,
+    required this.endTime,
+    required this.status,
+    required this.analysis,
+  });
+
+  @override
+  State<CampaignName> createState() => _CampaignNameState();
+}
+
+class _CampaignNameState extends State<CampaignName> {
   final RxBool isOpen1 = false.obs;
   final RxBool isOpen3 = false.obs;
   final String range = '';
   final RxList<String> imageList =
       <String>['assets/pngs/imageicon.png', 'assets/pngs/videos.png'].obs;
   final List<String> items = ['Business', 'Poster', 'Scheduling', 'Cancel'];
+  final RxList<int> impressions = <int>[].obs;
+  final RxList<int> clicks = <int>[].obs;
+  final RxList<String> dates = <String>[].obs;
+  RxInt totalImpression=0.obs;
+  RxInt totalClicks=0.obs;
+  List<AnalysisData> salesData = [];
+  String convertDateToMonth(String dateString) {
+    DateTime dateTime = DateTime.parse(dateString);
+    return DateFormat('MMM').format(dateTime); // Outputs "aug", "sep", etc.
+  }
 
+  void filterOutClicks() {
+    for (int i = 0; i < widget.analysis.length; i++) {
+      if (widget.analysis[i].impressions.toString().isNotEmpty) {
+        impressions.add(widget.analysis[i].impressions);
+      }
+      if (widget.analysis[i].clicks.toString().isNotEmpty) {
+        clicks.add(widget.analysis[i].clicks);
+      }
+      if (widget.analysis[i].date.toString().isNotEmpty) {
+        String month = convertDateToMonth(widget.analysis[i].date.toString());
+        salesData.add(AnalysisData(date:month , clicks: widget.analysis[i].clicks,
+        impressions: widget.analysis[i].impressions));
+      }
+    }
+     totalImpression.value = impressions.fold(0, (a, b) => a + b);
+     totalClicks.value = clicks.fold(0, (a, b) => a + b);
+  }
+
+ @override
+  void initState() {
+    super.initState();
+    filterOutClicks();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,14 +104,14 @@ class CampaignName extends StatelessWidget {
             )),
         automaticallyImplyLeading: false,
         title: Text(
-          campaignName,
+          widget.campaignName,
           style: CustomTextStyles.buttonTextStyle.copyWith(
               fontSize: 20.px,
               fontWeight: FontWeight.w600,
               color: AppColors.mainColor),
         ),
         actions: [
-          status == "pending"
+          widget.status == "pending"
               ? Padding(
                   padding: EdgeInsets.only(right: 1.h),
                   child: PopupMenuButton<String>(
@@ -160,7 +201,7 @@ class CampaignName extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(1.h),
                                   image: DecorationImage(
-                                    image: NetworkImage(selectedPoster),
+                                    image: NetworkImage(widget.selectedPoster),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -180,7 +221,7 @@ class CampaignName extends StatelessWidget {
                               ),
                               getVerticalSpace(.8.h),
                               Text(
-                                businessName,
+                                widget.businessName,
                                 style: TextStyle(
                                   fontSize: 14.px,
                                   fontFamily: 'bold',
@@ -202,7 +243,7 @@ class CampaignName extends StatelessWidget {
                               ),
                               getVerticalSpace(.8.h),
                               Text(
-                                campaignName,
+                                widget.campaignName,
                                 style: TextStyle(
                                   fontSize: 14.px,
                                   fontFamily: 'bold',
@@ -223,7 +264,7 @@ class CampaignName extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                campaignDescription,
+                                widget.campaignDescription,
                                 style: TextStyle(
                                   fontSize: 12.px,
                                   fontFamily: 'bold',
@@ -245,7 +286,7 @@ class CampaignName extends StatelessWidget {
                               getVerticalSpace(.8.h),
                               Wrap(
                                 spacing: 8.0, // Horizontal space between items
-                                children: campaignPlatForms.map((platform) {
+                                children: widget.campaignPlatForms.map((platform) {
                                   return Container(
                                     decoration: BoxDecoration(
                                       // Optionally, you can add a border or background color if needed
@@ -294,7 +335,7 @@ class CampaignName extends StatelessWidget {
                                       ),
                                       SizedBox(width: .8.h),
                                       Text(
-                                        "${DateFormat('dd MMM yy').format(startDate)} To ${DateFormat('dd MMM yy').format(endDate)}",
+                                        "${DateFormat('dd MMM yy').format(widget.startDate)} To ${DateFormat('dd MMM yy').format(widget.endDate)}",
                                         style: TextStyle(
                                           color: range.isNotEmpty
                                               ? AppColors.blackColor
@@ -322,7 +363,7 @@ class CampaignName extends StatelessWidget {
                               ),
                               getVerticalSpace(1.2.h),
                               Text(
-                                "$startTime To $endTime",
+                                "${widget.startTime} To ${widget.endTime}",
                                 style: TextStyle(
                                   color: range.isNotEmpty
                                       ? AppColors.blackColor
@@ -336,7 +377,7 @@ class CampaignName extends StatelessWidget {
                           ),
                         )
                       : const SizedBox.shrink(),
-                  status == "rejected" || status == "pending"
+                  widget.status == "rejected" || widget.status == "pending"
                       ? const SizedBox.shrink()
                       : GestureDetector(
                           onTap: () {
@@ -370,7 +411,7 @@ class CampaignName extends StatelessWidget {
                           ),
                         ),
                   isOpen3.value
-                      ? status == "rejected" || status == "pending"
+                      ? widget.status == "rejected" || widget.status == "pending"
                           ? const SizedBox.shrink()
                           : Container(
                               decoration: BoxDecoration(
@@ -391,13 +432,13 @@ class CampaignName extends StatelessWidget {
                                   ),
                                   getVerticalSpace(.9.h),
                                   Text(
-                                    '${analysis.isEmpty?"0":analysis[0].impressions} Importation',
+                                    '${totalImpression.value} impression',
                                     style: CustomTextStyles.onBoardingHeading
                                         .copyWith(fontSize: 25.px),
                                   ),
                                   getVerticalSpace(.9.h),
                                   Text(
-                                    '${analysis.isEmpty?"0":analysis[0].clicks} Clicks',
+                                    '${ totalClicks.value} Clicks',
                                     style: TextStyle(
                                       color: AppColors.blackColor,
                                       fontSize: 17.px,
@@ -406,14 +447,32 @@ class CampaignName extends StatelessWidget {
                                     ),
                                   ),
                                   getVerticalSpace(.9.h),
-                                  const Image(
-                                      image: AssetImage(
-                                          'assets/pngs/splinechart.png')),
+                                  SfCartesianChart(
+                                    primaryXAxis: const CategoryAxis(),
+                                    series: <CartesianSeries<AnalysisData, String>>[ // Change this line
+                                      LineSeries<AnalysisData, String>(
+                                        name: 'Impressions',
+                                        dataSource: salesData,
+                                        xValueMapper: (AnalysisData sales, _) => sales.date,
+                                        yValueMapper: (AnalysisData sales, _) => sales.clicks,
+                                        color: Colors.blue,
+                                      ),
+                                      LineSeries<AnalysisData, String>(
+                                        name: 'Clicks',
+                                        dataSource: salesData,
+                                        xValueMapper: (AnalysisData sales, _) => sales.date,
+                                        yValueMapper: (AnalysisData sales, _) => sales.impressions,
+                                        color: Colors.green,
+                                      ),
+                                    ],
+                                  )
+
+
                                 ],
                               ),
                             )
                       : const SizedBox.shrink(),
-                  status == "rejected" || status == "pending"
+                  widget.status == "rejected" || widget.status == "pending"
                       ? getVerticalSpace(3.h)
                       : const SizedBox.shrink()
                 ],
@@ -443,4 +502,12 @@ class CampaignName extends StatelessWidget {
     }
     return menuItems;
   }
+}
+
+class AnalysisData {
+  final String date;
+  final int impressions;
+  final int clicks;
+
+  AnalysisData({required this.date, required this.impressions, required this.clicks});
 }

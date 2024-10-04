@@ -4,12 +4,16 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:ttpdm/controller/apis_services/poster_apis.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/models/get_fcm_token_model.dart';
+
+import '../getx_controllers/get_fcm_token_send_notification_controller.dart';
 
 class GetFcmTokenApi {
   final BuildContext context;
   GetFcmTokenApi({required this.context});
+
   //Get Fcm Api Method
   Future<GetFcmTokenModel?> getFcmTokenApiMethod(
       {required String userId}) async {
@@ -57,6 +61,27 @@ class GetFcmTokenApi {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
       log(responseBody["message"]);
 
+    }
+  }
+
+  Future<void> sendNotificationToAllMidAdmins({required String token,required String title,required String message,required String info1,required String info2})
+  async {
+    List<String> fcmTokens = await PosterApis(context: context)
+        .getAllMidAdminFcmApiMethod()
+        .then(
+          (getAllMidAdminFcmModel) {
+        return getAllMidAdminFcmModel?.tokens ?? [];
+      },
+    );
+    for (int i = 0; i < fcmTokens.length; i++) {
+      GetFcmTokenSendNotificationController(context: context)
+          .sendNotification(
+          token: token,
+          title: title,
+          message: message,
+          info1: info1,
+          info2: info2,
+          fcmToken: fcmTokens[i]);
     }
   }
 }

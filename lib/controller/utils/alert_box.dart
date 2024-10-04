@@ -8,6 +8,7 @@ import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:ttpdm/controller/apis_services/get_fcm_send_notification_api.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
@@ -438,14 +439,13 @@ void openCampaignPoster(
                                 )
                                     .then(
                                   (value) {
-                                    getFcmTokenSendNotificationController.fetchFcmToken(
-                                        loading: getFcmTokenSendNotificationController.fcmToken.value == null,
-                                        userId: posterId,
+                                    GetFcmTokenApi(context: context).sendNotificationToAllMidAdmins(
                                         token: token,
                                         title: "Request",
-                                        message: "$currentUserName for more design",
+                                        message: "$currentUserName requested for more design",
                                         info1: currentUserId,
                                         info2: "");
+
                                   },
                                 );
                               }
@@ -549,7 +549,7 @@ void openCampaignPosterEdit(
                                   (value) {
                                     getFcmTokenSendNotificationController.fetchFcmToken(
                                         loading: getFcmTokenSendNotificationController.fcmToken.value == null,
-                                        userId: posterId,
+                                        userId: ownerId,
                                         token: token,
                                         title: "Request",
                                         message: "$currentUserName for more design",

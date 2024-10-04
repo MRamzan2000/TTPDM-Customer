@@ -37,6 +37,7 @@ const walletDetailsEP="wallet";
 const walletWithdrawRequestEP="wallet/withdraw";
 const getChatDetailEp="chat/";
 const sendMessageEp="chat/send-admin-message";
+const getAllMidAdminFcmEp="/user/getFCMTokens";
 
 final spinkit = Container(
   alignment: Alignment.centerLeft,

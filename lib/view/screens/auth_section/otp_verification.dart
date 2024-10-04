@@ -55,7 +55,6 @@ final RxString otpCode=''.obs;
                   enabledBorderColor: Colors.transparent,
                   focusedBorderColor: AppColors.mainColor,
                   fieldHeight: 6.h,
-                  fieldWidth: 6.h,
                   margin: EdgeInsets.symmetric(horizontal: 2.h),
                   borderColor: Colors.transparent,
                   filled: true,
