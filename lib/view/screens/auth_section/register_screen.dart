@@ -1,19 +1,20 @@
 import 'dart:developer';
+import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/signup_user_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
-  RegisterScreen({super.key});
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -21,13 +22,9 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController nameController = TextEditingController();
-
   final TextEditingController phoneNumber = TextEditingController();
-
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
-
   final TextEditingController confirmPasswordController = TextEditingController();
   late WebViewControllerPlus _controler;
   bool isCaptchaVerified = false;
@@ -103,18 +100,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 getVerticalSpace(1.6.h),
                 getVerticalSpace(2.4.h),
                 Obx(
-                  () => Row(
+                      () => Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       customElevatedButton(
                         title: signUpController.isLoading.value == true
                             ? spinkit
                             : Text(
-                                'Sign Up',
-                                style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
-                              ),
+                          'Sign Up',
+                          style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
+                        ),
                         onTap: () {
-                          showWebViewDialog(context, webViewHeight);
                           if (nameController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Please enter the name')),
@@ -143,9 +139,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Password and Confirm Password do not match')),
                             );
-                          } else if (!isCaptchaVerified) {
+                          } else if (Platform.isAndroid && !isCaptchaVerified) {
+                            // Show CAPTCHA only for Android
                             showWebViewDialog(context, webViewHeight);
-
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Success')),
@@ -195,6 +191,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void showWebViewDialog(BuildContext context, double webViewHeight) {
+    if (!Platform.isAndroid) return; // Only execute CAPTCHA on Android
+
     WebViewControllerPlus controller = WebViewControllerPlus()
       ..loadFlutterAssetServer('assets/webpages/index.html')
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -221,9 +219,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               isCaptchaVerified = true; // Update your verification state
             });
           }
-        },).then((value) {
-        showWebViewDialog(context, webViewHeight, _controler);
-      },);
+        },);
 
     showDialog(
       context: context,

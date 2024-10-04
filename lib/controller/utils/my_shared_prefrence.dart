@@ -34,9 +34,19 @@ class MySharedPreferences {
     return _preferences.getBool(key) ?? false;
   }
 
-  static removeKey(String key) {
-    return _preferences.remove(key) ;
+  // New methods for int
+  static setInt(String key, int value) {
+    return _preferences.setInt(key, value);
   }
+
+  static int getInt(String key) {
+    return _preferences.getInt(key) ?? 0;
+  }
+
+  static removeKey(String key) {
+    return _preferences.remove(key);
+  }
+
   Future<void> saveNotification(RemoteMessage message) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> notifications = prefs.getStringList('notifications') ?? [];
@@ -57,7 +67,8 @@ class MySharedPreferences {
     await prefs.setStringList('notifications', notifications);
   }
 
-  List<String> notifications=[];
+  List<String> notifications = [];
+
   Future<List<Map<String, dynamic>>> getSavedNotifications() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> notifications = prefs.getStringList('notifications') ?? [];

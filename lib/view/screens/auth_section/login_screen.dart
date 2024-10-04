@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   alignment: Alignment.bottomCenter,
                   child: GestureDetector(
                     onTap: () {
-                      Get.to(() => RegisterScreen());
+                      Get.to(() => const RegisterScreen());
                     },
                     child: RichText(
                         text: TextSpan(children: [
