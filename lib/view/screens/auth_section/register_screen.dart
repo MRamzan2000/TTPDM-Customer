@@ -26,18 +26,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+
   late WebViewControllerPlus _controler;
   bool isCaptchaVerified = false;
   double webViewHeight = 400;
+  late SignUpController signUpController;
 
   @override
   void initState() {
+    signUpController = Get.put(SignUpController(context: context));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final SignUpController signUpController = Get.put(SignUpController(context: context));
     return Scaffold(
       backgroundColor: const Color(0xfff8f9fa),
       body: SizedBox(
@@ -146,14 +148,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Success')),
                             );
-                            // signUpController.userSignUp(
-                            //   fullName: nameController.text,
-                            //   email: emailController.text,
-                            //   phoneNumber: phoneNumber.text,
-                            //   password: passwordController.text,
-                            //   confirmPassword: confirmPasswordController.text,
-                            //   role: 'customer',
-                            // );
+                            signUpController.userSignUp(
+                              fullName: nameController.text,
+                              email: emailController.text,
+                              phoneNumber: phoneNumber.text,
+                              password: passwordController.text,
+                              confirmPassword: confirmPasswordController.text,
+                              role: 'customer',
+                            );
                           }
                         },
                         bgColor: AppColors.mainColor,
