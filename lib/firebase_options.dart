@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBRPyKfVW11jhrY8bvdMQmqrC2UJpEAV1Y',
-    appId: '1:591801525051:android:3e359c0c1e7981e48e0d1e',
+    appId: '1:591801525051:android:7b8a96122895165d8e0d1e',
     messagingSenderId: '591801525051',
     projectId: 'advyro-33ad7',
     storageBucket: 'advyro-33ad7.appspot.com',
@@ -59,11 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAmGQ8mp-coXgvqF5N0ToruBYceWLml7t0',
-    appId: '1:591801525051:ios:6011d45b7041da0f8e0d1e',
+    appId: '1:591801525051:ios:4e901e7420e909488e0d1e',
     messagingSenderId: '591801525051',
     projectId: 'advyro-33ad7',
     storageBucket: 'advyro-33ad7.appspot.com',
-    iosBundleId: 'com.example.ttpdm',
+    iosBundleId: 'com.advyro.customer',
   );
 
 }
