@@ -277,7 +277,7 @@ class AuthApis {
   // Function to check login attempts and block the user if necessary
   Future<bool> _checkLoginAttempts(BuildContext context) async {
     // Get the current number of failed attempts (default to 0 if not found)
-    int failedAttempts = MySharedPreferences.getInt('failedAttempts') ?? 0;
+    int failedAttempts = MySharedPreferences.getInt('failedAttempts') ;
 
     // If failed attempts are 5 or more, block the user
     if (failedAttempts >= 5) {
@@ -306,7 +306,7 @@ class AuthApis {
 
   // Function to increment login attempts
   Future<void> _incrementLoginAttempts() async {
-    int failedAttempts = MySharedPreferences.getInt('failedAttempts') ?? 0;
+    int failedAttempts = MySharedPreferences.getInt('failedAttempts');
     failedAttempts++;
     await MySharedPreferences.setInt('failedAttempts', failedAttempts);
   }
