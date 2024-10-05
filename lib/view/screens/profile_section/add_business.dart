@@ -144,8 +144,8 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
     super.initState();
     getFcmTokenSendNotificationController = Get.put(GetFcmTokenSendNotificationController(context: context));
     id.value = MySharedPreferences.getString(userIdKey);
-    token.value = MySharedPreferences.getString(authToken);
-    fullname.value = MySharedPreferences.getString(userName);
+    token.value = MySharedPreferences.getString(authTokenKey);
+    fullname.value = MySharedPreferences.getString(userNameKey);
   }
 
   @override

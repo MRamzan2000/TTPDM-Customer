@@ -64,47 +64,6 @@ class NotificationServices {
     );
   }
 
-
-  Future<void> showNotification(RemoteMessage message) async {
-    const channelId = 'your_channel_id';
-    const channelName = 'Your Channel Name';
-
-    AndroidNotificationChannel channel = const AndroidNotificationChannel(
-      channelId,
-      channelName,
-      importance: Importance.max,
-      playSound: true,
-      showBadge: true,
-    );
-
-    AndroidNotificationDetails androidNotificationDetails =
-    AndroidNotificationDetails(
-      channel.id,
-      channel.name,
-      channelDescription: channel.description,
-      importance: Importance.high,
-      priority: Priority.high,
-      playSound: true,
-    );
-
-    const DarwinNotificationDetails darwinNotificationDetails =
-    DarwinNotificationDetails(
-        presentAlert: true, presentBadge: true, presentSound: true);
-
-    NotificationDetails notificationDetails = NotificationDetails(
-      android: androidNotificationDetails,
-      iOS: darwinNotificationDetails,
-    );
-
-    await _flutterLocalNotificationsPlugin.show(
-      0,
-      message.notification?.title ?? 'No Title',
-      message.notification?.body ?? 'No Body',
-      notificationDetails,
-    );
-  }
-
-
   Future<String?> getDeviceToken() async {
     try {
       String? token = await _firebaseMessaging.getToken();
@@ -119,4 +78,38 @@ class NotificationServices {
       return null;
     }
   }
+  Future<void> showNotification(RemoteMessage message) async {
+    const channelId = 'your_channel_id';
+    const channelName = 'Your Channel Name';
+    AndroidNotificationChannel channel = const AndroidNotificationChannel(
+      channelId,
+      channelName,
+      importance: Importance.max,
+      playSound: true,
+      showBadge: true,
+    );
+    AndroidNotificationDetails androidNotificationDetails =
+    AndroidNotificationDetails(
+      channel.id,
+      channel.name,
+      channelDescription: channel.description,
+      importance: Importance.high,
+      priority: Priority.high,
+      playSound: true,
+    );
+    const DarwinNotificationDetails darwinNotificationDetails =
+    DarwinNotificationDetails(
+        presentAlert: true, presentBadge: true, presentSound: true);
+    NotificationDetails notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
+      iOS: darwinNotificationDetails,
+    );
+    await _flutterLocalNotificationsPlugin.show(
+      0,
+      message.notification?.title ?? 'No Title',
+      message.notification?.body ?? 'No Body',
+      notificationDetails,
+    );
+  }
+
 }

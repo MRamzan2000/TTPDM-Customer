@@ -376,8 +376,6 @@ void openCampaignPoster(
   required String currentUserName,
 }) {
   final TextEditingController descriptionController = TextEditingController();
-  final GetFcmTokenSendNotificationController getFcmTokenSendNotificationController =
-      Get.put(GetFcmTokenSendNotificationController(context: context));
   showDialog(
     context: context,
     builder: (context) {
@@ -668,18 +666,6 @@ void openCampaignSubmit(
   required String clientSecretKey,
 }) {
   RxInt isPressedCount = 0.obs;
-  log("businessId:$businessId");
-  log("businessName:$businessName");
-  log("campaignName:$campaignName");
-  log("campaignDescription:$campaignDescription");
-  log("selectedPoster:$selectedPoster");
-  log("campaignPlatForms:$campaignPlatForms");
-  log("startDate:$startDate");
-  log("endDate :$endDate");
-  log("startTime :$startTime");
-  log("endTime :$endTime");
-  log("token :$token");
-  log("clientSecretKey :$clientSecretKey");
   showDialog(
     context: context,
     builder: (context) {
@@ -873,13 +859,19 @@ void openCampaignCancel(BuildContext context) {
 }
 
 void openChooseSubscription(
-  BuildContext context,
-  String token,
-  String clientSecretKey,
+{
+ required String token,
+  required BuildContext context,
+ required String clientSecretKey,
+ required int plan,
+ required String planName,
+}
 ) {
+  RxInt isPressedCount = 0.obs;
+
   RxBool isPressed = false.obs;
   final SubscriptionController subscriptionController = Get.put(SubscriptionController());
-  final RxInt isSelected = 0.obs;
+  RxInt isSelected = (planName.isNotEmpty) ? plan.obs : (-1).obs; // Default to -1 if no plan is selected
 
   RxList<String> description = <String>['Add Business only', 'Add up to Business only', 'Add up to Business only'].obs;
   subscriptionController.fetchAllPlans(loading: subscriptionController.getAllPlans.isEmpty, context: context);
@@ -1041,7 +1033,8 @@ void openChooseSubscription(
                               },
                               title: Text(
                                 'Deny',
-                                style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
+                                style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor,
+                                fontSize: 12.px),
                               ),
                               bgColor: const Color(0xff7C7C7C),
                               verticalPadding: .6.h,
@@ -1053,10 +1046,11 @@ void openChooseSubscription(
                             () => customElevatedButton(
                                 loading: subscriptionController.paymentLoading.value,
                                 onTap: () async {
-                                  isPressed.value = true;
+                                  isPressedCount.value = isPressedCount.value + 1;
+
                                   if (clientSecretKey.isEmpty) {
                                   } else {
-                                    if (!subscriptionController.paymentLoading.value) {
+                                    if (isPressedCount.value == 1) {
                                       await StripePayments.name(subscriptionController.getAllPlans[isSelected.value]!.price.toDouble(),
                                               context: context,
                                               clientSecretKey: clientSecretKey,
@@ -1073,13 +1067,17 @@ void openChooseSubscription(
                                               startDate: "",
                                               startTime: "",
                                               cost: '')
-                                          .startPayment();
+                                          .startPayment().then((value) {
+                                        isPressedCount.value = 2;
+                                          },);
                                     }
                                   }
                                 },
-                                title: Text(
+                                title:isPressedCount.value == 1
+                                    ? spinkit: Text(
+                                  planName.isNotEmpty?"update plan":
                                   'Pay now',
-                                  style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
+                                  style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor,fontSize: 12.px),
                                 ),
                                 bgColor: AppColors.mainColor,
                                 verticalPadding: .6.h,

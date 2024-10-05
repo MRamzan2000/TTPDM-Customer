@@ -32,7 +32,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
   void initState() {
     super.initState();
     createNewPasswordController = Get.put(CreateNewPasswordController(context));
-   token.value=MySharedPreferences.getString(authToken);
+   token.value=MySharedPreferences.getString(authTokenKey);
   }
 
   @override

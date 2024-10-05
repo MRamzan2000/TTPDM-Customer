@@ -103,8 +103,6 @@ class StripePayments {
   Future<void> displayPaymentSheet({required String token, required String plan}) async {
     try {
       await Stripe.instance.presentPaymentSheet();
-      log("Payment successful!");
-
       if(plan=="no plan"){
        await addCampaignController
             .submitCampaign(

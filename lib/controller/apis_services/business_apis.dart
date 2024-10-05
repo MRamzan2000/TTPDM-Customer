@@ -3,14 +3,11 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:ttpdm/models/getbusiness_profile_model.dart';
 
-import 'package:dio/dio.dart';
 
 import 'package:path_provider/path_provider.dart';
 
@@ -70,7 +67,6 @@ class BusinessApis {
 
     // Set headers, including Authorization header
     request.headers['Authorization'] = 'Bearer $token';
-
     try {
       log("Sending request to: $url");
       final response = await request.send();
@@ -86,9 +82,6 @@ class BusinessApis {
             const SnackBar(
                 content: Text('Business profile submitted successfully')),
           );
-
-
-
         } else if (response.statusCode == 400) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -122,7 +115,6 @@ class BusinessApis {
       }
     }
   }
-
   //GetBusiness Profile
   Future<GetBusinessProfileModel?> getBusinessProfile(
       {required BuildContext context, required token}) async {
@@ -151,7 +143,6 @@ class BusinessApis {
       return null;
     }
   }
-
   //delete business profile
   Future<void> deleteBusinessProfile(
       {required String businessId, required BuildContext context,
@@ -231,7 +222,6 @@ class BusinessApis {
       request.fields['instagramUrl'] = instagramUrl;
       request.fields['linkedinUrl'] = linkedinUrl;
       request.fields['tiktokUrl'] = tiktokUrl;
-
       // Handle the logo (upload only if newLogo is true)
       if (newLogo) {
         log("Adding new logo file to request");
@@ -244,7 +234,6 @@ class BusinessApis {
         log("Using existing logo URL: $logo");
         request.fields['logo'] = logo; // Send the URL as a regular field if it's an existing logo
       }
-
       // Filter out gallery items that are listed in removeGalleryItems
       final filteredGallery = gallery.where((item) => !removeGalleryItems.contains(item)).toList();
 

@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-GetCampaignsByStatusModel getCampaignsByStatusModelFromJson(String str) => GetCampaignsByStatusModel.fromJson(json.decode(str));
+GetCampaignsByStatusModel getCampaignsByStatusModelFromJson(String str) =>
+    GetCampaignsByStatusModel.fromJson(json.decode(str));
 
-String getCampaignsByStatusModelToJson(GetCampaignsByStatusModel data) => json.encode(data.toJson());
+String getCampaignsByStatusModelToJson(GetCampaignsByStatusModel data) =>
+    json.encode(data.toJson());
 
 class GetCampaignsByStatusModel {
   List<Campaign> campaigns;
@@ -11,16 +14,11 @@ class GetCampaignsByStatusModel {
     required this.campaigns,
   });
 
-  GetCampaignsByStatusModel copyWith({
-    List<Campaign>? campaigns,
-  }) =>
+  factory GetCampaignsByStatusModel.fromJson(Map<String, dynamic> json) =>
       GetCampaignsByStatusModel(
-        campaigns: campaigns ?? this.campaigns,
+        campaigns: List<Campaign>.from(
+            json["campaigns"].map((x) => Campaign.fromJson(x))),
       );
-
-  factory GetCampaignsByStatusModel.fromJson(Map<String, dynamic> json) => GetCampaignsByStatusModel(
-    campaigns: List<Campaign>.from(json["campaigns"].map((x) => Campaign.fromJson(x))),
-  );
 
   Map<String, dynamic> toJson() => {
     "campaigns": List<dynamic>.from(campaigns.map((x) => x.toJson())),
@@ -62,41 +60,6 @@ class Campaign {
     required this.v,
   });
 
-  Campaign copyWith({
-    DateSchedule? dateSchedule,
-    String? id,
-    String? adBanner,
-    Business? business,
-    String? adsName,
-    String? campaignDesc,
-    List<String>? campaignPlatforms,
-    String? startTime,
-    String? endTime,
-    String? status,
-    int? cost,
-    List<Analytics>? analytics,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    int? v,
-  }) =>
-      Campaign(
-        dateSchedule: dateSchedule ?? this.dateSchedule,
-        id: id ?? this.id,
-        adBanner: adBanner ?? this.adBanner,
-        business: business ?? this.business,
-        adsName: adsName ?? this.adsName,
-        campaignDesc: campaignDesc ?? this.campaignDesc,
-        campaignPlatforms: campaignPlatforms ?? this.campaignPlatforms,
-        startTime: startTime ?? this.startTime,
-        endTime: endTime ?? this.endTime,
-        status: status ?? this.status,
-        cost: cost ?? this.cost,
-        analytics: analytics ?? this.analytics,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        v: v ?? this.v,
-      );
-
   factory Campaign.fromJson(Map<String, dynamic> json) => Campaign(
     dateSchedule: DateSchedule.fromJson(json["dateSchedule"]),
     id: json["_id"],
@@ -108,8 +71,8 @@ class Campaign {
     startTime: json["startTime"],
     endTime: json["endTime"],
     status: json["status"],
-    cost: json["cost"],
-    analytics: List<Analytics>.from(json["analytics"].map((x) => x)),
+    cost: (json["cost"] is int) ? json["cost"] : (json["cost"] as double).toInt(), // Handle type conversion
+    analytics: List<Analytics>.from(json["analytics"].map((x) => Analytics.fromJson(x))),
     createdAt: DateTime.parse(json["createdAt"]),
     updatedAt: DateTime.parse(json["updatedAt"]),
     v: json["__v"],
@@ -127,7 +90,7 @@ class Campaign {
     "endTime": endTime,
     "status": status,
     "cost": cost,
-    "analytics": List<dynamic>.from(analytics.map((x) => x)),
+    "analytics": List<dynamic>.from(analytics.map((x) => x.toJson())),
     "createdAt": createdAt.toIso8601String(),
     "updatedAt": updatedAt.toIso8601String(),
     "__v": v,
@@ -146,19 +109,6 @@ class Business {
     required this.location,
     required this.owner,
   });
-
-  Business copyWith({
-    String? id,
-    String? name,
-    String? location,
-    Owner? owner,
-  }) =>
-      Business(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        location: location ?? this.location,
-        owner: owner ?? this.owner,
-      );
 
   factory Business.fromJson(Map<String, dynamic> json) => Business(
     id: json["_id"],
@@ -186,17 +136,6 @@ class Owner {
     required this.email,
   });
 
-  Owner copyWith({
-    String? id,
-    String? fullname,
-    String? email,
-  }) =>
-      Owner(
-        id: id ?? this.id,
-        fullname: fullname ?? this.fullname,
-        email: email ?? this.email,
-      );
-
   factory Owner.fromJson(Map<String, dynamic> json) => Owner(
     id: json["_id"],
     fullname: json["fullname"],
@@ -218,15 +157,6 @@ class DateSchedule {
     required this.startDate,
     required this.endDate,
   });
-
-  DateSchedule copyWith({
-    DateTime? startDate,
-    DateTime? endDate,
-  }) =>
-      DateSchedule(
-        startDate: startDate ?? this.startDate,
-        endDate: endDate ?? this.endDate,
-      );
 
   factory DateSchedule.fromJson(Map<String, dynamic> json) => DateSchedule(
     startDate: DateTime.parse(json["startDate"]),
@@ -254,8 +184,8 @@ class Analytics {
 
   factory Analytics.fromJson(Map<String, dynamic> json) => Analytics(
     date: DateTime.parse(json["date"]),
-    clicks: json["clicks"],
-    impressions: json["impressions"],
+    clicks: json["clicks"] is int ? json["clicks"] : (json["clicks"] as double).toInt(),
+    impressions: json["impressions"] is int ? json["impressions"] : (json["impressions"] as double).toInt(),
     id: json["_id"],
   );
 
@@ -264,4 +194,23 @@ class Analytics {
     "clicks": clicks,
     "impressions": impressions,
   };
+}
+
+// Function to fetch campaigns
+Future<void> fetchCampaigns() async {
+  try {
+    final response = await http.get(Uri.parse('https://api.yourservice.com/campaigns/status'));
+
+    if (response.statusCode == 200) {
+      final campaigns = getCampaignsByStatusModelFromJson(response.body);
+      // Process your campaigns
+      print('Fetched campaigns: ${campaigns.campaigns}');
+    } else {
+      final errorResponse = json.decode(response.body);
+      throw Exception(errorResponse['message']); // Handle the error message
+    }
+  } catch (e) {
+    print('Error fetching campaigns: $e');
+    // Handle your error UI/logic here
+  }
 }

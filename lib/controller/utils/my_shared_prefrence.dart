@@ -48,22 +48,18 @@ class MySharedPreferences {
       "data": message.data,
       "receivedTime": receivedTime,
     });
-
     log("New notification: $notificationJson");
-
-    // Limit the number of notifications
     if (notifications.length >= 10) {
       notifications.removeAt(0); // Remove the oldest notification
     }
 
-    // Add the new notification to the list
     notifications.add(notificationJson);
     log("Notifications count before saving: ${notifications.length}");
 
-    // Store the updated notifications list
     await prefs.setStringList('notifications', notifications);
     log("Notifications count after saving: ${notifications.length}");
   }
+
   List<String> notifications=[];
   Future<List<Map<String, dynamic>>> getSavedNotifications() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -10,9 +10,7 @@ import '../apis_services/user_profile_api.dart';
 class UserProfileController extends GetxController {
   final BuildContext context;
   UserProfileController({required this.context});
-  //fetch User Profile Data
   Rxn<GetUserProfileModel?> userProfile = Rxn<GetUserProfileModel>();
-
   final RxBool isLoading = true.obs;
   Future<void> fetchUserProfile({
     required bool loading,
@@ -44,7 +42,6 @@ class UserProfileController extends GetxController {
       isLoading.value = false;
     }
   }
-
 //update profile
   RxBool uploading = false.obs;
   Future<void> uploadProfileImage({
@@ -74,17 +71,24 @@ class UserProfileController extends GetxController {
       uploading.value = false;
     }
   }
-
   //Delete user Account
+  RxBool deleteLoading = false.obs;
   Future<void> deleteUserAccount({required String token}) async {
     try {
+      deleteLoading.value = true;
       await UserProfileApi(context: context)
-          .deleteUserAccountMethod(token: token);
+          .deleteUserAccountMethod(token: token)
+          .then(
+        (value) {
+          deleteLoading.value = false;
+        },
+      );
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("unexpected error occurred :${e.toString()}")));
       }
+      deleteLoading.value = false;
     }
   }
 }

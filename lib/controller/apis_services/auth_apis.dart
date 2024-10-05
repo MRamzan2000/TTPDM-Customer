@@ -62,13 +62,11 @@ class AuthApis {
         }
       } else if (response.statusCode == 400) {
         Map<String, dynamic> responseBody = jsonDecode(response.body);
-        if (responseBody.containsKey('errors')) {
           if (context.mounted) {
-            String errorMessage = responseBody['errors'].isNotEmpty ? responseBody['errors'].first['msg'] : 'An error occurred';
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(errorMessage)),
+              SnackBar(content: Text(responseBody["message"])),
             );
-          }
+
         } else {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -110,10 +108,11 @@ class AuthApis {
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseBody = jsonDecode(response.body);
       if (context.mounted) {
-        MySharedPreferences.setString(authToken, responseBody['token']);
+        MySharedPreferences.setString(authTokenKey, responseBody['token']);
         MySharedPreferences.setString(userIdKey, responseBody["user"]['_id']);
-        MySharedPreferences.setString(userName, responseBody["user"]['fullname']);
-        MySharedPreferences.setString(subscription, responseBody["user"]['subscription']["expiryDate"] ?? "");
+        MySharedPreferences.setString(userNameKey, responseBody["user"]['fullname']);
+        MySharedPreferences.setString(subscriptionKey, responseBody["user"]['subscription']["expiryDate"] ?? "");
+        MySharedPreferences.setString(planKey, responseBody["user"]['subscription']["plan"] ?? "");
         MySharedPreferences.setBool(isLoggedInKey, true);
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -122,11 +121,6 @@ class AuthApis {
       }
       if (context.mounted) {
         Get.offAll(const CustomBottomNavigationBar());
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            return const CustomBottomNavigationBar();
-          },
-        ));
       }
     } else if (response.statusCode == 404) {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
@@ -210,7 +204,7 @@ class AuthApis {
         );
       }
       Map<String, dynamic> responseBody = jsonDecode(response.body);
-      MySharedPreferences.setString(authToken, responseBody['token']);
+      MySharedPreferences.setString(authTokenKey, responseBody['token']);
       if (title == "newUser") {
         if (context.mounted) {
           Navigator.push(context, MaterialPageRoute(

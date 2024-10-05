@@ -1,9 +1,7 @@
 import 'dart:convert';
 
-// Function to convert JSON string to GetAllDesignsModel
 GetAllDesignsModel getAllDesignsModelFromJson(String str) => GetAllDesignsModel.fromJson(json.decode(str));
 
-// Function to convert GetAllDesignsModel to JSON string
 String getAllDesignsModelToJson(GetAllDesignsModel data) => json.encode(data.toJson());
 
 class GetAllDesignsModel {
@@ -94,7 +92,9 @@ class Design {
   factory Design.fromJson(Map<String, dynamic> json) => Design(
     id: json["_id"] ?? "",  // Fallback to empty string if null
     fileUrl: json["fileUrl"] ?? "",  // Fallback to empty string if null
-    uploadedBy: UploadedBy.fromJson(json["uploadedBy"]),
+    uploadedBy: json["uploadedBy"] != null
+        ? UploadedBy.fromJson(json["uploadedBy"])
+        : UploadedBy(id: "", fullname: "", email: ""),
     businessId: json["businessId"] ?? "",  // Already handled
     likes: List<dynamic>.from(json["likes"]?.map((x) => x) ?? []), // Handle null case
     dislikes: List<dynamic>.from(json["dislikes"]?.map((x) => x) ?? []), // Handle null case
