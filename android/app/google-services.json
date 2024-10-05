@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:591801525051:android:3e359c0c1e7981e48e0d1e",
+        "mobilesdk_app_id": "1:591801525051:android:c3c82df83f3be1158e0d1e",
         "android_client_info": {
-          "package_name": "com.example.ttpdm"
+          "package_name": "com.advyro.admin"
         }
       },
       "oauth_client": [],
@@ -26,9 +26,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:591801525051:android:63a122330b351ca18e0d1e",
+        "mobilesdk_app_id": "1:591801525051:android:7b8a96122895165d8e0d1e",
         "android_client_info": {
-          "package_name": "com.example.ttpdm_admin"
+          "package_name": "com.advyro.customer"
         }
       },
       "oauth_client": [],

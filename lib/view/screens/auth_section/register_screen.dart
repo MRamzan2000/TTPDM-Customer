@@ -1,19 +1,20 @@
 import 'dart:developer';
+import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/signup_user_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
-  RegisterScreen({super.key});
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -21,26 +22,24 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController nameController = TextEditingController();
-
   final TextEditingController phoneNumber = TextEditingController();
-
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
-
   final TextEditingController confirmPasswordController = TextEditingController();
+
   late WebViewControllerPlus _controler;
   bool isCaptchaVerified = false;
   double webViewHeight = 400;
+  late SignUpController signUpController;
 
   @override
   void initState() {
+    signUpController = Get.put(SignUpController(context: context));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final SignUpController signUpController = Get.put(SignUpController(context: context));
     return Scaffold(
       backgroundColor: const Color(0xfff8f9fa),
       body: SizedBox(
@@ -103,16 +102,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 getVerticalSpace(1.6.h),
                 getVerticalSpace(2.4.h),
                 Obx(
-                  () => Row(
+                      () => Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       customElevatedButton(
                         title: signUpController.isLoading.value == true
                             ? spinkit
                             : Text(
-                                'Sign Up',
-                                style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
-                              ),
+                          'Sign Up',
+                          style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
+                        ),
                         onTap: () {
                           if (nameController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -142,7 +141,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Password and Confirm Password do not match')),
                             );
-                          } else if (!isCaptchaVerified) {
+                          } else if (Platform.isAndroid && !isCaptchaVerified) {
+                            // Show CAPTCHA only for Android
                             showWebViewDialog(context, webViewHeight);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -193,6 +193,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void showWebViewDialog(BuildContext context, double webViewHeight) {
+    if (!Platform.isAndroid) return; // Only execute CAPTCHA on Android
+
     WebViewControllerPlus controller = WebViewControllerPlus()
       ..loadFlutterAssetServer('assets/webpages/index.html')
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -217,13 +219,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             log('Received reCAPTCHA token: $token');
             setState(() {
               isCaptchaVerified = true; // Update your verification state
-              Future.delayed(const Duration(seconds: 2), () {
-                Navigator.of(context).pop();
-              },);
             });
           }
-        },).then((value) {
-      },);
+        },);
 
     showDialog(
       context: context,
@@ -275,6 +273,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         );
       },
-    );
+    ).then((value) {
+      setState(() {
+        isCaptchaVerified = false; // Reset the verification state if needed
+      });
+    });
   }
 }

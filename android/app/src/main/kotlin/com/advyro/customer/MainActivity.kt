@@ -1,4 +1,4 @@
-package com.example.ttpdm
+package com.advyro.customer
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 class MainActivity: FlutterFragmentActivity() {

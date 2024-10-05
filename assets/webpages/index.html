@@ -4,17 +4,17 @@
     <title>reCAPTCHA</title>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
-        /* Style for the reCAPTCHA wrapper */
-        .recaptcha-wrapper {
-            width: 100%; /* Full width */
-            display: flex;
-            margin-top: 20px; /* Add some space on top */
-        }
+<!--        /* Style for the reCAPTCHA wrapper */-->
+<!--        .recaptcha-wrapper {-->
+<!--            width: 100%; /* Full width */-->
+<!--            display: flex;-->
+<!--            margin-top: 20px; /* Add some space on top */-->
+<!--        }-->
 
-        .g-recaptcha {
-            transform: scale(3.0); /* Initial scale for the reCAPTCHA checkbox */
-            transform-origin: 0 0; /* Keep the top-left corner as origin */
-        }
+<!--        .g-recaptcha {-->
+<!--            transform: scale(3.0); /* Initial scale for the reCAPTCHA checkbox */-->
+<!--            transform-origin: 0 0; /* Keep the top-left corner as origin */-->
+<!--        }-->
     </style>
 </head>
 <body>
@@ -26,69 +26,69 @@
     </div>
 </form>
 <script>
-    // Common scale variable for both the reCAPTCHA checkbox and parent div
-    const scaleFactor = 2.0; // Adjust this value for scaling
+<!--    // Common scale variable for both the reCAPTCHA checkbox and parent div-->
+<!--    const scaleFactor = 2.0; // Adjust this value for scaling-->
 
-    function captchaCallback(response) {
-        console.log(response); // For debugging
-        if (typeof Captcha !== "undefined") {
-            Captcha.postMessage(response);
-        }
-    }
-
-    // Function to continuously check for visibility of the parent div of .g-recaptcha-bubble-arrow
-    function checkForBubbleArrowParentDiv() {
-        const intervalId = setInterval(() => {
-            const bubbleArrow = document.querySelector('.g-recaptcha-bubble-arrow'); // Get the bubble arrow div
-            if (bubbleArrow) {
-                const parentDiv = bubbleArrow.parentElement; // Get the direct parent div
-                console.log("Parent Div:", parentDiv); // Debug log for the parent div
-
-                if (parentDiv) {
-                    // Check visibility of the parent div
-                    const style = window.getComputedStyle(parentDiv);
-                    const isVisible = style.visibility === 'visible' && style.opacity === '1';
-
-                    if (isVisible) {
-                        console.log("Parent div is visible"); // Debug log
-
-                        // Apply styles to the parent div
-                        parentDiv.style.transform = `scale(${scaleFactor})`; // Use common scale variable
-                        parentDiv.style.transformOrigin = '-5% -40%'; // Set origin to top-left corner
-                        parentDiv.style.transition = 'transform 0.3s'; // Add transition for smoothness
-
-                        // Debug logs for applied styles
-                        console.log("Applied styles to parent div:", {
-                            transform: parentDiv.style.transform,
-                            transformOrigin: parentDiv.style.transformOrigin,
-                            transition: parentDiv.style.transition,
-                            visibility: style.visibility,
-                            opacity: style.opacity,
-                        });
-
-                        clearInterval(intervalId); // Stop checking once the div is found
-                    } else {
-                        console.log("Parent div is not visible"); // Debug log
-                    }
-                } else {
-                    console.log("No parent div found"); // Debug log
-                }
-            } else {
-                console.log("Bubble arrow not found"); // Debug log
-            }
-        }, 100); // Check every 100 milliseconds
-    }
-
-    // Wait for the reCAPTCHA to load and then start checking for the bubble arrow parent div
-    window.onload = function() {
-        // Apply the initial scale to the reCAPTCHA checkbox
-<!--        const recaptchaDiv = document.querySelector('.g-recaptcha');-->
-<!--        if (recaptchaDiv) {-->
-<!--            recaptchaDiv.style.transform = `scale(${scaleFactor})`; // Use common scale variable for reCAPTCHA-->
-<!--            recaptchaDiv.style.transformOrigin = '0 0'; // Set origin to top-left corner-->
+<!--    function captchaCallback(response) {-->
+<!--        console.log(response); // For debugging-->
+<!--        if (typeof Captcha !== "undefined") {-->
+<!--            Captcha.postMessage(response);-->
 <!--        }-->
-        checkForBubbleArrowParentDiv();
-    };
+<!--    }-->
+
+<!--    // Function to continuously check for visibility of the parent div of .g-recaptcha-bubble-arrow-->
+<!--    function checkForBubbleArrowParentDiv() {-->
+<!--        const intervalId = setInterval(() => {-->
+<!--            const bubbleArrow = document.querySelector('.g-recaptcha-bubble-arrow'); // Get the bubble arrow div-->
+<!--            if (bubbleArrow) {-->
+<!--                const parentDiv = bubbleArrow.parentElement; // Get the direct parent div-->
+<!--                console.log("Parent Div:", parentDiv); // Debug log for the parent div-->
+
+<!--                if (parentDiv) {-->
+<!--                    // Check visibility of the parent div-->
+<!--                    const style = window.getComputedStyle(parentDiv);-->
+<!--                    const isVisible = style.visibility === 'visible' && style.opacity === '1';-->
+
+<!--                    if (isVisible) {-->
+<!--                        console.log("Parent div is visible"); // Debug log-->
+
+<!--                        // Apply styles to the parent div-->
+<!--                        parentDiv.style.transform = `scale(${scaleFactor})`; // Use common scale variable-->
+<!--                        parentDiv.style.transformOrigin = '-5% -40%'; // Set origin to top-left corner-->
+<!--                        parentDiv.style.transition = 'transform 0.3s'; // Add transition for smoothness-->
+
+<!--                        // Debug logs for applied styles-->
+<!--                        console.log("Applied styles to parent div:", {-->
+<!--                            transform: parentDiv.style.transform,-->
+<!--                            transformOrigin: parentDiv.style.transformOrigin,-->
+<!--                            transition: parentDiv.style.transition,-->
+<!--                            visibility: style.visibility,-->
+<!--                            opacity: style.opacity,-->
+<!--                        });-->
+
+<!--                        clearInterval(intervalId); // Stop checking once the div is found-->
+<!--                    } else {-->
+<!--                        console.log("Parent div is not visible"); // Debug log-->
+<!--                    }-->
+<!--                } else {-->
+<!--                    console.log("No parent div found"); // Debug log-->
+<!--                }-->
+<!--            } else {-->
+<!--                console.log("Bubble arrow not found"); // Debug log-->
+<!--            }-->
+<!--        }, 100); // Check every 100 milliseconds-->
+<!--    }-->
+
+<!--    // Wait for the reCAPTCHA to load and then start checking for the bubble arrow parent div-->
+<!--    window.onload = function() {-->
+<!--        // Apply the initial scale to the reCAPTCHA checkbox-->
+<!--&lt;!&ndash;        const recaptchaDiv = document.querySelector('.g-recaptcha');&ndash;&gt;-->
+<!--&lt;!&ndash;        if (recaptchaDiv) {&ndash;&gt;-->
+<!--&lt;!&ndash;            recaptchaDiv.style.transform = `scale(${scaleFactor})`; // Use common scale variable for reCAPTCHA&ndash;&gt;-->
+<!--&lt;!&ndash;            recaptchaDiv.style.transformOrigin = '0 0'; // Set origin to top-left corner&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+<!--        checkForBubbleArrowParentDiv();-->
+<!--    };-->
 </script>
 </body>
 </html>
