@@ -51,7 +51,7 @@ class _PosterScreenState extends State<PosterScreen> {
     posterController
         .fetchPosters(
         context: context,
-        loading: posterController.allPosters.value == null)
+        loading: posterController.allPosters.value == null, businessId: widget.businessId)
         .then((value) {});
   }
 
@@ -60,17 +60,15 @@ class _PosterScreenState extends State<PosterScreen> {
         designId: designId, token: widget.token);
     likedPosters[designId] = true;
     dislikedPosters[designId] = false;
-    posterController.fetchPosters(context: context, loading: false);
+    posterController.fetchPosters(context: context, loading: false,businessId: widget.businessId);
   }
-
   void handleDisLikePoster(String designId) async {
     await posterController.dislikeCampaignPoster(
         designId: designId, token: widget.token);
     dislikedPosters[designId] = true;
     likedPosters[designId] = false;
-    posterController.fetchPosters(context: context, loading: false);
+    posterController.fetchPosters(context: context, loading: false, businessId: widget.businessId);
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,15 +99,8 @@ class _PosterScreenState extends State<PosterScreen> {
       body: Obx(() {
         final posters = posterController.allPosters.value;
         final isLoading = posterController.isLoading.value;
-
-        final filteredPosters = posters?.designs
-            .where((poster) =>
-        poster.businessId.isEmpty ||
-            poster.businessId == widget.businessId)
-            .toList() ?? [];
-
-        final itemCount =
-        filteredPosters.isNotEmpty ? filteredPosters.length : 1;
+        final filteredPosters = posters?.designs ?? [];
+        final itemCount = filteredPosters.isNotEmpty ? filteredPosters.length : 1;
 
         return Stack(
           children: [
@@ -130,8 +121,7 @@ class _PosterScreenState extends State<PosterScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: List.generate(
-                          5, (i) => SizedBox(height: 6.h, width: 5.h)),
+                      children: List.generate(5, (i) => SizedBox(height: 6.h, width: 5.h)),
                     ),
                   ),
                 ),
@@ -146,8 +136,7 @@ class _PosterScreenState extends State<PosterScreen> {
                   final poster = filteredPosters[index];
                   final image = poster.fileUrl.isNotEmpty
                       ? NetworkImage(poster.fileUrl)
-                      : const AssetImage('assets/pngs/mainposter.png')
-                  as ImageProvider;
+                      : const AssetImage('assets/pngs/mainposter.png') as ImageProvider;
 
                   final hasLiked = poster.likes.any((like) => like['_id'] == id.value);
                   final hasDisliked = poster.dislikes.any((like) => like['_id'] == id.value);
@@ -257,7 +246,10 @@ class _PosterScreenState extends State<PosterScreen> {
                 } else {
                   // Handle the case where there are no posters
                   if (filteredPosters.isEmpty) {
-                    return Center(child: Text('No posters available.'));
+                    return RequestMoreDesign(
+                      businessId: widget.businessId,
+                      postId: "",
+                    );
                   }
                   return RequestMoreDesign(
                     businessId: widget.businessId,
@@ -297,6 +289,7 @@ class _PosterScreenState extends State<PosterScreen> {
           ],
         );
       }),
+
     );
   }
 }

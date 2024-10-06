@@ -9,15 +9,11 @@ import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/view/screens/auth_section/create_new_password.dart';
 import 'package:ttpdm/view/screens/auth_section/login_screen.dart';
 import 'package:ttpdm/view/screens/auth_section/otp_verification.dart';
-
 import '../../main.dart';
 import '../../view/screens/bottom_navigationbar.dart';
-
 class AuthApis {
   final BuildContext context;
-
   AuthApis({required this.context});
-
   Future<void> signUPApis({
     required String fullName,
     required String email,
@@ -36,18 +32,11 @@ class AuthApis {
       "confirmPassword": confirmPassword,
       "role": role,
     });
-
     try {
       Response response = await post(url, body: body, headers: headers);
-
-      // Debug prints
-      log('Response status: ${response.statusCode}');
-      log('Response body: ${response.body}');
-
       if (response.statusCode == 201) {
         Map<String,dynamic>responseBody=jsonDecode(response.body);
         MySharedPreferences.setString(userIdKey, responseBody["user"]['_id']);
-
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('User registered successfully')),
@@ -73,7 +62,6 @@ class AuthApis {
       }
     }
   }
-
   //Login Api hit
   Future<void> loginApis({
     required String email,
