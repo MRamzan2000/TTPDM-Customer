@@ -44,31 +44,35 @@ final RxString otpCode=''.obs;
                       fontFamily: 'bold'),
                 ),
                 getVerticalSpace(5.2.h),
-                OtpTextField(
-                  textStyle: TextStyle(
-                      fontSize: 24.px,
-                      color: const Color(0xff4D4F53),
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'bold'),
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  enabledBorderColor: Colors.transparent,
-                  focusedBorderColor: AppColors.mainColor,
-                  fieldHeight: 6.h,
-                  margin: EdgeInsets.symmetric(horizontal: 2.h),
-                  borderColor: Colors.transparent,
-                  filled: true,
-                  fillColor: const Color(0xffF3F3F3),
-                    onSubmit: (value) {
-                      otpCode.value=value;
-                    },
+                Row(mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    OtpTextField(
+                      textStyle: TextStyle(
+                          fontSize: 24.px,
+                          color: const Color(0xff4D4F53),
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'bold'),
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      enabledBorderColor: Colors.transparent,
+                      focusedBorderColor: AppColors.mainColor,
+                      fieldHeight: 6.h,
+                      margin: EdgeInsets.symmetric(horizontal: 2.h),
+                      borderColor: Colors.transparent,
+                      filled: true,
+                      fillColor: const Color(0xffF3F3F3),
+                        onSubmit: (value) {
+                          otpCode.value=value;
+                        },
+                    ),
+                  ],
                 ),
                 getVerticalSpace(4.2.h),
                 Obx(() =>
                     Row(mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customElevatedButton(
-                          title: verifyOtpController.isLoading.value == true
+                          title: verifyOtpController.isLoading.value
                               ? spinkit
                               : Text(
                             'Next ',
@@ -93,28 +97,6 @@ final RxString otpCode=''.obs;
                       ],
                     )),
                 getVerticalSpace(1.2.h),
-                // Align(
-                //   alignment: Alignment.bottomCenter,
-                //   child: GestureDetector(
-                //     onTap: () {
-                //       Get.to(() =>  RegisterScreen());
-                //     },
-                //     child: RichText(
-                //         text: TextSpan(children: [
-                //       TextSpan(
-                //           text: "Didn't receive?",
-                //           style: CustomTextStyles.buttonTextStyle.copyWith(
-                //               color: const Color(0xff444545), fontSize: 14.px)),
-                //       // TextSpan(
-                //       //   text: '\n           59',
-                //       //   style: CustomTextStyles.buttonTextStyle.copyWith(
-                //       //     color: AppColors.mainColor,
-                //       //     fontSize: 14.px,
-                //       //   ),
-                //       // ),
-                //     ])),
-                //   ),
-                // )
               ],
             ),
           ),

@@ -45,41 +45,23 @@ class AuthApis {
       log('Response body: ${response.body}');
 
       if (response.statusCode == 201) {
+        Map<String,dynamic>responseBody=jsonDecode(response.body);
+        MySharedPreferences.setString(userIdKey, responseBody["user"]['_id']);
+
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('User registered successfully')),
           );
         }
-        if (context.mounted) {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) {
-              return OtpVerification(
-                email: email,
-                title: 'newUser',
-              );
-            },
-          ));
-        }
-      } else if (response.statusCode == 400) {
-        Map<String, dynamic> responseBody = jsonDecode(response.body);
-        if (responseBody.containsKey('errors')) {
-          if (context.mounted) {
-            String errorMessage = responseBody['errors'].isNotEmpty ? responseBody['errors'].first['msg'] : 'An error occurred';
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(errorMessage)),
-            );
-          }
-        } else {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('An unexpected error occurred: ${response.body}')),
-            );
-          }
-        }
+        Get.offAll(() => OtpVerification(
+              email: email,
+              title: 'newUser',
+            ));
       } else {
+        Map<String, dynamic> responseBody = jsonDecode(response.body);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Unexpected status code: ${response.body}')),
+            SnackBar(content: Text(responseBody["message"])),
           );
         }
       }
@@ -122,8 +104,10 @@ class AuthApis {
         if (context.mounted) {
           MySharedPreferences.setString(authTokenKey, responseBody['token']);
           MySharedPreferences.setString(userIdKey, responseBody["user"]['_id']);
-          MySharedPreferences.setString(userNameKey, responseBody["user"]['fullname']);
-          MySharedPreferences.setString(subscriptionKey, responseBody["user"]['subscription']["expiryDate"] ?? "");
+          MySharedPreferences.setString(
+              userNameKey, responseBody["user"]['fullname']);
+          MySharedPreferences.setString(subscriptionKey,
+              responseBody["user"]['subscription']["expiryDate"] ?? "");
           MySharedPreferences.setBool(isLoggedInKey, true);
 
           ScaffoldMessenger.of(context).showSnackBar(
@@ -209,62 +193,20 @@ class AuthApis {
     });
     Response response = await post(url, headers: headers, body: body);
     if (response.statusCode == 200) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('OTP verified successfully')),
-        );
-      }
       Map<String, dynamic> responseBody = jsonDecode(response.body);
       MySharedPreferences.setString(authTokenKey, responseBody['token']);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseBody["message"])),
+        );
+      }
       if (title == "newUser") {
-        if (context.mounted) {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) {
-              return const LoginScreen();
-            },
-          ));
-        }
+        Get.offAll(() => const LoginScreen());
       } else {
-        if (context.mounted) {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) {
-              return const CreateNewPassword();
-            },
-          ));
-        }
-      }
-    } else if (response.statusCode == 400) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid or expired OTP')),
-        );
-      }
-    }
-  }
-
-  //Reset Your Password Api
-  Future<void> resetPassword({required String newPassword, required String confirmPassword, required String token}) async {
-    final url = Uri.parse("$baseUrl/$resetPasswordEp");
-    final headers = {"Content-Type": "application/json", "Authorization": "Bearer $token"};
-    final body = jsonEncode({
-      "newPassword": newPassword,
-      "confirmPassword": confirmPassword,
-    });
-    Response response = await post(url, headers: headers, body: body);
-    if (response.statusCode == 200) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset successfully')),
-        );
-      }
-      if (context.mounted) {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            return const LoginScreen();
-          },
-        ));
+        Get.offAll(() => const CreateNewPassword());
       }
     } else {
+      log(response.body);
       Map<String, dynamic> responseBody = jsonDecode(response.body);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -274,35 +216,65 @@ class AuthApis {
     }
   }
 
+  //Reset Your Password Api
+  Future<void> resetPassword(
+      {required String newPassword,
+      required String confirmPassword,
+      required String userId}) async {
+    final url = Uri.parse("$baseUrl/$resetPasswordEp$userId");
+    final headers = {
+      "Content-Type": "application/json",
+    };
+    final body = jsonEncode({
+      "newPassword": newPassword,
+      "confirmPassword": confirmPassword,
+    });
+    Response response = await post(url, headers: headers, body: body);
+    if (response.statusCode == 200) {
+      await _resetLoginAttempts();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password reset successfully')),
+        );
+      }
+      Get.offAll(()=>const LoginScreen());
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response.body)),
+        );
+      }
+    }
+  }
+
   // Function to check login attempts and block the user if necessary
   Future<bool> _checkLoginAttempts(BuildContext context) async {
-    // Get the current number of failed attempts (default to 0 if not found)
-    int failedAttempts = MySharedPreferences.getInt('failedAttempts') ;
-
-    // If failed attempts are 5 or more, block the user
+    int failedAttempts = MySharedPreferences.getInt('failedAttempts');
     if (failedAttempts >= 5) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You have been blocked due to multiple failed login attempts.')),
+        const SnackBar(
+            content: Text(
+                'You have been blocked due to multiple failed login attempts.')),
       );
       return true; // User is blocked
     }
-    // Warn the user on the 3rd attempt (2 attempts left)
     else if (failedAttempts == 3) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You have 2 attempts left before you are blocked.')),
+        const SnackBar(
+            content: Text('You have 2 attempts left before you are blocked.')),
       );
     }
     // Warn the user on the 4th attempt (1 attempt left)
     else if (failedAttempts == 4) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You have 1 attempt left before you are blocked.')),
+        const SnackBar(
+            content: Text('You have 1 attempt left before you are blocked.')),
       );
     }
 
     // Allow the user to continue login process
     return false;
   }
-
 
   // Function to increment login attempts
   Future<void> _incrementLoginAttempts() async {

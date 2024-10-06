@@ -19,11 +19,12 @@ class CreateNewPasswordController extends GetxController {
           .resetPassword(
           newPassword: newPassword,
           confirmPassword: confirmPassword,
-          token: userId)
+          userId: userId)
           .then(
             (value) => isLoading.value = false,
       );
     } catch (e) {
+      isLoading.value = false;
       log("unexpected error occurred :${e.toString()}");
     }
   }

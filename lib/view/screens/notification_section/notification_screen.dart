@@ -2,25 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
-import 'package:ttpdm/controller/custom_widgets/widgets.dart';
+import 'package:ttpdm/controller/getx_controllers/notification_controller.dart';
+
 
 import '../../../controller/custom_widgets/app_colors.dart';
-import '../../../controller/getx_controllers/notification_controller.dart';
-
+import '../../../controller/custom_widgets/custom_text_styles.dart';
+import '../../../controller/custom_widgets/widgets.dart';
 class NotificationScreen extends StatelessWidget {
-  final String title;
+final String title;
   const NotificationScreen({super.key, required this.title});
-
   @override
   Widget build(BuildContext context) {
-    final NotificationController notificationController = Get.put(NotificationController());
+    final NotificationController notificationController =
+    Get.put(NotificationController());
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        leading:title=="home"? GestureDetector(
+        leading:title=="Home"? GestureDetector(
           onTap: () {
             Get.back();
           },
@@ -46,15 +47,18 @@ class NotificationScreen extends StatelessWidget {
             children: [
               if (notificationController.todayNotifications.isNotEmpty) ...[
                 _buildSectionTitle('Today'),
-                ...notificationController.todayNotifications.map((notification) => _buildNotificationItem(notification)),
+                ...notificationController.todayNotifications.map(
+                        (notification) => _buildNotificationItem(notification)),
               ],
               if (notificationController.yesterdayNotifications.isNotEmpty) ...[
                 _buildSectionTitle('Yesterday'),
-                ...notificationController.yesterdayNotifications.map((notification) => _buildNotificationItem(notification)),
+                ...notificationController.yesterdayNotifications.map(
+                        (notification) => _buildNotificationItem(notification)),
               ],
               if (notificationController.olderNotifications.isNotEmpty) ...[
                 _buildSectionTitle('Older Notifications'),
-                ...notificationController.olderNotifications.map((notification) => _buildNotificationItem(notification)),
+                ...notificationController.olderNotifications.map(
+                        (notification) => _buildNotificationItem(notification)),
               ],
             ],
           );
@@ -68,9 +72,12 @@ class NotificationScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         getVerticalSpace(1.4.h),
-        Row(crossAxisAlignment: CrossAxisAlignment.end,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(title, style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.mainColor)),
+            Text(title,
+                style: CustomTextStyles.buttonTextStyle
+                    .copyWith(color: AppColors.mainColor)),
             getHorizentalSpace(0.5.h),
             const Expanded(child: Divider(color: Colors.grey)),
           ],
@@ -86,7 +93,8 @@ class NotificationScreen extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 1.h),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -94,21 +102,24 @@ class NotificationScreen extends StatelessWidget {
               Text(
                 notification['title'],
                 style: TextStyle(
-                    fontSize: 16.px,
+                    fontSize: 14.px,
                     fontWeight: FontWeight.w500,
                     fontFamily: 'bold',
                     color: const Color(0xff15141F)),
               ),
-              Text(formattedTime, style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.mainColor,
-                  fontSize: 12.px)),
+              Text(formattedTime,
+                  style: CustomTextStyles.buttonTextStyle
+                      .copyWith(color: AppColors.mainColor, fontSize: 12.px)),
             ],
           ),
           getVerticalSpace(0.8.h),
-          Text(notification['body'], style: TextStyle(
-              fontSize: 12.px,
-              color: const Color(0xff454544),
-              fontFamily: 'regular',
-              fontWeight: FontWeight.w400),
+          Text(
+            notification['body'],
+            style: TextStyle(
+                fontSize: 12.px,
+                color: const Color(0xff454544),
+                fontFamily: 'regular',
+                fontWeight: FontWeight.w400),
           )
         ],
       ),

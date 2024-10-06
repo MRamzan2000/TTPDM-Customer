@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,12 +26,12 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
-  RxString token="".obs;
+  RxString id="".obs;
   @override
   void initState() {
     super.initState();
     createNewPasswordController = Get.put(CreateNewPasswordController(context));
-   token.value=MySharedPreferences.getString(authTokenKey);
+    id.value=MySharedPreferences.getString(userIdKey);
   }
 
   @override
@@ -115,17 +114,16 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                                 const SnackBar(
                                     content: Text('password and confirmPassword should be same')),
                               );
-                            } else if (token.value.isEmpty) {
+                            } else if (id.value.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content: Text('AuthToken is empty')),
+                                    content: Text('User Id is empty')),
                               );
                             }  else {
-                              log("token ${token.value}");
                             createNewPasswordController.createNewPassword(
                                 newPassword: passwordController.text,
                                 confirmPassword: confirmPasswordController.text,
-                                userId:token.value );
+                                userId:id.value );
                             }
                           },
                           bgColor: AppColors.mainColor,

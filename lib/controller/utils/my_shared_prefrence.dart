@@ -51,20 +51,24 @@ class MySharedPreferences {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> notifications = prefs.getStringList('notifications') ?? [];
 
+    // Create the notification JSON string
     String receivedTime = DateTime.now().toIso8601String();
-
-    // Create a properly formatted notification JSON string
-    String notificationJson = '''
-    {
-      "title": "${message.notification?.title}",
-      "body": "${message.notification?.body}",
-      "data": ${json.encode(message.data)},  
-      "receivedTime": "$receivedTime"
+    String notificationJson = json.encode({
+      "title": message.notification?.title,
+      "body": message.notification?.body,
+      "data": message.data,
+      "receivedTime": receivedTime,
+    });
+    log("New notification: $notificationJson");
+    if (notifications.length >= 10) {
+      notifications.removeAt(0); // Remove the oldest notification
     }
-  ''';
 
     notifications.add(notificationJson);
+    log("Notifications count before saving: ${notifications.length}");
+
     await prefs.setStringList('notifications', notifications);
+    log("Notifications count after saving: ${notifications.length}");
   }
 
   List<String> notifications = [];
