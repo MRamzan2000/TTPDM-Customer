@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -6,6 +8,7 @@ import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/login_user_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
+import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 import 'package:ttpdm/view/screens/auth_section/register_screen.dart';
 import 'reset_otp.dart';
 
@@ -15,20 +18,19 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
-
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
-
   late LoginUserController loginUserController;
-
   @override
   void initState() {
     super.initState();
     loginUserController = Get.put(LoginUserController(context: context));
+    List<String> blockedUsers = MySharedPreferences.getStringList('blockedUsers');
+    List<String> counts = MySharedPreferences.getStringList('failedAttempts_');
+    log("block users :$blockedUsers");
+    log("counts users :$counts");
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

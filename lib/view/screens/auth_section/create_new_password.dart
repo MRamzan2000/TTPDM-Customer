@@ -11,8 +11,9 @@ import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
 
 class CreateNewPassword extends StatefulWidget {
+  final String email;
   const CreateNewPassword({
-    super.key,
+    super.key, required this.email,
   });
 
   @override
@@ -123,7 +124,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                             createNewPasswordController.createNewPassword(
                                 newPassword: passwordController.text,
                                 confirmPassword: confirmPasswordController.text,
-                                userId:id.value );
+                                userId:id.value, userEmail: widget.email );
                             }
                           },
                           bgColor: AppColors.mainColor,

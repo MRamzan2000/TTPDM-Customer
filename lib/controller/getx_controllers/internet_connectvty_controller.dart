@@ -17,10 +17,13 @@ class ConnectivityController extends GetxController {
   void _startMonitoring() {
     InternetConnectionChecker().onStatusChange.listen((status) {
       isConnected.value = status == InternetConnectionStatus.connected;
-      if (!isConnected.value) {
-        Get.offAll(() => const ConnectivityScreen(), transition: Transition.fadeIn);
+      if (isConnected.value) {
+        Get.offAll(() => const ConnectivityScreen(),
+            transition: Transition.fadeIn);
       } else {
         Get.off(() => const SplashScreen());
+
+
       }
     });
   }

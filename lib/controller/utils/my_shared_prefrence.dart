@@ -46,7 +46,13 @@ class MySharedPreferences {
   static removeKey(String key) {
     return _preferences.remove(key);
   }
+  static Future<bool> setStringList(String key, List<String> value) {
+    return _preferences.setStringList(key, value);
+  }
 
+  static List<String> getStringList(String key) {
+    return _preferences.getStringList(key) ?? [];
+  }
   Future<void> saveNotification(RemoteMessage message) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> notifications = prefs.getStringList('notifications') ?? [];
