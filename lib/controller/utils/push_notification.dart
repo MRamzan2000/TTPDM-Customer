@@ -33,6 +33,7 @@ class NotificationServices {
 
   void firebaseInit(BuildContext context) {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("Notification Recieved");
       if (message.notification != null) {
         showNotification(message);
         MySharedPreferences().saveNotification(message);
