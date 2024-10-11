@@ -179,7 +179,6 @@ class AddCampaignController extends GetxController {
   RxBool isLoading = true.obs;
   RxBool addCampaignLoading = false.obs;
 
-
   Future<void> submitCampaign(
       {required String businessId,
       required String adsName,
@@ -209,8 +208,7 @@ class AddCampaignController extends GetxController {
               token: token,
               context: context,
               adBannerUrl: adBanner,
-        cost: cost
-      )
+              cost: cost)
           .then(
         (value) {
           return addCampaignLoading.value = false;
@@ -264,7 +262,7 @@ class AddCampaignController extends GetxController {
   }
 
   //RequestMoreDesign
-  RxBool requestLoading=false.obs;
+  RxBool requestLoading = false.obs;
   Future<void> requestForMoreDesign({
     required BuildContext context,
     required String token,
@@ -276,9 +274,11 @@ class AddCampaignController extends GetxController {
 
       AddCampaignApis()
           .getDesignRequest(
-              description: description, token: token, context: context,
-          businessId: businessId,
-          )
+        description: description,
+        token: token,
+        context: context,
+        businessId: businessId,
+      )
           .then(
         (value) {
           return requestLoading.value = false;
@@ -288,7 +288,6 @@ class AddCampaignController extends GetxController {
       log('Unexpected error occurred :${e.toString()}');
     }
   }
-
 
   //getCampaignByStatus
   Rxn<GetCampaignsByStatusModel?> approvedCampaigns =
@@ -311,10 +310,9 @@ class AddCampaignController extends GetxController {
               ? pendingCampaigns.value = data
               : rejectedCampaigns.value = data;
       isLoading.value = false;
-    }else{
+    } else {
       isLoading.value = false;
     }
   }
   //Cancel Campaign
-
 }

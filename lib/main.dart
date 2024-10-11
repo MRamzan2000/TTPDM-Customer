@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:ttpdm/controller/getx_controllers/internet_connectvty_controller.dart';
 import 'package:ttpdm/controller/utils/push_notification.dart';
 import 'package:ttpdm/firebase_options.dart';
 import 'package:ttpdm/view/screens/splash_screen.dart';
 
-import 'controller/check_internet_connectivity.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {

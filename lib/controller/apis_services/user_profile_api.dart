@@ -6,7 +6,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:ttpdm/view/screens/auth_section/register_screen.dart';
+import 'package:ttpdm/view/screens/auth_section/login_screen.dart';
 
 import '../../models/get_user_profile_model.dart';
 import '../utils/apis_constant.dart';
@@ -37,6 +37,7 @@ class UserProfileApi {
       return null;
     }
   }
+
   Future<void> updateProfile({
     required String token,
     required File profileImage, // Expecting a File object for image
@@ -66,31 +67,31 @@ class UserProfileApi {
         log('Decoded JSON: $jsonResponse');
 
         // Show success message
-       if(context.mounted){
-         ScaffoldMessenger.of(context).showSnackBar(
-           const SnackBar(content: Text('Profile updated successfully!')),
-         );
-       }
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile updated successfully!')),
+          );
+        }
       } else {
         log('Failed to update profile. Status code: ${response.statusCode}');
 
         // Show failure message
-      if(context.mounted){
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update profile.')),
-        );
-      }
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to update profile.')),
+          );
+        }
       }
     } catch (e) {
       log('Exception: $e');
 
       // Show error message
-     if(context.mounted){
-       ScaffoldMessenger.of(context).showSnackBar(
-         const SnackBar(
-             content: Text('An error occurred while updating profile.')),
-       );
-     }
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('An error occurred while updating profile.')),
+        );
+      }
     }
   }
 
@@ -106,19 +107,9 @@ class UserProfileApi {
       headers: headers,
     );
     if (response.statusCode == 200) {
-    if(context.mounted){
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User Account Deleted Successfully')),
-      );
-      Get.to(()=>RegisterScreen());
-    }
+      Get.offAll(() => const LoginScreen());
     } else {
-      Map<String, dynamic> responseBody = jsonDecode(response.body);
-    if(context.mounted){
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(responseBody["message"])),
-      );
-    }
+      log("response statusCode :${response.statusCode}");
     }
   }
 }

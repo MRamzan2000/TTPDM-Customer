@@ -17,10 +17,11 @@ class PosterController extends GetxController {
   Future<void> fetchPosters({
     required BuildContext context,
     required bool loading,
+    required String businessId,
   }) async {
     try {
       isLoading.value = loading;
-      final data = await PosterApis(context: context).getAllDesigns();
+      final data = await PosterApis(context: context).getAllDesigns(businessId: businessId);
       if (data != null) {
         allPosters.value = data;
       } else {

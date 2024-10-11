@@ -25,33 +25,21 @@ class _RequestMoreDesignState extends State<RequestMoreDesign> {
   @override
   void initState() {
     super.initState();
-    token.value = MySharedPreferences.getString(authToken);
+    token.value = MySharedPreferences.getString(authTokenKey);
     currentUserId.value = MySharedPreferences.getString(userIdKey);
-    currentUserName.value = MySharedPreferences.getString(userName);
+    currentUserName.value = MySharedPreferences.getString(userNameKey);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff8f9fa),
-      appBar: AppBar(
-        backgroundColor: AppColors.whiteColor,
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        title: Text(
-          'Add Campaign',
-          style: CustomTextStyles.buttonTextStyle.copyWith(
-              fontSize: 20.px,
-              fontWeight: FontWeight.w600,
-              color: AppColors.mainColor),
-        ),
-      ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Column(
           children: [
-            getVerticalSpace(4.h),
+            getVerticalSpace(12.h),
             SizedBox(
                 height: 28.h,
                 width: 28.h,

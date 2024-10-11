@@ -105,7 +105,7 @@ class _EditProfileState extends State<EditProfile> {
   @override
   void initState() {
     super.initState();
-    token.value = MySharedPreferences.getString(authToken);
+    token.value = MySharedPreferences.getString(authTokenKey);
   }
 
   @override

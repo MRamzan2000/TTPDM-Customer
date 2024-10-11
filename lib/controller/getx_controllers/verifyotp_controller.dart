@@ -15,7 +15,9 @@ class VerifyOtpController extends GetxController {
   }) async {
     try {
       isLoading.value = true;
-      await AuthApis(context: context).verifyOtp(email: email, otp: otp, title:title ).then(
+      await AuthApis(context: context)
+          .verifyOtp(email: email, otp: otp, title: title)
+          .then(
         (value) {
           return isLoading.value = false;
         },
@@ -25,6 +27,7 @@ class VerifyOtpController extends GetxController {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Something went wrong ${e.toString()}')));
       }
+      isLoading.value = false;
     }
   }
 }

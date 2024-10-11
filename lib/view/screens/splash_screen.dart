@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
       (value) {
         if (MySharedPreferences.getBool(isLoggedInKey)) {
           Get.off(() => const CustomBottomNavigationBar());
-          log("token is that :${MySharedPreferences.getString(authToken)}");
+          log("token is that :${MySharedPreferences.getString(authTokenKey)}");
         } else {
           Get.off(() => const OnBoardingScreen());
         }

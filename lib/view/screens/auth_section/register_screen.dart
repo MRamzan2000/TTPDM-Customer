@@ -141,10 +141,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Password and Confirm Password do not match')),
                             );
-                          } else if (Platform.isAndroid && !isCaptchaVerified) {
+                          }
+                          else if (Platform.isAndroid && !isCaptchaVerified) {
                             // Show CAPTCHA only for Android
                             showWebViewDialog(context, webViewHeight);
-                          } else {
+                          }
+                          else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Success')),
                             );
@@ -193,8 +195,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void showWebViewDialog(BuildContext context, double webViewHeight) {
-    if (!Platform.isAndroid) return; // Only execute CAPTCHA on Android
-
     WebViewControllerPlus controller = WebViewControllerPlus()
       ..loadFlutterAssetServer('assets/webpages/index.html')
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -219,9 +219,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             log('Received reCAPTCHA token: $token');
             setState(() {
               isCaptchaVerified = true; // Update your verification state
+              Future.delayed(const Duration(seconds: 2), () {
+                Navigator.of(context).pop();
+              },);
             });
           }
-        },);
+        },).then((value) {
+      },);
 
     showDialog(
       context: context,
@@ -273,10 +277,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         );
       },
-    ).then((value) {
-      setState(() {
-        isCaptchaVerified = false; // Reset the verification state if needed
-      });
-    });
+    );
   }
 }

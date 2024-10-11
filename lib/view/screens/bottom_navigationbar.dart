@@ -28,7 +28,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   @override
   void initState() {
     super.initState();
-    token.value = MySharedPreferences.getString(authToken);
+    token.value = MySharedPreferences.getString(authTokenKey);
   }
 
   @override

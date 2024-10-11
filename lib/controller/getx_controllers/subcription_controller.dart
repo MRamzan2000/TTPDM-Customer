@@ -82,7 +82,7 @@ class SubscriptionController extends GetxController {
     try {
       paymentLoading.value = true;
       await SubscriptionApi(context: context)
-          .confirmPaymentApiMethod( plan: plan,token:token)
+          .confirmPaymentApiMethod( plan: plan,token:token, context: context)
           .then(
         (value) {
           paymentLoading.value = false;

@@ -19,11 +19,11 @@ const campaignFeeEp="campaign/pay-fee";
 const cancelCampaignEp="campaign/cancel";
 const subscriptionEp="business/select-plan";
 const confirmSubscriptionPaymentEp="business/payment-success?plan=";
-const getAllDesignsEP="campaign/allDesigns";
+const getAllDesignsEP="/campaign//allDesigns/";
 const getAllCoinsEP="coin/coin-balance";
 const getAllCoinsPlanEP="superAdmin/allCoins";
 const purchaseCoinsEP="coin/purchase-coins";
-const resetPasswordEp="user/reset-password";
+const resetPasswordEp="user/reset-password/";
 const getUserProfileEp="user";
 const updateUserProfileEp="user/profile-pic";
 const deleteUserProfileEp="user/delUser";
@@ -38,6 +38,7 @@ const walletWithdrawRequestEP="wallet/withdraw";
 const getChatDetailEp="chat/";
 const sendMessageEp="chat/send-admin-message";
 const getAllMidAdminFcmEp="/user/getFCMTokens";
+const getCampaignRulesEp="/campaign/campaignRules";
 
 final spinkit = Container(
   alignment: Alignment.centerLeft,

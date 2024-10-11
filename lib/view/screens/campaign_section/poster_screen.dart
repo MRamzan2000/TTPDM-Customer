@@ -47,30 +47,26 @@ class _PosterScreenState extends State<PosterScreen> {
     super.initState();
     posterController = Get.put(PosterController(context: context));
     id.value = MySharedPreferences.getString(userIdKey);
-    name.value = MySharedPreferences.getString(userName);
-    posterController
-        .fetchPosters(
-            context: context,
-            loading: posterController.allPosters.value == null)
-        .then(
-          (value) {},
-        );
+    name.value = MySharedPreferences.getString(userNameKey);
+    posterController.fetchPosters(
+      context: context,
+      loading: posterController.allPosters.value == null,
+      businessId: widget.businessId,
+    );
   }
 
   void handleLikePoster(String designId) async {
-    await posterController.likeCampaignPoster(
-        designId: designId, token: widget.token);
+    await posterController.likeCampaignPoster(designId: designId, token: widget.token);
     likedPosters[designId] = true;
     dislikedPosters[designId] = false;
-    posterController.fetchPosters(context: context, loading: false);
+    posterController.fetchPosters(context: context, loading: false, businessId: widget.businessId);
   }
 
   void handleDisLikePoster(String designId) async {
-    await posterController.dislikeCampaignPoster(
-        designId: designId, token: widget.token);
+    await posterController.dislikeCampaignPoster(designId: designId, token: widget.token);
     dislikedPosters[designId] = true;
     likedPosters[designId] = false;
-    posterController.fetchPosters(context: context, loading: false);
+    posterController.fetchPosters(context: context, loading: false, businessId: widget.businessId);
   }
 
   @override
@@ -103,189 +99,147 @@ class _PosterScreenState extends State<PosterScreen> {
       body: Obx(() {
         final posters = posterController.allPosters.value;
         final isLoading = posterController.isLoading.value;
-
-        final filteredPosters = posters?.designs
-                .where((poster) =>
-                    poster.businessId.isEmpty ||
-                    poster.businessId == widget.businessId)
-                .toList() ??
-            [];
-
-        final itemCount =
-            filteredPosters.isNotEmpty ? filteredPosters.length : 1;
+        final filteredPosters = posters?.designs ?? [];
+        final itemCount = filteredPosters.length;
 
         return Stack(
           children: [
             isLoading
                 ? Shimmer.fromColors(
-                    highlightColor: AppColors.highlightColor,
-                    baseColor: AppColors.baseColor,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        color: AppColors.baseColor,
+              highlightColor: AppColors.highlightColor,
+              baseColor: AppColors.baseColor,
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  color: AppColors.baseColor,
+                ),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 1.h, bottom: 2.h),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: List.generate(5, (i) => SizedBox(height: 6.h, width: 5.h)),
+                    ),
+                  ),
+                ),
+              ),
+            )
+                : PageView.builder(
+              controller: _pageController,
+              scrollDirection: Axis.vertical,
+              itemCount: itemCount + 1, // Plus one for "Request More" screen
+              itemBuilder: (context, index) {
+                if (index < itemCount) {
+                  final poster = filteredPosters[index];
+                  final image = poster.fileUrl.isNotEmpty
+                      ? NetworkImage(poster.fileUrl)
+                      : const AssetImage('assets/pngs/mainposter.png') as ImageProvider;
+
+                  final hasLiked = poster.likes.any((like) => like['_id'] == id.value);
+                  final hasDisliked = poster.dislikes.any((like) => like['_id'] == id.value);
+
+                  return Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: image,
+                        fit: BoxFit.cover,
                       ),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: EdgeInsets.only(right: 1.h, bottom: 2.h),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: List.generate(
-                                5, (i) => SizedBox(height: 6.h, width: 5.h)),
-                          ),
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 1.h, bottom: 2.h),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Get.to(() => AddCampaignDuration(
+                                  businessId: widget.businessId,
+                                  campaignDescription: widget.campaignDescription,
+                                  campaignName: widget.campaignName,
+                                  selectedPoster: File(poster.fileUrl),
+                                  businessName: widget.businessName,
+                                  token: widget.token,
+                                ));
+                              },
+                              child: SizedBox(
+                                height: 7.h,
+                                width: 6.h,
+                                child: const Image(image: AssetImage('assets/pngs/select.png')),
+                              ),
+                            ),
+                            getVerticalSpace(.8.h),
+                            GestureDetector(
+                              onTap: () {
+                                likedPosters[poster.id] = true;
+                                dislikedPosters[poster.id] = false;
+                                handleLikePoster(poster.id);
+                              },
+                              child: SizedBox(
+                                height: 7.h,
+                                width: 6.h,
+                                child: Image(
+                                  image: const AssetImage('assets/pngs/like.png'),
+                                  color: hasLiked ? AppColors.mainColor : null,
+                                ),
+                              ),
+                            ),
+                            getVerticalSpace(.8.h),
+                            GestureDetector(
+                              onTap: () {
+                                dislikedPosters[poster.id] = true;
+                                likedPosters[poster.id] = false;
+                                handleDisLikePoster(poster.id);
+                              },
+                              child: SizedBox(
+                                height: 7.h,
+                                width: 6.h,
+                                child: Image(
+                                  image: const AssetImage('assets/pngs/dislike.png'),
+                                  color: hasDisliked ? AppColors.mainColor : null,
+                                ),
+                              ),
+                            ),
+                            getVerticalSpace(.8.h),
+                            GestureDetector(
+                              onTap: () {
+                                openCampaignPosterEdit(
+                                  context,
+                                  token: widget.token,
+                                  businessId: widget.businessId,
+                                  posterId: poster.id,
+                                  currentUserId: id.value,
+                                  currentUserName: name.value,
+                                  ownerId: poster.uploadedBy.id,
+                                );
+                              },
+                              child: SizedBox(
+                                height: 7.h,
+                                width: 6.h,
+                                child: const Image(image: AssetImage("assets/pngs/edit.png")),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  )
-                : PageView.builder(
-                    controller: _pageController,
-                    scrollDirection: Axis.vertical,
-                    itemCount: itemCount + 1,
-                    itemBuilder: (context, index) {
-                      if (index < filteredPosters.length) {
-                        final poster = filteredPosters[index];
-                        final image = poster.fileUrl.isNotEmpty
-                            ? NetworkImage(poster.fileUrl)
-                            : const AssetImage('assets/pngs/mainposter.png')
-                                as ImageProvider;
-
-                        final hasLiked = poster.likes.any((like) => like['_id'] == id.value);
-                        final hasDisliked = poster.dislikes.any((like) => like['_id'] == id.value);
-
-
-
-                        return Container(
-                          height: MediaQuery.of(context).size.height,
-                          width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: image,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Padding(
-                              padding: EdgeInsets.only(right: 1.h, bottom: 2.h),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      Get.to(() => AddCampaignDuration(
-                                        businessId: widget.businessId,
-                                        campaignDescription:
-                                        widget.campaignDescription,
-                                        campaignName: widget.campaignName,
-                                        selectedPoster:
-                                        File(poster.fileUrl),
-                                        businessName: widget.businessName,
-                                        token: widget.token,
-                                      ));
-                                    },
-                                    child: SizedBox(
-                                      height: 7.h,
-                                      width: 6.h,
-                                      child: const Image(
-                                          image: AssetImage(
-                                              'assets/pngs/select.png')),
-                                    ),
-                                  ),
-                                  getVerticalSpace(.8.h),
-                                  GestureDetector(
-                                    onTap: () {
-                                      likedPosters[poster.id] = true;
-                                      dislikedPosters[poster.id] =
-                                      false;
-                                      handleLikePoster(poster.id);
-                                    },
-                                    child:hasLiked? SizedBox(
-                                      height: 7.h,
-                                      width: 6.h,
-                                      child:  Image(
-                                        image: const AssetImage(
-                                            'assets/pngs/like.png'),
-                                          color: AppColors.mainColor
-
-                                      ),
-                                    ):SizedBox(
-                                      height: 7.h,
-                                      width: 6.h,
-                                      child:  const Image(
-                                          image: AssetImage(
-                                              'assets/pngs/like.png'),
-
-
-                                      ),
-                                    ),
-                                  ),
-                                  getVerticalSpace(.8.h),
-                                  GestureDetector(
-                                    onTap: () {
-                                      dislikedPosters[poster.id] = true;
-                                      likedPosters[poster.id] =
-                                      false; // Reset like
-
-                                      // Call the API to dislike the poster in the background
-                                      handleDisLikePoster(poster.id);
-                                    },
-                                    child:hasDisliked?SizedBox(
-                                      height: 7.h,
-                                      width: 6.h,
-                                      child: Image(
-                                        image: const AssetImage(
-                                            'assets/pngs/dislike.png'),
-                                        color:
-                                            AppColors.mainColor
-
-                                      ),
-                                    ): SizedBox(
-                                      height: 7.h,
-                                      width: 6.h,
-                                      child: const Image(
-                                        image: AssetImage(
-                                            'assets/pngs/dislike.png'),
-
-
-                                      ),
-                                    ),
-                                  ),
-                                  getVerticalSpace(.8.h),
-                                  GestureDetector(
-                                    onTap: () {
-                                      openCampaignPosterEdit(
-                                        context,
-                                        token: widget.token,
-                                        businessId: widget.businessId,
-                                        posterId: poster.id,
-                                        currentUserId: id.value,
-                                        currentUserName: name.value, ownerId:poster.uploadedBy.id ,
-                                      );
-                                    },
-                                    child: SizedBox(
-                                      height: 7.h,
-                                      width: 6.h,
-                                      child: const Image(
-                                          image: AssetImage(
-                                              "assets/pngs/edit.png")),
-                                    ),
-                                  ),
-
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      } else {
-                        return RequestMoreDesign(businessId: widget.businessId,
-                          postId: posters!.designs[index].uploadedBy.id, );
-                      }
-                    },
-                  ),
+                  );
+                } else {
+                  // Last item to show "Request More Design"
+                  return RequestMoreDesign(
+                    businessId: widget.businessId,
+                    postId: "", // You can customize this as needed
+                  );
+                }
+              },
+            ),
             Positioned(
               top: 2.h,
               right: 1,

@@ -29,7 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    token.value = MySharedPreferences.getString(authToken);
+    token.value = MySharedPreferences.getString(authTokenKey);
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
         businessProfileController.fetchBusiness(

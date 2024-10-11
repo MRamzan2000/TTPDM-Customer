@@ -14,14 +14,11 @@ import 'package:ttpdm/controller/utils/push_notification.dart';
 import 'package:ttpdm/models/get_campaigns_by_status_model.dart';
 import 'package:ttpdm/view/screens/campaign_section/campaign_name.dart';
 import 'package:ttpdm/view/screens/notification_section/notification_screen.dart';
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
 class _HomeScreenState extends State<HomeScreen> {
   RxString token = "".obs;
   final TextEditingController _searchController = TextEditingController();
@@ -33,19 +30,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     userProfileController = Get.put(UserProfileController(context: context));
-    token.value = MySharedPreferences.getString(authToken);
+    token.value = MySharedPreferences.getString(authTokenKey);
     String id = MySharedPreferences.getString(userIdKey);
 WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-  _fetchCampaignsForCurrentTab();
-
+  addCampaignController.fetchCampaignByStatus(context: context, isLoad: addCampaignController.pendingCampaigns.value==null, status: "pending");
   _searchController.addListener(() {
     _searchQuery.value = _searchController.text;
   });
-
   userProfileController.fetchUserProfile(loading: userProfileController.userProfile.value == null, id: id);
-
 },);
-
       }
 
   @override
@@ -54,30 +47,7 @@ WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
     super.dispose();
   }
 
-  void _fetchCampaignsForCurrentTab() {
-    String status;
-    switch (selectedIndex.value) {
-      case 1:
-        status = "approved";
-        break;
-      case 2:
-        status = "rejected";
-        break;
-      case 0:
-      default:
-        status = "pending";
-        break;
-    }
-    addCampaignController.fetchCampaignByStatus(
-      context: context,
-      status: status,
-      isLoad: status == "pending"
-          ? addCampaignController.pendingCampaigns.value == null
-          : status == "approved"
-              ? addCampaignController.approvedCampaigns.value == null
-              : addCampaignController.rejectedCampaigns.value == null,
-    );
-  }
+
 
   final RxList<String> tabBarItems = [
     'Pending Ads',
@@ -150,7 +120,7 @@ WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                                       TextStyle(fontFamily: 'light', fontWeight: FontWeight.w400, fontSize: 12.px, color: const Color(0xff2F3542))),
                               trailing: GestureDetector(
                                 onTap: () {
-                                  Get.to(() => const NotificationScreen(title: 'home',));
+                                  Get.to(() => const NotificationScreen(title: 'Home',));
                                 },
                                 // child: SizedBox(
                                 //     height: 4.8.h,
@@ -270,7 +240,16 @@ WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                       return GestureDetector(
                         onTap: () {
                           selectedIndex.value = index;
-                          _fetchCampaignsForCurrentTab();
+                          if(selectedIndex.value==0){
+                            addCampaignController.fetchCampaignByStatus(context: context, isLoad: addCampaignController.pendingCampaigns.value==null, status: "pending");
+
+                          }else if(selectedIndex.value==1){
+                            addCampaignController.fetchCampaignByStatus(context: context, isLoad: addCampaignController.pendingCampaigns.value==null, status: "approved");
+
+                          }else{
+                            addCampaignController.fetchCampaignByStatus(context: context, isLoad: addCampaignController.pendingCampaigns.value==null, status: "rejected");
+
+                          }
                         },
                         child: Obx(
                           () => Container(

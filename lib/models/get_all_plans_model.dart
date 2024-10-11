@@ -12,7 +12,6 @@ class GetAllPlansModel {
   int businessLimit;
   DateTime createdAt;
   DateTime updatedAt;
-  int v;
 
   GetAllPlansModel({
     required this.id,
@@ -21,7 +20,6 @@ class GetAllPlansModel {
     required this.businessLimit,
     required this.createdAt,
     required this.updatedAt,
-    required this.v,
   });
 
   GetAllPlansModel copyWith({
@@ -31,7 +29,6 @@ class GetAllPlansModel {
     int? businessLimit,
     DateTime? createdAt,
     DateTime? updatedAt,
-    int? v,
   }) =>
       GetAllPlansModel(
         id: id ?? this.id,
@@ -40,7 +37,6 @@ class GetAllPlansModel {
         businessLimit: businessLimit ?? this.businessLimit,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
-        v: v ?? this.v,
       );
 
   factory GetAllPlansModel.fromJson(Map<String, dynamic> json) => GetAllPlansModel(
@@ -50,7 +46,6 @@ class GetAllPlansModel {
     businessLimit: json["businessLimit"],
     createdAt: DateTime.parse(json["createdAt"]),
     updatedAt: DateTime.parse(json["updatedAt"]),
-    v: json["__v"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -60,6 +55,5 @@ class GetAllPlansModel {
     "businessLimit": businessLimit,
     "createdAt": createdAt.toIso8601String(),
     "updatedAt": updatedAt.toIso8601String(),
-    "__v": v,
   };
 }

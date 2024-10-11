@@ -101,6 +101,7 @@ class SubscriptionApi {
   Future<void> confirmPaymentApiMethod({
     required String plan,
     required String token,
+    required BuildContext  context,
   }) async {
     final url = Uri.parse(
         "$baseUrl/$confirmSubscriptionPaymentEp$plan");
@@ -112,15 +113,27 @@ class SubscriptionApi {
     log("$baseUrl/$confirmSubscriptionPaymentEp$plan");
     log("$token\n$plan");
     http.Response response = await http.get(url, headers: headers);
-    log(response.body);
-    log("${response.statusCode}");
+    log("response body confirm payment${response.body}");
+    log("response statusCode confirm payment${response.statusCode}");
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("payment Confirmed Successfully")));
-      MySharedPreferences.setString(subscription,data['subscription']["expiryDate"]);
+      log("after 200 code${response.statusCode}");
+      log("after 200 code body${response.body}");
 
-      log("Payment confirmed: $data");
+      final data = jsonDecode(response.body);
+      if(context.mounted){
+        ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text(data["message"])));
+      }
+      log("after subscription update expiry date :${data['subscription']["expiryDate"]}");
+      log("after subscription update expiry date :${data['subscription']["expiryDate"]}");
+
+      MySharedPreferences.setString(subscriptionKey,data['subscription']["expiryDate"]);
+      log("after subscription update plan :${data['subscription']["plan"]}");
+      MySharedPreferences.setString(planKey,data['subscription']["plan"]);
     } else {
+      final data = jsonDecode(response.body);
+
+      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text(data["message"])));
+
       log("Error: ${response.statusCode} - ${response.body}");
     }
   }

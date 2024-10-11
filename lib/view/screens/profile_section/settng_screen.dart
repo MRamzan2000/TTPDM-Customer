@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +12,6 @@ import 'package:ttpdm/controller/utils/alert_box.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/view/screens/chat_support/chat_support.dart';
-
 class LogOutScreen extends StatefulWidget {
   const LogOutScreen({super.key});
 
@@ -26,6 +24,7 @@ class _LogOutScreenState extends State<LogOutScreen> {
   late GetStripeKeyController getStripeKeyController;
   RxString token = "".obs;
   RxString subscriptionEnd = "".obs;
+  RxString planeName = "".obs;
   DateTime dateTime=DateTime.now();
   String formattedDate="";
   @override
@@ -33,19 +32,35 @@ class _LogOutScreenState extends State<LogOutScreen> {
     super.initState();
     userProfileController = Get.put(UserProfileController(context: context));
     getStripeKeyController = Get.put(GetStripeKeyController(context: context));
-    token.value = MySharedPreferences.getString(authToken);
-    subscriptionEnd.value = MySharedPreferences.getString(subscription);
+    token.value = MySharedPreferences.getString(authTokenKey);
+    subscriptionEnd.value = MySharedPreferences.getString(subscriptionKey);
+    planeName.value = MySharedPreferences.getString(planKey);
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      // Initialize token and subscriptionEnd
-      log("subscriptionEnd.value :${subscriptionEnd.value}");
-      // Fetch Stripe key
       getStripeKeyController.fetchStripeKey(loading: true).then((_) {
-        dateTime = DateTime.parse(subscriptionEnd.value);
-        formattedDate = DateFormat('dd MMMM').format(dateTime);
-        getStripeKeyController.keyLoading.value = false;
+        try {
+          log('Subscription end date: ${subscriptionEnd.value}');
+
+          if (subscriptionEnd.value.isNotEmpty) {
+            dateTime = DateTime.parse(subscriptionEnd.value);
+            formattedDate = DateFormat('d MMMM y').format(dateTime); // Updated format
+          } else {
+            log('Subscription end date is empty or null');
+            formattedDate = ''; // Handle the empty case
+          }
+        } catch (e) {
+          log('Error parsing subscription end date: $e');
+          formattedDate = ''; // Ensure fallback
+        } finally {
+          getStripeKeyController.keyLoading.value = false; // Ensure loading is stopped
+        }
+      }).catchError((error) {
+        log('Error fetching Stripe key: $error');
+        getStripeKeyController.keyLoading.value = false; // Ensure loading is stopped
       });
-    },);
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -73,18 +88,23 @@ class _LogOutScreenState extends State<LogOutScreen> {
           ),
         ),
         actions: [
-          GestureDetector(
-            onTap: () {
-              userProfileController.deleteUserAccount(token: token.value).then((value) {
-                MySharedPreferences.setBool(isLoggedInKey, false);
-              });
-            },
-            child: Text(
-              "Delete Account",
-              style: CustomTextStyles.buttonTextStyle.copyWith(
-                fontSize: 12.px,
-                fontWeight: FontWeight.w600,
-                color: AppColors.mainColor,
+          Obx(() =>
+             GestureDetector(
+              onTap: () {
+                if(!userProfileController.deleteLoading.value){
+                  userProfileController.deleteUserAccount(token: token.value).then((value) {
+                    MySharedPreferences.setBool(isLoggedInKey, false);
+                  });
+                }
+
+              },
+              child: Text(
+                userProfileController.deleteLoading.value?"Please wait..." : "Delete Account",
+                style: CustomTextStyles.buttonTextStyle.copyWith(
+                  fontSize: 12.px,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.mainColor,
+                ),
               ),
             ),
           ),
@@ -105,9 +125,11 @@ class _LogOutScreenState extends State<LogOutScreen> {
                 return GestureDetector(
                   onTap: () {
                     openChooseSubscription(
-                      context,
-                      token.value,
-                      getStripeKeyController.stripeKey.value!.secretKey.toString(),
+                    context:context,
+                      token:    token.value,
+                      clientSecretKey:   getStripeKeyController.stripeKey.value!.secretKey.toString(),
+                      plan:planeName.value=="basic"? 0:planeName.value=="standard"?1:2,
+                      planName: planeName.value
                     );
                   },
                   child: Row(
@@ -124,7 +146,7 @@ class _LogOutScreenState extends State<LogOutScreen> {
                         ),
                       ),
                       Text(
-                        getStripeKeyController.keyLoading.value ? "Loading..." : formattedDate.isEmpty?"No Plan Buy" : 'Expire on $formattedDate',
+                        getStripeKeyController.keyLoading.value ? "Loading..." : formattedDate.isEmpty?"No Plan" : 'Expire on $formattedDate',
                         style: TextStyle(
                           fontWeight: FontWeight.w400,
                           fontFamily: 'bold',
