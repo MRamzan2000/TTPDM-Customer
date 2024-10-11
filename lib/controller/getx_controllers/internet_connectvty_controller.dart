@@ -1,8 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:ttpdm/view/screens/splash_screen.dart';
-
 import '../check_internet_connectivity.dart';
 
 class ConnectivityController extends GetxController {
@@ -13,17 +13,15 @@ class ConnectivityController extends GetxController {
     super.onInit();
     _startMonitoring();
   }
-
   void _startMonitoring() {
     InternetConnectionChecker().onStatusChange.listen((status) {
+      log("InternetConnectionStatus:$status");
       isConnected.value = status == InternetConnectionStatus.connected;
-      if (isConnected.value) {
-        Get.offAll(() => const ConnectivityScreen(),
+      if (!isConnected.value) {
+        Get.to(() => const ConnectivityScreen(),
             transition: Transition.fadeIn);
       } else {
-        Get.off(() => const SplashScreen());
-
-
+        Get.back();
       }
     });
   }

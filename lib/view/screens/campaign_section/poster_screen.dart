@@ -48,27 +48,27 @@ class _PosterScreenState extends State<PosterScreen> {
     posterController = Get.put(PosterController(context: context));
     id.value = MySharedPreferences.getString(userIdKey);
     name.value = MySharedPreferences.getString(userNameKey);
-    posterController
-        .fetchPosters(
-        context: context,
-        loading: posterController.allPosters.value == null, businessId: widget.businessId)
-        .then((value) {});
+    posterController.fetchPosters(
+      context: context,
+      loading: posterController.allPosters.value == null,
+      businessId: widget.businessId,
+    );
   }
 
   void handleLikePoster(String designId) async {
-    await posterController.likeCampaignPoster(
-        designId: designId, token: widget.token);
+    await posterController.likeCampaignPoster(designId: designId, token: widget.token);
     likedPosters[designId] = true;
     dislikedPosters[designId] = false;
-    posterController.fetchPosters(context: context, loading: false,businessId: widget.businessId);
+    posterController.fetchPosters(context: context, loading: false, businessId: widget.businessId);
   }
+
   void handleDisLikePoster(String designId) async {
-    await posterController.dislikeCampaignPoster(
-        designId: designId, token: widget.token);
+    await posterController.dislikeCampaignPoster(designId: designId, token: widget.token);
     dislikedPosters[designId] = true;
     likedPosters[designId] = false;
     posterController.fetchPosters(context: context, loading: false, businessId: widget.businessId);
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,7 +100,7 @@ class _PosterScreenState extends State<PosterScreen> {
         final posters = posterController.allPosters.value;
         final isLoading = posterController.isLoading.value;
         final filteredPosters = posters?.designs ?? [];
-        final itemCount = filteredPosters.isNotEmpty ? filteredPosters.length : 1;
+        final itemCount = filteredPosters.length;
 
         return Stack(
           children: [
@@ -130,9 +130,9 @@ class _PosterScreenState extends State<PosterScreen> {
                 : PageView.builder(
               controller: _pageController,
               scrollDirection: Axis.vertical,
-              itemCount: itemCount + 1,
+              itemCount: itemCount + 1, // Plus one for "Request More" screen
               itemBuilder: (context, index) {
-                if (index < filteredPosters.length) {
+                if (index < itemCount) {
                   final poster = filteredPosters[index];
                   final image = poster.fileUrl.isNotEmpty
                       ? NetworkImage(poster.fileUrl)
@@ -182,19 +182,13 @@ class _PosterScreenState extends State<PosterScreen> {
                                 dislikedPosters[poster.id] = false;
                                 handleLikePoster(poster.id);
                               },
-                              child: hasLiked
-                                  ? SizedBox(
+                              child: SizedBox(
                                 height: 7.h,
                                 width: 6.h,
                                 child: Image(
                                   image: const AssetImage('assets/pngs/like.png'),
-                                  color: AppColors.mainColor,
+                                  color: hasLiked ? AppColors.mainColor : null,
                                 ),
-                              )
-                                  : SizedBox(
-                                height: 7.h,
-                                width: 6.h,
-                                child: const Image(image: AssetImage('assets/pngs/like.png')),
                               ),
                             ),
                             getVerticalSpace(.8.h),
@@ -204,19 +198,13 @@ class _PosterScreenState extends State<PosterScreen> {
                                 likedPosters[poster.id] = false;
                                 handleDisLikePoster(poster.id);
                               },
-                              child: hasDisliked
-                                  ? SizedBox(
+                              child: SizedBox(
                                 height: 7.h,
                                 width: 6.h,
                                 child: Image(
                                   image: const AssetImage('assets/pngs/dislike.png'),
-                                  color: AppColors.mainColor,
+                                  color: hasDisliked ? AppColors.mainColor : null,
                                 ),
-                              )
-                                  : SizedBox(
-                                height: 7.h,
-                                width: 6.h,
-                                child: const Image(image: AssetImage('assets/pngs/dislike.png')),
                               ),
                             ),
                             getVerticalSpace(.8.h),
@@ -244,16 +232,10 @@ class _PosterScreenState extends State<PosterScreen> {
                     ),
                   );
                 } else {
-                  // Handle the case where there are no posters
-                  if (filteredPosters.isEmpty) {
-                    return RequestMoreDesign(
-                      businessId: widget.businessId,
-                      postId: "",
-                    );
-                  }
+                  // Last item to show "Request More Design"
                   return RequestMoreDesign(
                     businessId: widget.businessId,
-                    postId: posters!.designs[index].uploadedBy.id,
+                    postId: "", // You can customize this as needed
                   );
                 }
               },
@@ -289,7 +271,6 @@ class _PosterScreenState extends State<PosterScreen> {
           ],
         );
       }),
-
     );
   }
 }

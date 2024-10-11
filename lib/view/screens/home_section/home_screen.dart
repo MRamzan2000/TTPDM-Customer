@@ -120,7 +120,7 @@ WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                                       TextStyle(fontFamily: 'light', fontWeight: FontWeight.w400, fontSize: 12.px, color: const Color(0xff2F3542))),
                               trailing: GestureDetector(
                                 onTap: () {
-                                  Get.to(() => const NotificationScreen(title: 'home',));
+                                  Get.to(() => const NotificationScreen(title: 'Home',));
                                 },
                                 // child: SizedBox(
                                 //     height: 4.8.h,

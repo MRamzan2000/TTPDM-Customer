@@ -141,10 +141,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Password and Confirm Password do not match')),
                             );
-                          } else if (Platform.isAndroid && !isCaptchaVerified) {
+                          }
+                          else if (Platform.isAndroid && !isCaptchaVerified) {
                             // Show CAPTCHA only for Android
                             showWebViewDialog(context, webViewHeight);
-                          } else {
+                          }
+                          else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Success')),
                             );

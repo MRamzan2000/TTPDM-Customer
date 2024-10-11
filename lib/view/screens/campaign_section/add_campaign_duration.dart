@@ -4,38 +4,73 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
+import 'package:ttpdm/controller/getx_controllers/get_campaign_rules_controller.dart';
 import 'package:ttpdm/controller/utils/alert_box.dart';
 import 'package:ttpdm/view/screens/campaign_section/campaign_details.dart';
 import '../../../controller/getx_controllers/add_campaign_controller.dart';
 
-class AddCampaignDuration extends StatelessWidget {
+class AddCampaignDuration extends StatefulWidget {
   final String businessId;
   final String businessName;
   final String campaignName;
   final String campaignDescription;
   final File selectedPoster;
   final String token;
-  AddCampaignDuration({super.key, required this.businessId, required this.campaignName, required this.campaignDescription, required this.selectedPoster, required this.businessName, required this.token});
-  final AddCampaignController addCampaignController =
-      Get.put(AddCampaignController());
-  final Rx<DateTime> minTime = DateTime(2023, 01, 01, 1).obs; // 1:00 AM
-  final Rx<DateTime> maxTime = DateTime(2023, 01, 02, 0).obs; // 24:00 PM
-  final Rx<DateTime> startTime =
-      DateTime(2023, 01, 01, 8).obs; // Default start time: 8:00 AM
-  final Rx<DateTime> endTime =
-      DateTime(2023, 01, 01, 16).obs; // Default end time: 4:00 PM (16:00)
-
+  const AddCampaignDuration(
+      {super.key,
+      required this.businessId,
+      required this.campaignName,
+      required this.campaignDescription,
+      required this.selectedPoster,
+      required this.businessName,
+      required this.token});
 
   @override
+  State<AddCampaignDuration> createState() => _AddCampaignDurationState();
+}
+
+class _AddCampaignDurationState extends State<AddCampaignDuration> {
+  final AddCampaignController addCampaignController =
+      Get.put(AddCampaignController());
+
+  final Rx<DateTime> minTime = DateTime(2023, 01, 01, 1).obs;
+  // 1:00 AM
+  final Rx<DateTime> maxTime = DateTime(2023, 01, 02, 0).obs;
+  // 24:00 PM
+  final Rx<DateTime> startTime = DateTime(2023, 01, 01, 8).obs;
+  // Default start time: 8:00 AM
+  final Rx<DateTime> endTime = DateTime(2023, 01, 01, 16).obs;
+  // Default end time: 4:00 PM (16:00)
+  late CampaignRuleController campaignRuleController;
+
+  @override
+  void initState() {
+    super.initState();
+    campaignRuleController = Get.put(CampaignRuleController(context: context));
+    fetchRules();
+
+  }
+void fetchRules(){
+  WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) async {
+      await campaignRuleController
+          .fetchCampaignRules(
+          isLoading: campaignRuleController.allRules.value == null)
+          .then(
+            (value) {
+          log("campaignRuleController :${campaignRuleController.allRules.value?.advyroSocialPages}");
+        },
+      );
+    },
+  );
+}
+  @override
   Widget build(BuildContext context) {
-    log('Campaign Name $campaignName');
-    log('campaignDescription $campaignDescription');
-    log('businessId $businessId');
-    log('selectedPoster $selectedPoster');
     return Scaffold(
       backgroundColor: const Color(0xfff8f9fa),
       appBar: AppBar(
@@ -126,190 +161,225 @@ class AddCampaignDuration extends StatelessWidget {
                           fontFamily: 'regular'),
                     ),
                     getVerticalSpace(1.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            if (!selectionLst
-                                .contains('TTPDM Social Media pages')) {
-                              selectionLst.add('TTPDM Social Media pages');
-                            } else {
-                              selectionLst.remove('TTPDM Social Media pages');
-                            }
-                            log("$selectionLst");
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: .8.h, vertical: 1.h),
+                    campaignRuleController.rulesLoading.value
+                        ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Wrap(
+                          alignment: WrapAlignment.start,
+                          spacing: 8.0,
+                          runSpacing: 8.0,
+                          children: List.generate(6, (index) => Container(
+                            width: 100,
+                            height: 30,
                             decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5.h),
+                            ),
+                          )),
+                        ),
+                      ),
+                    )
+                        :
+                    Wrap(
+                      alignment: WrapAlignment.start,
+                      spacing: 8.0, // Adjust spacing between items as needed
+                      runSpacing: 8.0, // Adjust vertical spacing
+                      children: [
+                        if (campaignRuleController
+                            .allRules.value!.advyroSocialPages)
+                          GestureDetector(
+                            onTap: () {
+                              if (!selectionLst
+                                  .contains('Advyro Social Media pages')) {
+                                selectionLst.add('Advyro Social Media pages');
+                              } else {
+                                selectionLst
+                                    .remove('Advyro Social Media pages');
+                              }
+                              log("$selectionLst");
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: .8.h, vertical: 1.h),
+                              decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.h),
                                 color: selectionLst
-                                        .contains('TTPDM Social Media pages')
+                                        .contains('Advyro Social Media pages')
                                     ? AppColors.mainColor
-                                    : const Color(0xffE0E0DF)),
-                            child: Text(
-                              'TTPDM Social Media pages',
-                              style: TextStyle(
+                                    : const Color(0xffE0E0DF),
+                              ),
+                              child: Text(
+                                'Advyro Social Media pages',
+                                style: TextStyle(
                                   fontFamily: 'bold',
                                   color: selectionLst
-                                          .contains('TTPDM Social Media pages')
+                                          .contains('Advyro Social Media pages')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
                                   fontSize: 11.px,
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            if (!selectionLst.contains('Facebook')) {
-                              selectionLst.add('Facebook');
-                            } else {
-                              selectionLst.remove('Facebook');
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: .8.h, vertical: 1.h),
-                            decoration: BoxDecoration(
+                        if (campaignRuleController.allRules.value!.facebook)
+                          GestureDetector(
+                            onTap: () {
+                              if (!selectionLst.contains('Facebook')) {
+                                selectionLst.add('Facebook');
+                              } else {
+                                selectionLst.remove('Facebook');
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: .8.h, vertical: 1.h),
+                              decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.h),
                                 color: selectionLst.contains('Facebook')
                                     ? AppColors.mainColor
-                                    : const Color(0xffE0E0DF)),
-                            child: Text(
-                              'Facebook',
-                              style: TextStyle(
+                                    : const Color(0xffE0E0DF),
+                              ),
+                              child: Text(
+                                'Facebook',
+                                style: TextStyle(
                                   fontFamily: 'bold',
                                   color: selectionLst.contains('Facebook')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
                                   fontSize: 11.px,
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            if (!selectionLst.contains('TIKTOK')) {
-                              selectionLst.add('TIKTOK');
-                            } else {
-                              selectionLst.remove('TIKTOK');
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: .8.h, vertical: 1.h),
-                            decoration: BoxDecoration(
+                        if (campaignRuleController.allRules.value!.tiktok)
+                          GestureDetector(
+                            onTap: () {
+                              if (!selectionLst.contains('TIKTOK')) {
+                                selectionLst.add('TIKTOK');
+                              } else {
+                                selectionLst.remove('TIKTOK');
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: .8.h, vertical: 1.h),
+                              decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.h),
                                 color: selectionLst.contains('TIKTOK')
                                     ? AppColors.mainColor
-                                    : const Color(0xffE0E0DF)),
-                            child: Text(
-                              'TIKTOK',
-                              style: TextStyle(
+                                    : const Color(0xffE0E0DF),
+                              ),
+                              child: Text(
+                                'TIKTOK',
+                                style: TextStyle(
                                   fontFamily: 'bold',
                                   color: selectionLst.contains('TIKTOK')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
                                   fontSize: 11.px,
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    getVerticalSpace(1.4.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            if (!selectionLst.contains('Instagram')) {
-                              selectionLst.add('Instagram');
-                            } else {
-                              selectionLst.remove('Instagram');
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 1.6.h, vertical: 1.h),
-                            decoration: BoxDecoration(
+                        if (campaignRuleController.allRules.value!.instagram)
+                          GestureDetector(
+                            onTap: () {
+                              if (!selectionLst.contains('Instagram')) {
+                                selectionLst.add('Instagram');
+                              } else {
+                                selectionLst.remove('Instagram');
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 1.6.h, vertical: 1.h),
+                              decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.h),
                                 color: selectionLst.contains('Instagram')
                                     ? AppColors.mainColor
-                                    : const Color(0xffE0E0DF)),
-                            child: Text(
-                              'Instagram',
-                              style: TextStyle(
+                                    : const Color(0xffE0E0DF),
+                              ),
+                              child: Text(
+                                'Instagram',
+                                style: TextStyle(
                                   fontFamily: 'bold',
                                   color: selectionLst.contains('Instagram')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
                                   fontSize: 11.px,
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        getHorizentalSpace(1.2.h),
-                        GestureDetector(
-                          onTap: () {
-                            if (!selectionLst.contains('Youtube')) {
-                              selectionLst.add('Youtube');
-                            } else {
-                              selectionLst.remove('Youtube');
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 1.6.h, vertical: 1.h),
-                            decoration: BoxDecoration(
+                        if (campaignRuleController.allRules.value!.youtube)
+                          GestureDetector(
+                            onTap: () {
+                              if (!selectionLst.contains('Youtube')) {
+                                selectionLst.add('Youtube');
+                              } else {
+                                selectionLst.remove('Youtube');
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 1.6.h, vertical: 1.h),
+                              decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.h),
                                 color: selectionLst.contains('Youtube')
                                     ? AppColors.mainColor
-                                    : const Color(0xffE0E0DF)),
-                            child: Text(
-                              'Youtube',
-                              style: TextStyle(
+                                    : const Color(0xffE0E0DF),
+                              ),
+                              child: Text(
+                                'Youtube',
+                                style: TextStyle(
                                   fontFamily: 'bold',
                                   color: selectionLst.contains('Youtube')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
                                   fontSize: 11.px,
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        getHorizentalSpace(1.2.h),
-                        GestureDetector(
-                          onTap: () {
-                            if (!selectionLst.contains('Google')) {
-                              selectionLst.add('Google');
-                            } else {
-                              selectionLst.remove('Google');
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 1.6.h, vertical: 1.h),
-                            decoration: BoxDecoration(
+                        if (campaignRuleController.allRules.value!.google)
+                          GestureDetector(
+                            onTap: () {
+                              if (!selectionLst.contains('Google')) {
+                                selectionLst.add('Google');
+                              } else {
+                                selectionLst.remove('Google');
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 1.6.h, vertical: 1.h),
+                              decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.h),
                                 color: selectionLst.contains('Google')
                                     ? AppColors.mainColor
-                                    : const Color(0xffE0E0DF)),
-                            child: Text(
-                              'Google',
-                              style: TextStyle(
+                                    : const Color(0xffE0E0DF),
+                              ),
+                              child: Text(
+                                'Google',
+                                style: TextStyle(
                                   fontFamily: 'bold',
                                   color: selectionLst.contains('Google')
                                       ? AppColors.whiteColor
                                       : const Color(0xff454544),
                                   fontSize: 12.px,
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        const Expanded(child: SizedBox())
                       ],
                     ),
                   ],
@@ -479,7 +549,6 @@ class AddCampaignDuration extends StatelessWidget {
                               values.end.toInt());
                           log('Start Time: ${DateFormat('HH:mm').format(startTime.value)}');
                           log('End Time: ${DateFormat('HH:mm').format(endTime.value)}');
-
                         }
                       },
                     ),
@@ -491,54 +560,70 @@ class AddCampaignDuration extends StatelessWidget {
             customElevatedButton(
                 onTap: () {
                   String concatenatedString = selectionLst.join(', ');
-                  if(campaignName.isEmpty){
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Campaign name is required')));
-                  }else if(campaignDescription.isEmpty){
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Campaign description is required')));
-
-                  }else if(businessId.isEmpty){
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('business Id null')));
-
+                  if (widget.campaignName.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Campaign name is required')));
+                  } else if (widget.campaignDescription.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Campaign description is required')));
+                  } else if (widget.businessId.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('business Id null')));
+                  } else if (widget.selectedPoster.path.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Campaign poster is null')));
+                  } else if (concatenatedString.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('At least one platform is selected')));
+                  } else if (addCampaignController
+                      .startFormatDate.value.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('please select campaign start date')));
+                  } else if (addCampaignController
+                      .endFormatDate.value.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('please select campaign end date')));
+                  } else if (DateFormat('HH:mm')
+                      .format(startTime.value)
+                      .isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('please select campaign start time')));
+                  } else if (DateFormat('HH:mm')
+                      .format(endTime.value)
+                      .isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('please select campaign end time')));
+                  } else {
+                    Get.to(() => CampaignDetails(
+                          campaignName: widget.campaignName,
+                          campaignDescription: widget.campaignDescription,
+                          businessId: widget.businessId,
+                          selectedPoster: widget.selectedPoster,
+                          campaignPlatForms: concatenatedString,
+                          startDate:
+                              addCampaignController.startFormatDate.value,
+                          endDate: addCampaignController.endFormatDate.value,
+                          startTime:
+                              DateFormat('HH:mm').format(startTime.value),
+                          endTime: DateFormat('HH:mm').format(endTime.value),
+                          businessName: widget.businessName,
+                          token: widget.token,
+                          numberOfPlatforms: selectionLst.length,
+                      dayFee: campaignRuleController.allRules.value?.dayFee??0.0,
+                      hourFee: campaignRuleController.allRules.value?.hourFee??0.0,
+                      advyroSocialMediaPagesFee: campaignRuleController.allRules.value?.advyroSocialMediaPagesFee??0.0,
+                      advyroFacebookFee: campaignRuleController.allRules.value?.advyroFacebookFee??0.0,
+                      advyroTiktokFee: campaignRuleController.allRules.value?.advyroTiktokFee??0.0,
+                      advyroInstagramFee: campaignRuleController.allRules.value?.advyroInstagramFee??0.0,
+                      advyroYoutubeFee: campaignRuleController.allRules.value?.advyroYoutubeFee??0.0,
+                      advyroGoogleFee: campaignRuleController.allRules.value?.advyroGoogleFee??0.0,
+                        ));
                   }
-                  else if(selectedPoster.path.isEmpty){
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Campaign poster is null')));
-
-                  }else if(concatenatedString.isEmpty){
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('At least one platform is selected')));
-
-                  }else if(addCampaignController.startFormatDate.value.isEmpty)
-                  {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('please select campaign start date')));
-
-                  }else if( addCampaignController.endFormatDate.value.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('please select campaign end date')));
-
-                  }
-                  else if(DateFormat('HH:mm').format(startTime.value).isEmpty){
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('please select campaign start time')));
-
-                  }else if(DateFormat('HH:mm').format(endTime.value).isEmpty){
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('please select campaign end time')));
-
-                  }else{
-                    Get.to(() =>CampaignDetails(
-                      campaignName: campaignName,
-                      campaignDescription: campaignDescription,
-                      businessId:businessId ,
-                      selectedPoster:selectedPoster ,
-                      campaignPlatForms: concatenatedString,
-                      startDate:addCampaignController.startFormatDate.value ,
-                      endDate: addCampaignController.endFormatDate.value ,
-                      startTime:DateFormat('HH:mm').format(startTime.value) ,
-                      endTime: DateFormat('HH:mm').format(endTime.value), businessName: businessName,
-                      token: token, numberOfPlatforms: selectionLst.length,
-                    ));
-                  }
-
                 },
                 title: Text(
                   'Next',
-                  style: CustomTextStyles.buttonTextStyle.copyWith(color:AppColors.whiteColor ),
+                  style: CustomTextStyles.buttonTextStyle
+                      .copyWith(color: AppColors.whiteColor),
                 ),
                 bgColor: AppColors.mainColor,
                 titleColor: AppColors.whiteColor,

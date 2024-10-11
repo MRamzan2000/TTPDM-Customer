@@ -21,7 +21,7 @@ final String title;
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        leading:title=="Home"? GestureDetector(
+        leading:title=="bottom"?const SizedBox.shrink():GestureDetector(
           onTap: () {
             Get.back();
           },
@@ -30,7 +30,7 @@ final String title;
             size: 2.3.h,
             color: Colors.black,
           ),
-        ):const SizedBox.shrink(),
+        ),
         title: Text(
           'Notification ',
           style: CustomTextStyles.buttonTextStyle.copyWith(

@@ -12,19 +12,24 @@ class ConnectivityScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ConnectivityController connectivityController = Get.find();
 
-    return Scaffold(
-      backgroundColor: const Color(0xfff8f9fa),
-      body: Obx(() {
-        if (connectivityController.isConnected.value) {
-          return const SplashScreen();
-        } else {
-          return SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: noInternet(),
-          );
-        }
-      }),
+    return WillPopScope(
+      onWillPop: () async {
+        return connectivityController.isConnected.value;
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xfff8f9fa),
+        body: Obx(() {
+          if (connectivityController.isConnected.value) {
+            return const SplashScreen();
+          } else {
+            return SizedBox(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: noInternet(),
+            );
+          }
+        }),
+      ),
     );
   }
 
