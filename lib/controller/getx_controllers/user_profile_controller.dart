@@ -75,7 +75,7 @@ class UserProfileController extends GetxController {
   RxBool deleteLoading = false.obs;
   Future<void> deleteUserAccount({required String token}) async {
     try {
-      deleteLoading.value = true;
+      deleteLoading.value = !deleteLoading.value;
       await UserProfileApi(context: context)
           .deleteUserAccountMethod(token: token)
           .then(
@@ -88,7 +88,7 @@ class UserProfileController extends GetxController {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("unexpected error occurred :${e.toString()}")));
       }
-      deleteLoading.value = false;
+      // deleteLoading.value = false;
     }
   }
 }

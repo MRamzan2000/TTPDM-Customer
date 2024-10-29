@@ -12,6 +12,7 @@ import 'package:ttpdm/controller/utils/alert_box.dart';
 import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/view/screens/chat_support/chat_support.dart';
+
 class LogOutScreen extends StatefulWidget {
   const LogOutScreen({super.key});
 
@@ -25,8 +26,9 @@ class _LogOutScreenState extends State<LogOutScreen> {
   RxString token = "".obs;
   RxString subscriptionEnd = "".obs;
   RxString planeName = "".obs;
-  DateTime dateTime=DateTime.now();
-  String formattedDate="";
+  DateTime dateTime = DateTime.now();
+  String formattedDate = "";
+
   @override
   void initState() {
     super.initState();
@@ -61,7 +63,6 @@ class _LogOutScreenState extends State<LogOutScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,18 +89,13 @@ class _LogOutScreenState extends State<LogOutScreen> {
           ),
         ),
         actions: [
-          Obx(() =>
-             GestureDetector(
+          Obx(
+            () => GestureDetector(
               onTap: () {
-                if(!userProfileController.deleteLoading.value){
-                  userProfileController.deleteUserAccount(token: token.value).then((value) {
-                    MySharedPreferences.setBool(isLoggedInKey, false);
-                  });
-                }
-
+                deleteAccountPopUp(context, token.value);
               },
               child: Text(
-                userProfileController.deleteLoading.value?"Please wait..." : "Delete Account",
+                userProfileController.deleteLoading.value ? "Please wait..." : "Delete Account",
                 style: CustomTextStyles.buttonTextStyle.copyWith(
                   fontSize: 12.px,
                   fontWeight: FontWeight.w600,
@@ -125,11 +121,23 @@ class _LogOutScreenState extends State<LogOutScreen> {
                 return GestureDetector(
                   onTap: () {
                     openChooseSubscription(
-                    context:context,
-                      token:    token.value,
-                      clientSecretKey:   getStripeKeyController.stripeKey.value!.secretKey.toString(),
-                      plan:planeName.value=="basic"? 0:planeName.value=="standard"?1:2,
-                      planName: planeName.value
+                      context: context,
+                      token: token.value,
+                      clientSecretKey: getStripeKeyController.stripeKey.value!.secretKey.toString(),
+                      plan: planeName.value == "basic"
+                          ? 0
+                          : planeName.value == "standard"
+                          ? 1
+                          : 2,
+                      planName: planeName.value,
+                      expiry: (() {
+                        try {
+                          return DateTime.parse(subscriptionEnd.value);
+                        } catch (e) {
+                          // If parsing fails, set to DateTime.now() - 1 day
+                          return DateTime.now().subtract(const Duration(days: 1));
+                        }
+                      })(),
                     );
                   },
                   child: Row(
@@ -146,7 +154,11 @@ class _LogOutScreenState extends State<LogOutScreen> {
                         ),
                       ),
                       Text(
-                        getStripeKeyController.keyLoading.value ? "Loading..." : formattedDate.isEmpty?"No Plan" : 'Expire on $formattedDate',
+                        getStripeKeyController.keyLoading.value
+                            ? "Loading..."
+                            : formattedDate.isEmpty
+                                ? "No Plan"
+                                : 'Expire on $formattedDate',
                         style: TextStyle(
                           fontWeight: FontWeight.w400,
                           fontFamily: 'bold',

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ttpdm/controller/apis_services/auth_apis.dart';
+import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
+
+import '../custom_widgets/widgets.dart';
 
 class LoginUserController extends GetxController {
   final BuildContext context;
@@ -13,6 +16,7 @@ class LoginUserController extends GetxController {
   }) async {
     try {
       isLoading.value = true;
+      await MySharedPreferences.clearAll();
       await AuthApis(context: context)
           .loginApis(
         email: email,
@@ -25,8 +29,7 @@ class LoginUserController extends GetxController {
       );
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Something went wrong ${e.toString()}')));
+        customScaffoldMessenger('Something went wrong ${e.toString()}');
       }
     }
   }

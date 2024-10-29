@@ -18,29 +18,28 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
     super.key,
   });
+
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final BusinessProfileController businessProfileController =
-      Get.find(tag: 'business');
+  final BusinessProfileController businessProfileController = Get.find(tag: 'business');
   RxString token = "".obs;
+
   @override
   void initState() {
     super.initState();
     token.value = MySharedPreferences.getString(authTokenKey);
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
-        businessProfileController.fetchBusiness(
-            token: token.value,
-            context: context,
-            loading: businessProfileController.allBusinessProfiles.isEmpty);
+        businessProfileController.fetchBusiness(token: token.value, context: context, loading: businessProfileController.allBusinessProfiles.isEmpty);
       },
     );
   }
 
   RxBool hasDisplayedNoProfileMessage = false.obs;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,10 +114,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         baseColor: AppColors.baseColor,
                         highlightColor: AppColors.highlightColor,
                         child: Container(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 2.4.h, vertical: 1.6.h),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 1.6.h, vertical: 2.0.h),
+                          margin: EdgeInsets.symmetric(horizontal: 2.4.h, vertical: 1.6.h),
+                          padding: EdgeInsets.symmetric(horizontal: 1.6.h, vertical: 2.0.h),
                           decoration: BoxDecoration(
                             color: AppColors.whiteColor,
                             borderRadius: BorderRadius.circular(1.h),
@@ -168,50 +165,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     padding: EdgeInsets.zero,
-                    itemCount:
-                        businessProfileController.approvedProfiles.length,
+                    itemCount: businessProfileController.approvedProfiles.length,
                     itemBuilder: (context, index) {
                       {
                         return GestureDetector(
                           onTap: () {
                             log('logo detail ${businessProfileController.approvedProfiles[index]!.logo}');
                             Get.to(() => BusinessProfile(
-                                  targetArea: businessProfileController
-                                      .approvedProfiles[index]!.targetMapArea,
-                                  logo: businessProfileController
-                                      .approvedProfiles[index]!.logo!,
-                                  location: businessProfileController
-                                      .approvedProfiles[index]!.location,
-                                  description: businessProfileController
-                                      .approvedProfiles[index]!.description,
-                                  businessName: businessProfileController
-                                      .approvedProfiles[index]!.name,
-                                  phoneNumber: businessProfileController
-                                      .approvedProfiles[index]!.phone,
-                                  businessId: businessProfileController
-                                      .approvedProfiles[index]!.id,
-                                  imagesList: businessProfileController
-                                      .approvedProfiles[index]!.gallery,
+                                  targetArea: businessProfileController.approvedProfiles[index]!.targetMapArea,
+                                  logo: businessProfileController.approvedProfiles[index]!.logo!,
+                                  location: businessProfileController.approvedProfiles[index]!.location,
+                                  description: businessProfileController.approvedProfiles[index]!.description,
+                                  businessName: businessProfileController.approvedProfiles[index]!.name,
+                                  phoneNumber: businessProfileController.approvedProfiles[index]!.phone,
+                                  businessId: businessProfileController.approvedProfiles[index]!.id,
+                                  imagesList: businessProfileController.approvedProfiles[index]!.gallery,
                                   token: token.value,
-                                  fb: businessProfileController
-                                      .approvedProfiles[index]!.facebookUrl!,
-                                  insta: businessProfileController
-                                      .approvedProfiles[index]!.instagramUrl!,
-                                  linkdin: businessProfileController
-                                      .approvedProfiles[index]!.linkedinUrl!,
-                                  tiktok: businessProfileController
-                                      .approvedProfiles[index]!.tiktokUrl!,
-                                  webUrl: businessProfileController
-                                      .approvedProfiles[index]!.websiteUrl!,
-                                  status: businessProfileController
-                                      .approvedProfiles[index]!.status,
+                                  fb: businessProfileController.approvedProfiles[index]!.facebookUrl!,
+                                  insta: businessProfileController.approvedProfiles[index]!.instagramUrl!,
+                                  linkdin: businessProfileController.approvedProfiles[index]!.linkedinUrl!,
+                                  tiktok: businessProfileController.approvedProfiles[index]!.tiktokUrl!,
+                                  webUrl: businessProfileController.approvedProfiles[index]!.websiteUrl!,
+                                  status: businessProfileController.approvedProfiles[index]!.status,
                                 ));
                           },
                           child: Container(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 2.4.h, vertical: 1.6.h),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 1.6.h, vertical: 2.0.h),
+                            margin: EdgeInsets.symmetric(horizontal: 2.4.h, vertical: 1.6.h),
+                            padding: EdgeInsets.symmetric(horizontal: 1.6.h, vertical: 2.0.h),
                             decoration: BoxDecoration(
                               color: AppColors.whiteColor,
                               borderRadius: BorderRadius.circular(1.h),
@@ -220,8 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  businessProfileController
-                                      .approvedProfiles[index]!.name,
+                                  businessProfileController.approvedProfiles[index]!.name,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontFamily: 'bold',
@@ -272,10 +251,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         baseColor: AppColors.baseColor,
                         highlightColor: AppColors.highlightColor,
                         child: Container(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 2.4.h, vertical: 1.6.h),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 1.6.h, vertical: 2.0.h),
+                          margin: EdgeInsets.symmetric(horizontal: 2.4.h, vertical: 1.6.h),
+                          padding: EdgeInsets.symmetric(horizontal: 1.6.h, vertical: 2.0.h),
                           decoration: BoxDecoration(
                             color: AppColors.whiteColor,
                             borderRadius: BorderRadius.circular(1.h),
@@ -327,48 +304,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: EdgeInsets.zero,
                     itemCount: businessProfileController.pendingProfiles.length,
                     itemBuilder: (context, index) {
-                      final business =
-                          businessProfileController.pendingProfiles[index];
+                      final business = businessProfileController.pendingProfiles[index];
                       {
                         return GestureDetector(
                           onTap: () {
                             Get.to(() => BusinessProfile(
-                                  targetArea: businessProfileController
-                                      .pendingProfiles[index]!.targetMapArea,
-                                  logo: businessProfileController
-                                      .pendingProfiles[index]!.logo!,
-                                  location: businessProfileController
-                                      .pendingProfiles[index]!.location,
-                                  description: businessProfileController
-                                      .pendingProfiles[index]!.description,
-                                  businessName: businessProfileController
-                                      .pendingProfiles[index]!.name,
-                                  phoneNumber: businessProfileController
-                                      .pendingProfiles[index]!.phone,
-                                  businessId: businessProfileController
-                                      .pendingProfiles[index]!.id,
-                                  imagesList: businessProfileController
-                                      .pendingProfiles[index]!.gallery,
+                                  targetArea: businessProfileController.pendingProfiles[index]!.targetMapArea,
+                                  logo: businessProfileController.pendingProfiles[index]!.logo!,
+                                  location: businessProfileController.pendingProfiles[index]!.location,
+                                  description: businessProfileController.pendingProfiles[index]!.description,
+                                  businessName: businessProfileController.pendingProfiles[index]!.name,
+                                  phoneNumber: businessProfileController.pendingProfiles[index]!.phone,
+                                  businessId: businessProfileController.pendingProfiles[index]!.id,
+                                  imagesList: businessProfileController.pendingProfiles[index]!.gallery,
                                   token: token.value,
-                                  fb: businessProfileController
-                                      .pendingProfiles[index]!.facebookUrl!,
-                                  insta: businessProfileController
-                                      .pendingProfiles[index]!.instagramUrl!,
-                                  linkdin: businessProfileController
-                                      .pendingProfiles[index]!.linkedinUrl!,
-                                  tiktok: businessProfileController
-                                      .pendingProfiles[index]!.tiktokUrl!,
-                                  webUrl: businessProfileController
-                                      .pendingProfiles[index]!.websiteUrl!,
-                                  status: businessProfileController
-                                      .pendingProfiles[index]!.status,
+                                  fb: businessProfileController.pendingProfiles[index]!.facebookUrl!,
+                                  insta: businessProfileController.pendingProfiles[index]!.instagramUrl!,
+                                  linkdin: businessProfileController.pendingProfiles[index]!.linkedinUrl!,
+                                  tiktok: businessProfileController.pendingProfiles[index]!.tiktokUrl!,
+                                  webUrl: businessProfileController.pendingProfiles[index]!.websiteUrl!,
+                                  status: businessProfileController.pendingProfiles[index]!.status,
                                 ));
                           },
                           child: Container(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 2.4.h, vertical: 1.6.h),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 1.6.h, vertical: 2.0.h),
+                            margin: EdgeInsets.symmetric(horizontal: 2.4.h, vertical: 1.6.h),
+                            padding: EdgeInsets.symmetric(horizontal: 1.6.h, vertical: 2.0.h),
                             decoration: BoxDecoration(
                               color: AppColors.whiteColor,
                               borderRadius: BorderRadius.circular(1.h),
@@ -422,16 +382,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 1, // Number of shimmer items you want to display
+                    itemCount: 1,
+                    // Number of shimmer items you want to display
                     itemBuilder: (context, index) {
                       return Shimmer.fromColors(
                         baseColor: AppColors.baseColor,
                         highlightColor: AppColors.highlightColor,
                         child: Container(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 2.4.h, vertical: 1.6.h),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 1.6.h, vertical: 2.0.h),
+                          margin: EdgeInsets.symmetric(horizontal: 2.4.h, vertical: 1.6.h),
+                          padding: EdgeInsets.symmetric(horizontal: 1.6.h, vertical: 2.0.h),
                           decoration: BoxDecoration(
                             color: AppColors.whiteColor,
                             borderRadius: BorderRadius.circular(1.h),
@@ -481,51 +440,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     padding: EdgeInsets.zero,
-                    itemCount:
-                        businessProfileController.rejectedProfiles.length,
+                    itemCount: businessProfileController.rejectedProfiles.length,
                     itemBuilder: (context, index) {
-                      final business =
-                          businessProfileController.rejectedProfiles[index];
+                      final business = businessProfileController.rejectedProfiles[index];
                       {
                         return GestureDetector(
                           onTap: () {
                             Get.to(() => BusinessProfile(
-                                  targetArea: businessProfileController
-                                      .rejectedProfiles[index]!.targetMapArea,
-                                  logo: businessProfileController
-                                      .rejectedProfiles[index]!.logo!,
-                                  location: businessProfileController
-                                      .rejectedProfiles[index]!.location,
-                                  description: businessProfileController
-                                      .rejectedProfiles[index]!.description,
-                                  businessName: businessProfileController
-                                      .rejectedProfiles[index]!.name,
-                                  phoneNumber: businessProfileController
-                                      .rejectedProfiles[index]!.phone,
-                                  businessId: businessProfileController
-                                      .rejectedProfiles[index]!.id,
-                                  imagesList: businessProfileController
-                                      .rejectedProfiles[index]!.gallery,
+                                  targetArea: businessProfileController.rejectedProfiles[index]!.targetMapArea,
+                                  logo: businessProfileController.rejectedProfiles[index]!.logo!,
+                                  location: businessProfileController.rejectedProfiles[index]!.location,
+                                  description: businessProfileController.rejectedProfiles[index]!.description,
+                                  businessName: businessProfileController.rejectedProfiles[index]!.name,
+                                  phoneNumber: businessProfileController.rejectedProfiles[index]!.phone,
+                                  businessId: businessProfileController.rejectedProfiles[index]!.id,
+                                  imagesList: businessProfileController.rejectedProfiles[index]!.gallery,
                                   token: token.value,
-                                  fb: businessProfileController
-                                      .rejectedProfiles[index]!.facebookUrl!,
-                                  insta: businessProfileController
-                                      .rejectedProfiles[index]!.instagramUrl!,
-                                  linkdin: businessProfileController
-                                      .rejectedProfiles[index]!.linkedinUrl!,
-                                  tiktok: businessProfileController
-                                      .rejectedProfiles[index]!.tiktokUrl!,
-                                  webUrl: businessProfileController
-                                      .rejectedProfiles[index]!.websiteUrl!,
-                                  status: businessProfileController
-                                      .rejectedProfiles[index]!.status,
+                                  fb: businessProfileController.rejectedProfiles[index]!.facebookUrl!,
+                                  insta: businessProfileController.rejectedProfiles[index]!.instagramUrl!,
+                                  linkdin: businessProfileController.rejectedProfiles[index]!.linkedinUrl!,
+                                  tiktok: businessProfileController.rejectedProfiles[index]!.tiktokUrl!,
+                                  webUrl: businessProfileController.rejectedProfiles[index]!.websiteUrl!,
+                                  status: businessProfileController.rejectedProfiles[index]!.status,
                                 ));
                           },
                           child: Container(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 2.4.h, vertical: 1.6.h),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 1.6.h, vertical: 2.0.h),
+                            margin: EdgeInsets.symmetric(horizontal: 2.4.h, vertical: 1.6.h),
+                            padding: EdgeInsets.symmetric(horizontal: 1.6.h, vertical: 2.0.h),
                             decoration: BoxDecoration(
                               color: AppColors.whiteColor,
                               borderRadius: BorderRadius.circular(1.h),
@@ -560,10 +501,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Get.to(() => const AddNewBusiness());
                   },
                   child: Container(
-                    margin: EdgeInsets.symmetric(
-                        horizontal: 2.4.h, vertical: 1.6.h),
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 1.6.h, vertical: 2.0.h),
+                    margin: EdgeInsets.symmetric(horizontal: 2.4.h, vertical: 1.6.h),
+                    padding: EdgeInsets.symmetric(horizontal: 1.6.h, vertical: 2.0.h),
                     decoration: BoxDecoration(
                       color: AppColors.whiteColor,
                       borderRadius: BorderRadius.circular(1.h),

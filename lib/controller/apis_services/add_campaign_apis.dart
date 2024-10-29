@@ -14,6 +14,7 @@ import 'package:ttpdm/controller/utils/my_shared_prefrence.dart';
 import 'package:ttpdm/controller/utils/preference_key.dart';
 
 import '../../models/get_campaigns_by_status_model.dart';
+import '../custom_widgets/widgets.dart';
 import '../getx_controllers/get_fcm_token_send_notification_controller.dart';
 
 class AddCampaignApis {
@@ -134,8 +135,7 @@ class AddCampaignApis {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Unexpected error occurred')));
+        customScaffoldMessenger('Unexpected error occurred');
       }
       log('Unexpected error occurred :${e.toString()}');
     }
@@ -158,8 +158,7 @@ class AddCampaignApis {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Unexpected error occurred')));
+        customScaffoldMessenger('Unexpected error occurred');
       }
       log('Unexpected error occurred :${e.toString()}');
     }
@@ -196,8 +195,7 @@ class AddCampaignApis {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Unexpected error occurred')));
+        customScaffoldMessenger('Unexpected error occurred');
       }
       log('Unexpected error occurred :${e.toString()}');
     }

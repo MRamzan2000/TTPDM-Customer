@@ -71,39 +71,41 @@ class AuthApis {
     required String email,
     required String password,
   }) async {
-    if (await _checkLoginAttempts(context, email)) {
-      return; // User is blocked
-    }
-
-    final url = Uri.parse("$baseUrl/$signInEndP");
-    final headers = {"Content-Type": "application/json"};
-    final body = jsonEncode({
-      "email": email,
-      "password": password,
-      "fcmToken": await notificationServices.getDeviceToken(),
-    });
+    if (await _checkLoginAttempts(context, email)) return; // User is blocked
 
     try {
-      Response response = await post(url, headers: headers, body: body);
+      final response = await post(
+        Uri.parse("$baseUrl/$signInEndP"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email": email,
+          "password": password,
+          "fcmToken": await notificationServices.getDeviceToken(),
+        }),
+      );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseBody = jsonDecode(response.body);
-        await _resetLoginAttempts(email: email); // Reset attempts on success
+        final data = jsonDecode(response.body);
+        if ((data['user']['role'] ?? "").toLowerCase() != "customer") {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Email is not Customer Type')),
+          );
+          return;
+        }
 
-        // Handle successful login
-        MySharedPreferences.setString(authTokenKey, responseBody['token']);
-        MySharedPreferences.setString(userIdKey, responseBody["user"]['_id']);
-        MySharedPreferences.setString(userNameKey, responseBody["user"]['fullname']);
-        MySharedPreferences.setString(subscriptionKey, responseBody["user"]['subscription']["expiryDate"] ?? "");
+        await _resetLoginAttempts(email: email);
+        MySharedPreferences.setString(authTokenKey, data['token']);
+        MySharedPreferences.setString(userIdKey, data["user"]['_id']);
+        MySharedPreferences.setString(userNameKey, data["user"]['fullname']);
+        MySharedPreferences.setString(subscriptionKey, data["user"]['subscription']["expiryDate"] ?? "");
         MySharedPreferences.setBool(isLoggedInKey, true);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful')),
         );
-
         Get.offAll(const CustomBottomNavigationBar());
       } else {
-        await _incrementLoginAttempts(email); // Increment for specific user
+        await _incrementLoginAttempts(email);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Invalid email or password')),

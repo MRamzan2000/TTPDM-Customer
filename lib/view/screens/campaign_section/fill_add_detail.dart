@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -6,19 +8,18 @@ import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/view/screens/campaign_section/poster_screen.dart';
 
+import 'add_campaign_duration.dart';
+
 class FillAddDetails extends StatelessWidget {
   final String businessId;
   final String token;
   final String businessName;
-  FillAddDetails(
-      {super.key,
-      required this.businessId,
-      required this.businessName,
-      required this.token});
+  final File selectedPoster;
+
+  FillAddDetails({super.key, required this.businessId, required this.businessName, required this.token, required this.selectedPoster});
 
   final TextEditingController businessNameController = TextEditingController();
-  final TextEditingController businessDescriptionController =
-      TextEditingController();
+  final TextEditingController businessDescriptionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -27,23 +28,20 @@ class FillAddDetails extends StatelessWidget {
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
-    Get.back();
-    },
-      child: Icon(
-        Icons.arrow_back_ios_outlined,
-        size: 2.4.h,
-        color: const Color(0xff191918),
-      ),
-    ),
+            Get.back();
+          },
+          child: Icon(
+            Icons.arrow_back_ios_outlined,
+            size: 2.4.h,
+            color: const Color(0xff191918),
+          ),
+        ),
         backgroundColor: AppColors.whiteColor,
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: Text(
           "Add Campaign",
-          style: CustomTextStyles.buttonTextStyle.copyWith(
-              fontSize: 20.px,
-              fontWeight: FontWeight.w600,
-              color: AppColors.mainColor),
+          style: CustomTextStyles.buttonTextStyle.copyWith(fontSize: 20.px, fontWeight: FontWeight.w600, color: AppColors.mainColor),
         ),
       ),
       body: SizedBox(
@@ -71,9 +69,7 @@ class FillAddDetails extends StatelessWidget {
                         height: .4.h,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(1.h),
-                            color: index == 0 || index == 1
-                                ? AppColors.mainColor
-                                : const Color(0xffC3C3C2)),
+                            color: index == 0 || index == 1 || index == 2 ? AppColors.mainColor : const Color(0xffC3C3C2)),
                       );
                     },
                   ),
@@ -83,20 +79,14 @@ class FillAddDetails extends StatelessWidget {
                   alignment: Alignment.topCenter,
                   child: Text(
                     'Fill Campaign details',
-                    style: CustomTextStyles.buttonTextStyle.copyWith(
-                        fontSize: 14.px,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.blackColor),
+                    style: CustomTextStyles.buttonTextStyle.copyWith(fontSize: 14.px, fontWeight: FontWeight.w600, color: AppColors.blackColor),
                   ),
                 ),
                 getVerticalSpace(3.3.h),
                 Text(
                   "Ads Name",
-                  style: CustomTextStyles.onBoardingHeading.copyWith(
-                      color: const Color(0xff191918),
-                      fontSize: 14.px,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'bold'),
+                  style: CustomTextStyles.onBoardingHeading
+                      .copyWith(color: const Color(0xff191918), fontSize: 14.px, fontWeight: FontWeight.w500, fontFamily: 'bold'),
                 ),
                 getVerticalSpace(.4.h),
                 customTextFormField(
@@ -106,52 +96,36 @@ class FillAddDetails extends StatelessWidget {
                 getVerticalSpace(1.2.h),
                 Text(
                   "Campaign Descriptions",
-                  style: CustomTextStyles.onBoardingHeading.copyWith(
-                      color: const Color(0xff191918),
-                      fontSize: 14.px,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'bold'),
+                  style: CustomTextStyles.onBoardingHeading
+                      .copyWith(color: const Color(0xff191918), fontSize: 14.px, fontWeight: FontWeight.w500, fontFamily: 'bold'),
                 ),
                 getVerticalSpace(.4.h),
-                customTextFormField(
-                    controller: businessDescriptionController,
-                    maxLine: 4,
-                    bgColor: AppColors.whiteColor),
+                customTextFormField(controller: businessDescriptionController, maxLine: 4, bgColor: AppColors.whiteColor),
                 getVerticalSpace(27.h),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: customElevatedButton(
                       onTap: () {
                         if (businessNameController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text('Please enter your campaign name')));
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter your campaign name')));
                         } else if (businessDescriptionController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      'Please enter your campaign Description')));
-                        } else if (businessDescriptionController.text.length <
-                            50) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text(
-                                  'Description length At least 50 character')));
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter your campaign Description')));
+                        } else if (businessDescriptionController.text.length < 50) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Description length At least 50 character')));
                         } else {
-                          Get.to(() => PosterScreen(
-                                businessId: businessId,
-                                businessName: businessName,
-                                campaignName: businessNameController.text,
-                                campaignDescription:
-                                    businessDescriptionController.text,
-                                token: token,
-                              ));
+                          Get.to(() => AddCampaignDuration(
+                            businessId: businessId,
+                            campaignDescription: businessDescriptionController.text,
+                            campaignName: businessNameController.text,
+                            selectedPoster: selectedPoster,
+                            businessName: businessName,
+                            token: token,
+                          ));
                         }
                       },
                       title: Text(
                         'Next',
-                        style: CustomTextStyles.buttonTextStyle
-                            .copyWith(color: AppColors.whiteColor),
+                        style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
                       ),
                       horizentalPadding: 5.h,
                       verticalPadding: .8.h,

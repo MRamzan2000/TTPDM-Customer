@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -42,7 +43,6 @@ void openChooseEditProfile(
   final ImagePickerController imagePickerController = Get.put(ImagePickerController());
   final UserProfileController userProfileController = Get.put(UserProfileController(context: context));
 
-  log(profileImage);
 
   void resetImagePicker() {
     imagePickerController.image.value = null;
@@ -426,7 +426,7 @@ void openCampaignPoster(
                         () => customElevatedButton(
                             onTap: () {
                               if (descriptionController.text.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter the description Text')));
+                                customScaffoldMessenger('Please enter the description Text');
                               } else {
                                 addCampaignController
                                     .requestForMoreDesign(
@@ -535,7 +535,7 @@ void openCampaignPosterEdit(
                         () => customElevatedButton(
                             onTap: () {
                               if (descriptionController.text.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter the description Text')));
+                                customScaffoldMessenger('Please enter the description Text');
                               } else {
                                 posterController
                                     .editDesign(
@@ -865,6 +865,7 @@ void openChooseSubscription(
  required String clientSecretKey,
  required int plan,
  required String planName,
+  required DateTime expiry,
 }
 ) {
   RxInt isPressedCount = 0.obs;
@@ -872,8 +873,8 @@ void openChooseSubscription(
   RxBool isPressed = false.obs;
   final SubscriptionController subscriptionController = Get.put(SubscriptionController());
   RxInt isSelected = (planName.isNotEmpty) ? plan.obs : (-1).obs; // Default to -1 if no plan is selected
+  int currentPlan = isSelected.value;
 
-  RxList<String> description = <String>['Add Business only', 'Add up to Business only', 'Add up to Business only'].obs;
   subscriptionController.fetchAllPlans(loading: subscriptionController.getAllPlans.isEmpty, context: context);
   showDialog(
     context: context,
@@ -972,8 +973,15 @@ void openChooseSubscription(
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
                                     onTap: () {
-                                      subscriptionController.getAllPlans.refresh();
-                                      isSelected.value = index;
+                                      if(index < currentPlan && expiry.isAfter(DateTime.now()))
+                                        {
+                                          customScaffoldMessenger("You cannot downgrade until the current plant expires");
+                                        }
+                                      else
+                                        {
+                                          subscriptionController.getAllPlans.refresh();
+                                          isSelected.value = index;
+                                        }
                                     },
                                     child: Container(
                                       margin: EdgeInsets.only(bottom: 3.h, left: 1.9.h, right: 1.9.h),
@@ -996,7 +1004,7 @@ void openChooseSubscription(
                                           ),
                                           getVerticalSpace(.9.h),
                                           Text(
-                                            subscriptionController.getAllPlans[index]!.price.toString(),
+                                            "${subscriptionController.getAllPlans[index]!.price.toString()} USD / 3 Months",
                                             style: TextStyle(
                                               color: const Color(0xff444545),
                                               fontSize: 16.px,
@@ -1006,7 +1014,7 @@ void openChooseSubscription(
                                           ),
                                           getVerticalSpace(.4.h),
                                           Text(
-                                            "${description[index]}${subscriptionController.getAllPlans[index]!.businessLimit}",
+                                            "Add up to ${subscriptionController.getAllPlans[index]!.businessLimit} businesses.",
                                             style: TextStyle(
                                               color: const Color(0xff444545),
                                               fontSize: 10.px,
@@ -1032,7 +1040,7 @@ void openChooseSubscription(
                                 Get.back();
                               },
                               title: Text(
-                                'Deny',
+                                'Cancel',
                                 style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor,
                                 fontSize: 12.px),
                               ),
@@ -1048,28 +1056,27 @@ void openChooseSubscription(
                                 onTap: () async {
                                   isPressedCount.value = isPressedCount.value + 1;
 
-                                  if (clientSecretKey.isEmpty) {
-                                  } else {
+                                  if (clientSecretKey.isNotEmpty) {
                                     if (isPressedCount.value == 1) {
                                       await StripePayments.name(subscriptionController.getAllPlans[isSelected.value]!.price.toDouble(),
-                                              context: context,
-                                              clientSecretKey: clientSecretKey,
-                                              token: token,
-                                              businessId: "",
-                                              businessName: "",
-                                              campaignDescription: "",
-                                              campaignName: "",
-                                              campaignPlatForms: "",
-                                              endDate: "",
-                                              endTime: "",
-                                              plan: subscriptionController.getAllPlans.elementAt(isSelected.value)?.name.toLowerCase() ?? "",
-                                              selectedPoster: File(""),
-                                              startDate: "",
-                                              startTime: "",
-                                              cost: '')
+                                          context: context,
+                                          clientSecretKey: clientSecretKey,
+                                          token: token,
+                                          businessId: "",
+                                          businessName: "",
+                                          campaignDescription: "",
+                                          campaignName: "",
+                                          campaignPlatForms: "",
+                                          endDate: "",
+                                          endTime: "",
+                                          plan: subscriptionController.getAllPlans.elementAt(isSelected.value)?.name.toLowerCase() ?? "",
+                                          selectedPoster: File(""),
+                                          startDate: "",
+                                          startTime: "",
+                                          cost: '')
                                           .startPayment().then((value) {
                                         isPressedCount.value = 2;
-                                          },);
+                                      },);
                                     }
                                   }
                                 },
@@ -1189,6 +1196,100 @@ void logoutPopUp(BuildContext context) {
   );
 }
 
+void deleteAccountPopUp(BuildContext context, String token) {
+  UserProfileController userProfileController = Get.put(UserProfileController(context: context));
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Obx(() {
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 2.h,
+              ),
+              child: Material(
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 2.4.h, vertical: 2.h),
+                  height: 30.h,
+                  decoration: BoxDecoration(color: const Color(0xffF8F9FA), borderRadius: BorderRadius.circular(10)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(child: SizedBox()),
+                          Text(
+                            'Are you sure to delete ?',
+                            style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.blackColor, fontFamily: 'bold', fontSize: 16.px),
+                          ),
+                          const Expanded(child: SizedBox()),
+                          GestureDetector(
+                            onTap: () {
+                              Get.back();
+                            },
+                            child: SizedBox(height: 3.h, width: 3.h, child: const Image(image: AssetImage('assets/pngs/crossicon.png'))),
+                          ),
+                        ],
+                      ),
+                      getVerticalSpace(1.2.h),
+                      const Divider(
+                        color: Colors.grey,
+                      ),
+                      const Spacer(),
+                      Text(
+                        "This action will permanently delete your account and cannot be undone.",
+                        style: TextStyle(fontWeight: FontWeight.w500, color: AppColors.mainColor, fontSize: 14.px, fontFamily: 'bold'),
+                      ),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: customElevatedButton(
+                                onTap: () {
+                                  Get.back();
+                                },
+                                title: Text(
+                                  'Cancel',
+                                  style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor, fontFamily: 'bold'),
+                                ),
+                                bgColor: const Color(0xffC3C3C2),
+                                verticalPadding: .6.h,
+                                horizentalPadding: 1.6.h),
+                          ),
+                          getHorizentalSpace(1.6.h),
+                          Expanded(
+                            child: customElevatedButton(
+                              loading: userProfileController.deleteLoading.value,
+                                onTap: () {
+                                  if (!userProfileController.deleteLoading.value) {
+                                    userProfileController.deleteUserAccount(token: token).then((value) {
+                                      MySharedPreferences.setBool(isLoggedInKey, false);
+                                    });
+                                  }
+                                },
+                                title: Text(
+                                  'Confirm',
+                                  style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor, fontFamily: 'bold'),
+                                ),
+                                bgColor: AppColors.mainColor,
+                                verticalPadding: .6.h,
+                                horizentalPadding: 1.6.h),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      );
+    },
+  );
+}
 void openBottomSheet(
   BuildContext context,
 ) {

@@ -8,6 +8,8 @@ import 'package:ttpdm/controller/utils/preference_key.dart';
 import 'package:ttpdm/models/get_all_plans_model.dart';
 import 'package:ttpdm/models/getall_coins_model.dart';
 
+import '../custom_widgets/widgets.dart';
+
 class SubscriptionApi {
   final BuildContext context;
   SubscriptionApi({required this.context});
@@ -43,8 +45,7 @@ class SubscriptionApi {
         }
       } else {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('unexpected error occurred')));
+          customScaffoldMessenger('unexpected error occurred');
         }
       }
     } catch (e) {
@@ -121,7 +122,7 @@ class SubscriptionApi {
 
       final data = jsonDecode(response.body);
       if(context.mounted){
-        ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text(data["message"])));
+        customScaffoldMessenger(data["message"]);
       }
       log("after subscription update expiry date :${data['subscription']["expiryDate"]}");
       log("after subscription update expiry date :${data['subscription']["expiryDate"]}");
@@ -132,7 +133,7 @@ class SubscriptionApi {
     } else {
       final data = jsonDecode(response.body);
 
-      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text(data["message"])));
+      customScaffoldMessenger(data["message"]);
 
       log("Error: ${response.statusCode} - ${response.body}");
     }

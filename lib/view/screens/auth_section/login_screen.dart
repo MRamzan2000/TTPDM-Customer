@@ -18,10 +18,12 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
+
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   late LoginUserController loginUserController;
+
   @override
   void initState() {
     super.initState();
@@ -31,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
     log("block users :$blockedUsers");
     log("counts users :$counts");
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,10 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 getVerticalSpace(8.h),
                 Align(
                   alignment: Alignment.topCenter,
-                  child: SizedBox(
-                      height: 16.h,
-                      width: 16.h,
-                      child: pngImage('assets/pngs/logo.png')),
+                  child: SizedBox(height: 16.h, width: 16.h, child: pngImage('assets/pngs/logo.png')),
                 ),
                 getVerticalSpace(.8.h),
                 Align(
@@ -62,16 +62,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 getVerticalSpace(1.6.h),
                 Text(
                   'Email Address',
-                  style: CustomTextStyles.hintTextStyle
-                      .copyWith(color: const Color(0xff000000)),
+                  style: CustomTextStyles.hintTextStyle.copyWith(color: const Color(0xff000000)),
                 ),
                 getVerticalSpace(.4.h),
                 customTextFormField(controller: emailController),
                 getVerticalSpace(1.6.h),
                 Text(
                   'Password',
-                  style: CustomTextStyles.hintTextStyle
-                      .copyWith(color: const Color(0xff000000)),
+                  style: CustomTextStyles.hintTextStyle.copyWith(color: const Color(0xff000000)),
                 ),
                 getVerticalSpace(.4.h),
                 customTextFormField(controller: passwordController),
@@ -84,11 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text(
                       'Forgot Password',
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          color: AppColors.mainColor,
-                          fontFamily: 'italic',
-                          fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: 14.px, color: AppColors.mainColor, fontFamily: 'italic', fontWeight: FontWeight.w500),
                     ),
                   ),
                 ),
@@ -102,24 +96,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? spinkit
                             : Text(
                                 'Login ',
-                                style: CustomTextStyles.buttonTextStyle
-                                    .copyWith(color: AppColors.whiteColor),
+                                style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
                               ),
                         onTap: () {
                           if (emailController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Please enter the email')),
+                              const SnackBar(content: Text('Please enter the email')),
                             );
                           } else if (passwordController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Please enter the password')),
+                              const SnackBar(content: Text('Please enter the password')),
                             );
                           } else {
-                            loginUserController.userLogin(
-                                email: emailController.text,
-                                password: passwordController.text);
+                            loginUserController.userLogin(email: emailController.text, password: passwordController.text);
                           }
                         },
                         bgColor: AppColors.mainColor,
@@ -140,12 +129,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: TextSpan(children: [
                       TextSpan(
                           text: 'Don’t have an account? ',
-                          style: CustomTextStyles.buttonTextStyle.copyWith(
-                              color: const Color(0xff444545), fontSize: 14.px)),
-                      TextSpan(
-                          text: 'Sign Up',
-                          style: CustomTextStyles.buttonTextStyle.copyWith(
-                              color: AppColors.mainColor, fontSize: 14.px))
+                          style: CustomTextStyles.buttonTextStyle.copyWith(color: const Color(0xff444545), fontSize: 14.px)),
+                      TextSpan(text: 'Sign Up', style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.mainColor, fontSize: 14.px))
                     ])),
                   ),
                 )

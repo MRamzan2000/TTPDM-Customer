@@ -8,6 +8,7 @@ import 'package:ttpdm/controller/custom_widgets/app_colors.dart';
 import 'package:ttpdm/controller/custom_widgets/custom_text_styles.dart';
 import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/business_profile_controller.dart';
+import 'package:ttpdm/view/screens/campaign_section/poster_screen.dart';
 
 import 'fill_add_detail.dart';
 
@@ -146,11 +147,11 @@ class _AddNewCampaignState extends State<AddNewCampaign> {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(content: Text('Please Select your business for Campaign')));
                                     } else {
-                                      Get.to(() => FillAddDetails(
-                                            businessId: businessId.value,
-                                            businessName: businessName.value,
-                                            token: widget.token,
-                                          ));
+                                      Get.to(() => PosterScreen(
+                                        businessId: businessId.value,
+                                        businessName: businessName.value,
+                                        token: widget.token,
+                                      ));
                                     }
                                   },
                                   child: Obx(

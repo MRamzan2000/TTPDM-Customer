@@ -8,6 +8,7 @@ import 'package:ttpdm/controller/utils/push_notification.dart';
 import 'package:ttpdm/firebase_options.dart';
 import 'package:ttpdm/view/screens/splash_screen.dart';
 
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -47,9 +48,10 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ResponsiveSizer(
-      builder: (context, orientation, screenType) => const GetMaterialApp(
+      builder: (context, orientation, screenType) => GetMaterialApp(
+        scaffoldMessengerKey: scaffoldMessengerKey, // Use the global key here
         debugShowCheckedModeBanner: false,
-        home: SplashScreen(), // Wrap your initial screen
+        home: const SplashScreen(), // Wrap your initial screen
       ),
     );
   }

@@ -25,113 +25,104 @@ class CampaignDetails extends StatefulWidget {
   final String startTime;
   final String endTime;
   final String token;
-  final double dayFee;
-  final double hourFee;
-  final double advyroSocialMediaPagesFee;
-  final double advyroFacebookFee;
-  final double advyroTiktokFee;
-  final double advyroInstagramFee;
-  final double advyroYoutubeFee;
-  final double advyroGoogleFee;
-  final int numberOfPlatforms;
-  const CampaignDetails(
-      {super.key,
-      required this.businessId,
-      required this.campaignName,
-      required this.campaignDescription,
-      required this.selectedPoster,
-      required this.campaignPlatForms,
-      required this.startDate,
-      required this.endDate,
-      required this.startTime,
-      required this.endTime,
-      required this.businessName,
-      required this.numberOfPlatforms,
-      required this.token, required this.dayFee, required this.hourFee, required this.advyroSocialMediaPagesFee, required this.advyroFacebookFee, required this.advyroTiktokFee, required this.advyroInstagramFee, required this.advyroYoutubeFee, required this.advyroGoogleFee});
+  final List<String> selectedPlatforms;
+  // Remove the fee parameters and calculate them directly in the widget
+  const CampaignDetails({
+    super.key,
+    required this.businessId,
+    required this.campaignName,
+    required this.campaignDescription,
+    required this.selectedPoster,
+    required this.campaignPlatForms,
+    required this.startDate,
+    required this.endDate,
+    required this.startTime,
+    required this.endTime,
+    required this.businessName,
+    required this.token,
+    required this.selectedPlatforms, // Add this parameter
+  });
 
   @override
   State<CampaignDetails> createState() => _CampaignDetailsState();
 }
 
 class _CampaignDetailsState extends State<CampaignDetails> {
-  final AddCampaignController addCampaignController =
-      Get.put(AddCampaignController());
-  final SubscriptionController subscriptionController =
-      Get.put(SubscriptionController());
+  final AddCampaignController addCampaignController = Get.put(AddCampaignController());
+  final SubscriptionController subscriptionController = Get.put(SubscriptionController());
 
   late GetStripeKeyController getStripeKeyController;
   late CampaignRuleController campaignRuleController;
+
   @override
   void initState() {
     super.initState();
-    getStripeKeyController = Get.put(GetStripeKeyController(context: context));
     campaignRuleController = Get.put(CampaignRuleController(context: context));
+    feeCalculation();
+    getStripeKeyController = Get.put(GetStripeKeyController(context: context));
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
         getStripeKeyController.fetchStripeKey(loading: true).then((_) {
-          getStripeKeyController.keyLoading.value =
-              false; // Update loading state
+          getStripeKeyController.keyLoading.value = false; // Update loading state
         });
-        campaignRuleController
-            .fetchCampaignRules(
-                isLoading: campaignRuleController.allRules.value == null)
-            .then(
-          (value) {
-            feeCalculation();
-          },
-        );
       },
     );
   }
-  double? totalFee;
+
+  double totalFee = 0.0;
 
   void feeCalculation() {
-    DateTime startDate = DateTime.parse(widget.startDate);
-    DateTime endDate = DateTime.parse(widget.endDate);
-    final difference = endDate.difference(startDate);
-    int totalDays = difference.inDays < 0 ? 0 : difference.inDays; // Ensure non-negative
-    DateTime dateForTime = startDate;
+    // Get the campaign rule controller's values
+    double dayFee = campaignRuleController.allRules.value?.dayFee ?? 0.0;
+    double hourFee = campaignRuleController.allRules.value?.hourFee ?? 0.0;
 
-    DateTime startTime = DateTime.parse(
-        '${dateForTime.toIso8601String().split("T")[0]} ${widget.startTime}');
-    DateTime endTime = DateTime.parse(
-        '${dateForTime.toIso8601String().split("T")[0]} ${widget.endTime}');
-
-    Duration hours = endTime.difference(startTime);
-    int numberOfHours = hours.inHours < 0 ? 0 : hours.inHours; // Ensure non-negative
-
-    // Initialize totalFee
-    totalFee = 0.0;
-
-    // Calculate the base fee based on days and hours
-    double baseFee = (widget.dayFee * totalDays) +
-        (widget.hourFee * numberOfHours);
+    debugPrint('Day Fee: $dayFee');
+    debugPrint('Hour Fee: $hourFee');
 
     // Define a mapping for platforms and their respective fees
     Map<String, double> platformFees = {
-      "Advyro Social Media pages": widget.advyroSocialMediaPagesFee,
-      "Facebook":widget.advyroFacebookFee,
-      "TIKTOK": widget.advyroTiktokFee,
-      "Instagram":widget.advyroInstagramFee,
-      "Youtube": widget.advyroYoutubeFee,
-      "Google": widget.advyroGoogleFee,
+      "Advyro Social Media pages": campaignRuleController.allRules.value?.advyroSocialMediaPagesFee ?? 0.0,
+      "Facebook": campaignRuleController.allRules.value?.advyroFacebookFee ?? 0.0,
+      "TIKTOK": campaignRuleController.allRules.value?.advyroTiktokFee ?? 0.0,
+      "Instagram": campaignRuleController.allRules.value?.advyroInstagramFee ?? 0.0,
+      "Youtube": campaignRuleController.allRules.value?.advyroYoutubeFee ?? 0.0,
+      "Google": campaignRuleController.allRules.value?.advyroGoogleFee ?? 0.0,
     };
 
-    // Check the type of campaignPlatForms
-    List<String> platforms;
-    // If it's a string, split it into a list
-    platforms = (widget.campaignPlatForms).split(',').map((s) => s.trim()).toList();
+    debugPrint('Platform Fees: $platformFees');
 
-    // Calculate total fee based on selected platforms
-    for (String platform in platforms) {
-      if (platformFees.containsKey(platform)) {
-        totalFee = (totalFee! + baseFee * platformFees[platform]!).toDouble();
-      }
-    }
-    totalFee = double.parse(totalFee!.toStringAsFixed(2));
+    // Parse start and end dates
+    DateTime startDate = DateTime.parse(widget.startDate);
+    DateTime endDate = DateTime.parse(widget.endDate);
 
-    if (totalFee == 0) {
-    }
+    debugPrint('Start Date: $startDate');
+    debugPrint('End Date: $endDate');
+
+    // Calculate total days and hours
+    int totalDays = (endDate.difference(startDate).inDays).clamp(0, double.infinity).toInt();
+    DateTime startTime = DateTime.parse('${startDate.toIso8601String().split("T")[0]} ${widget.startTime}');
+    DateTime endTime = DateTime.parse('${startDate.toIso8601String().split("T")[0]} ${widget.endTime}');
+    int numberOfHours = (endTime.difference(startTime).inHours).clamp(0, double.infinity).toInt();
+
+    debugPrint('Total Days: $totalDays');
+    debugPrint('Start Time: $startTime');
+    debugPrint('End Time: $endTime');
+    debugPrint('Number of Hours: $numberOfHours');
+
+    // Calculate base fee
+    double baseFee = (dayFee * totalDays) + (hourFee * numberOfHours);
+    debugPrint('Base Fee: $baseFee');
+
+    // Calculate total fee using platform fees
+    totalFee = widget.selectedPlatforms.fold(0.0, (sum, platform) {
+      double platformFee = platformFees[platform] ?? 0.0;
+      debugPrint('Platform: $platform, Platform Fee: $platformFee');
+      return sum + (baseFee * platformFee);
+    });
+
+    // Round totalFee to two decimal places
+    totalFee = double.parse(totalFee.toStringAsFixed(2));
+    debugPrint('Total Fee: $totalFee');
   }
 
   @override
@@ -156,10 +147,7 @@ class _CampaignDetailsState extends State<CampaignDetails> {
         automaticallyImplyLeading: false,
         title: Text(
           'Add Campaign',
-          style: CustomTextStyles.buttonTextStyle.copyWith(
-              fontSize: 20.px,
-              fontWeight: FontWeight.w600,
-              color: AppColors.mainColor),
+          style: CustomTextStyles.buttonTextStyle.copyWith(fontSize: 20.px, fontWeight: FontWeight.w600, color: AppColors.mainColor),
         ),
       ),
       body: SizedBox(
@@ -168,8 +156,7 @@ class _CampaignDetailsState extends State<CampaignDetails> {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 2.5.h),
           child: SingleChildScrollView(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               getVerticalSpace(2.4.h),
               SizedBox(
                 height: .6.h,
@@ -186,13 +173,7 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                       height: .4.h,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(1.h),
-                          color: index == 0 ||
-                                  index == 1 ||
-                                  index == 2 ||
-                                  index == 3 ||
-                                  index == 4
-                              ? AppColors.mainColor
-                              : const Color(0xffC3C3C2)),
+                          color: index == 0 || index == 1 || index == 2 || index == 3 || index == 4 ? AppColors.mainColor : const Color(0xffC3C3C2)),
                     );
                   },
                 ),
@@ -202,37 +183,26 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                 alignment: Alignment.topCenter,
                 child: Text(
                   'Pay Campaign Fee to Upload',
-                  style: CustomTextStyles.buttonTextStyle.copyWith(
-                      fontSize: 14.px,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.blackColor),
+                  style: CustomTextStyles.buttonTextStyle.copyWith(fontSize: 14.px, fontWeight: FontWeight.w600, color: AppColors.blackColor),
                 ),
               ),
               getVerticalSpace(1.6.h),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 2.h, vertical: 1.5.h),
-                decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    borderRadius: BorderRadius.circular(2.h)),
+                decoration: BoxDecoration(color: AppColors.whiteColor, borderRadius: BorderRadius.circular(2.h)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Ad Banner',
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff191918)),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff191918)),
                     ),
                     getVerticalSpace(.5.h),
                     Container(
                       height: 24.h,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(1.h),
-                          image: DecorationImage(
-                              image: NetworkImage(widget.selectedPoster.path),
-                              fit: BoxFit.cover)),
+                          image: DecorationImage(image: NetworkImage(widget.selectedPoster.path), fit: BoxFit.cover)),
                     ),
                     getVerticalSpace(1.2.h),
                     const Divider(
@@ -242,20 +212,12 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                     getVerticalSpace(1.2.h),
                     Text(
                       'Business Profile',
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff191918)),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff191918)),
                     ),
                     getVerticalSpace(.8.h),
                     Text(
                       widget.businessName,
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff6E6E6D)),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff6E6E6D)),
                     ),
                     getVerticalSpace(1.2.h),
                     const Divider(
@@ -264,20 +226,12 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                     ),
                     Text(
                       'Ads Name',
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff191918)),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff191918)),
                     ),
                     getVerticalSpace(.8.h),
                     Text(
                       widget.campaignName,
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff6E6E6D)),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff6E6E6D)),
                     ),
                     getVerticalSpace(1.2.h),
                     const Divider(
@@ -287,20 +241,12 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                     getVerticalSpace(1.2.h),
                     Text(
                       'What’s the business name?',
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff191918)),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff191918)),
                     ),
                     getVerticalSpace(.8.h),
                     Text(
                       widget.businessName,
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff6E6E6D)),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff6E6E6D)),
                     ),
                     getVerticalSpace(1.2.h),
                     const Divider(
@@ -310,20 +256,12 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                     getVerticalSpace(1.2.h),
                     Text(
                       'Campaign Descriptions',
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff191918)),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff191918)),
                     ),
                     getVerticalSpace(1.2.h),
                     Text(
                       widget.campaignDescription,
-                      style: TextStyle(
-                          fontSize: 12.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xff6E6E6D)),
+                      style: TextStyle(fontSize: 12.px, fontFamily: 'bold', fontWeight: FontWeight.w400, color: const Color(0xff6E6E6D)),
                     ),
                     getVerticalSpace(1.2.h),
                     const Divider(
@@ -333,31 +271,19 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                     getVerticalSpace(1.2.h),
                     Text(
                       'Campaign Platform ',
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff191918)),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff191918)),
                     ),
                     getVerticalSpace(.8.h),
                     Text(
                       widget.campaignPlatForms,
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.mainColor),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: AppColors.mainColor),
                     ),
                     getVerticalSpace(1.2.h),
                     const Divider(color: Color(0xff6E6E6D)),
                     getVerticalSpace(1.2.h),
                     Text(
                       'Date Schedule',
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff191918)),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff191918)),
                     ),
                     getVerticalSpace(1.2.h),
                     Row(
@@ -374,13 +300,9 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                             ),
                             SizedBox(width: .8.h),
                             Text(
-                              range.isNotEmpty
-                                  ? range
-                                  : "${widget.startDate} To ${widget.endTime}",
+                              range.isNotEmpty ? range : "${widget.startDate} To ${widget.endTime}",
                               style: TextStyle(
-                                color: range.isNotEmpty
-                                    ? AppColors.blackColor
-                                    : AppColors.mainColor,
+                                color: range.isNotEmpty ? AppColors.blackColor : AppColors.mainColor,
                                 fontWeight: FontWeight.w400,
                                 fontFamily: 'bold',
                                 fontSize: 12.px,
@@ -395,21 +317,13 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                     getVerticalSpace(1.2.h),
                     Text(
                       'Time Duration',
-                      style: TextStyle(
-                          fontSize: 14.px,
-                          fontFamily: 'bold',
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff191918)),
+                      style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff191918)),
                     ),
                     getVerticalSpace(1.2.h),
                     Text(
-                      range.isNotEmpty
-                          ? range
-                          : "${widget.startTime} To ${widget.endTime}",
+                      range.isNotEmpty ? range : "${widget.startTime} To ${widget.endTime}",
                       style: TextStyle(
-                        color: range.isNotEmpty
-                            ? AppColors.blackColor
-                            : AppColors.mainColor,
+                        color: range.isNotEmpty ? AppColors.blackColor : AppColors.mainColor,
                         fontWeight: FontWeight.w400,
                         fontFamily: 'bold',
                         fontSize: 12.px,
@@ -423,20 +337,12 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                 children: [
                   Text(
                     'Your Campaign Fee',
-                    style: TextStyle(
-                        fontSize: 14.px,
-                        fontFamily: 'bold',
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xff191918)),
+                    style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff191918)),
                   ),
                   const Expanded(child: SizedBox()),
                   Text(
                     "\$${totalFee.toString()}",
-                    style: TextStyle(
-                        fontSize: 14.px,
-                        fontFamily: 'bold',
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xff191918)),
+                    style: TextStyle(fontSize: 14.px, fontFamily: 'bold', fontWeight: FontWeight.w500, color: const Color(0xff191918)),
                   ),
                 ],
               ),
@@ -455,23 +361,19 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                             businessId: widget.businessId,
                             selectedPoster: widget.selectedPoster,
                             campaignPlatForms: widget.campaignPlatForms,
-                            startDate:
-                                addCampaignController.startFormatDate.value,
+                            startDate: addCampaignController.startFormatDate.value,
                             endDate: addCampaignController.endFormatDate.value,
                             startTime: widget.startTime,
                             endTime: widget.endTime,
                             businessName: widget.businessName,
                             token: widget.token,
-                            clientSecretKey: getStripeKeyController
-                                .stripeKey.value!.secretKey
-                                .toString(),
+                            clientSecretKey: getStripeKeyController.stripeKey.value!.secretKey.toString(),
                           );
                         }
                       },
                       title: Text(
                         'Submit',
-                        style: CustomTextStyles.buttonTextStyle
-                            .copyWith(color: AppColors.whiteColor),
+                        style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
                       ),
                       bgColor: AppColors.mainColor,
                       titleColor: AppColors.whiteColor,

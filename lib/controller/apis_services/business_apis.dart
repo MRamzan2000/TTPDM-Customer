@@ -12,6 +12,7 @@ import 'package:ttpdm/models/getbusiness_profile_model.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../view/screens/bottom_navigationbar.dart';
+import '../custom_widgets/widgets.dart';
 import '../getx_controllers/add_campaign_controller.dart';
 
 class BusinessApis {
@@ -160,8 +161,7 @@ class BusinessApis {
 
       if (response.statusCode == 200) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Business deleted successfully')));
+          customScaffoldMessenger('Business deleted successfully');
           Get.to(
               ()=>const CustomBottomNavigationBar()
           );
@@ -169,14 +169,12 @@ class BusinessApis {
         }
       } else if (response.statusCode == 400) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Business not found')));
+          customScaffoldMessenger('Business not found');
         }
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Unexpected error occurred')));
+        customScaffoldMessenger('Unexpected error occurred');
       }
       log('Unexpected error occurred :${e.toString()}');
     }

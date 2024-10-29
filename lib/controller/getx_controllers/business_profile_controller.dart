@@ -8,7 +8,9 @@ import 'package:ttpdm/models/getbusiness_profile_model.dart';
 
 class BusinessProfileController extends GetxController {
   final BuildContext context;
+
   BusinessProfileController({required this.context});
+
   final RxBool isLoading2 = false.obs;
   final RxBool isLoading1 = false.obs;
 
@@ -69,9 +71,12 @@ class BusinessProfileController extends GetxController {
     required bool loading,
     required BuildContext context,
   }) async {
-    isLoading2.value = loading;
-    final data =
-        await BusinessApis().getBusinessProfile(context: context, token: token);
+    Future.microtask(
+      () {
+        isLoading2.value = loading;
+      },
+    );
+    final data = await BusinessApis().getBusinessProfile(context: context, token: token);
     if (data != null) {
       allBusinessProfiles.value = data.businesses;
       categorizeProfiles();
@@ -80,16 +85,11 @@ class BusinessProfileController extends GetxController {
       isLoading2.value = false;
     }
   }
+
   void categorizeProfiles() {
-    approvedProfiles.value = allBusinessProfiles
-        .where((profile) => profile?.status == 'accepted')
-        .toList();
-    rejectedProfiles.value = allBusinessProfiles
-        .where((profile) => profile?.status == 'rejected')
-        .toList();
-    pendingProfiles.value = allBusinessProfiles
-        .where((profile) => profile?.status == 'pending')
-        .toList();
+    approvedProfiles.value = allBusinessProfiles.where((profile) => profile?.status == 'accepted').toList();
+    rejectedProfiles.value = allBusinessProfiles.where((profile) => profile?.status == 'rejected').toList();
+    pendingProfiles.value = allBusinessProfiles.where((profile) => profile?.status == 'pending').toList();
   }
 
   //Delete Business profile
@@ -100,10 +100,7 @@ class BusinessProfileController extends GetxController {
   }) async {
     try {
       isLoading1.value = true;
-      await BusinessApis()
-          .deleteBusinessProfile(
-              businessId: businessId, context: context, token: token)
-          .then(
+      await BusinessApis().deleteBusinessProfile(businessId: businessId, context: context, token: token).then(
             (value) => isLoading1.value = false,
           );
     } catch (e) {

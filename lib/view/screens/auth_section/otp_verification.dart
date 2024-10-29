@@ -11,11 +11,14 @@ import 'package:ttpdm/controller/utils/apis_constant.dart';
 class OtpVerification extends StatelessWidget {
   final String title;
   final String email;
-   OtpVerification({super.key, required this.title, required this.email});
-final RxString otpCode=''.obs;
+
+  OtpVerification({super.key, required this.title, required this.email});
+
+  final RxString otpCode = ''.obs;
+
   @override
   Widget build(BuildContext context) {
-    final VerifyOtpController verifyOtpController=Get.put(VerifyOtpController(context:context));
+    final VerifyOtpController verifyOtpController = Get.put(VerifyOtpController(context: context));
     return Scaffold(
       backgroundColor: const Color(0xfff8f9fa),
       body: SizedBox(
@@ -30,28 +33,21 @@ final RxString otpCode=''.obs;
                 Text(
                   'Enter the verification code',
                   textAlign: TextAlign.center,
-                  style: CustomTextStyles.onBoardingHeading
-                      .copyWith(fontSize: 24.px),
+                  style: CustomTextStyles.onBoardingHeading.copyWith(fontSize: 24.px),
                 ),
                 getVerticalSpace(1.2.h),
                 Text(
                   'We have just sent you a 4-digit code on $email',
                   textAlign: TextAlign.center,
-                  style: CustomTextStyles.onBoardingLight.copyWith(
-                      color: AppColors.blackColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14.px,
-                      fontFamily: 'bold'),
+                  style: CustomTextStyles.onBoardingLight
+                      .copyWith(color: AppColors.blackColor, fontWeight: FontWeight.w500, fontSize: 14.px, fontFamily: 'bold'),
                 ),
                 getVerticalSpace(5.2.h),
-                Row(mainAxisAlignment: MainAxisAlignment.center,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     OtpTextField(
-                      textStyle: TextStyle(
-                          fontSize: 24.px,
-                          color: const Color(0xff4D4F53),
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'bold'),
+                      textStyle: TextStyle(fontSize: 24.px, color: const Color(0xff4D4F53), fontWeight: FontWeight.w700, fontFamily: 'bold'),
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       enabledBorderColor: Colors.transparent,
@@ -61,23 +57,26 @@ final RxString otpCode=''.obs;
                       borderColor: Colors.transparent,
                       filled: true,
                       fillColor: const Color(0xffF3F3F3),
-                        onSubmit: (value) {
-                          otpCode.value=value;
-                        },
+                      onSubmit: (value) {
+                        otpCode.value = value;
+                      },
+                      onCodeChanged: (value) {
+                        otpCode.value = value;
+                      },
                     ),
                   ],
                 ),
                 getVerticalSpace(4.2.h),
-                Obx(() =>
-                    Row(mainAxisAlignment: MainAxisAlignment.center,
+                Obx(() => Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         customElevatedButton(
                           title: verifyOtpController.isLoading.value
                               ? spinkit
                               : Text(
-                            'Next ',
-                            style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
-                          ),
+                                  'Next ',
+                                  style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
+                                ),
                           onTap: () {
                             if (otpCode.value.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -85,8 +84,9 @@ final RxString otpCode=''.obs;
                               );
                             } else {
                               verifyOtpController.verifyOtp(
-                                email: email, otp: otpCode.value, title: title,
-
+                                email: email,
+                                otp: otpCode.value,
+                                title: title,
                               );
                             }
                           },

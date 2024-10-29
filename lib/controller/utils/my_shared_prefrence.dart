@@ -53,6 +53,11 @@ class MySharedPreferences {
   static List<String> getStringList(String key) {
     return _preferences.getStringList(key) ?? [];
   }
+
+  static Future<void> clearAll() async {
+    await _preferences.clear();
+  }
+
   Future<void> saveNotification(RemoteMessage message) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> notifications = prefs.getStringList('notifications') ?? [];

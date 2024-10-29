@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../main.dart';
 import '../utils/apis_constant.dart';
 import 'app_colors.dart';
 import 'custom_text_styles.dart';
@@ -162,6 +163,12 @@ Widget customTextFormField1({
       fillColor: bgColor ?? AppColors.textFieldGreyColor,
       contentPadding: EdgeInsets.symmetric(horizontal: 1.6.h, vertical: 1.h),
     ),
+  );
+}
+
+void customScaffoldMessenger(String message) {
+  scaffoldMessengerKey.currentState?.showSnackBar(
+    SnackBar(content: Text(message)),
   );
 }
 

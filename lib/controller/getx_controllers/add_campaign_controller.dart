@@ -14,6 +14,7 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:ttpdm/models/get_campaigns_by_status_model.dart';
 import '../apis_services/add_campaign_apis.dart';
 import '../custom_widgets/app_colors.dart';
+import '../custom_widgets/widgets.dart';
 class AddCampaignController extends GetxController {
   //TextEditingController
   final TextEditingController businessNameController = TextEditingController();
@@ -216,8 +217,7 @@ class AddCampaignController extends GetxController {
       );
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Something went wrong ${e.toString()}')));
+        customScaffoldMessenger('Something went wrong ${e.toString()}');
         log("un expected error ${e.toString()}");
       }
       addCampaignLoading.value = false;

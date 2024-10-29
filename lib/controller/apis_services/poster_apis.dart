@@ -8,6 +8,8 @@ import 'package:ttpdm/models/get_all_mid_admin_fcm_model.dart';
 import 'package:ttpdm/models/getdesigns_model.dart';
 import 'package:http/http.dart' as http;
 
+import '../custom_widgets/widgets.dart';
+
 class PosterApis {
   final BuildContext context;
   PosterApis({required this.context});
@@ -111,8 +113,7 @@ class PosterApis {
     final response = await http.post(url, headers: headers, body: body);
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Edit Design Request successfully")));
+      customScaffoldMessenger("Edit Design Request successfully");
       log("Edit Design Request successfully");
       Get.back();
     } else {

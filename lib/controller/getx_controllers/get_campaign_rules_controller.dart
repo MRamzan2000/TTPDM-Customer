@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:ttpdm/controller/apis_services/get_campaign_rules_api.dart';
 import 'package:ttpdm/models/get_campaign_rules_model.dart';
 
+import '../custom_widgets/widgets.dart';
+
 class CampaignRuleController extends GetxController {
   final BuildContext context;
   CampaignRuleController({required this.context});
@@ -20,7 +22,7 @@ class CampaignRuleController extends GetxController {
 
       // Show an error message
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+        customScaffoldMessenger(e.toString());
       }
     } finally {
       rulesLoading.value = false; // Ensure loading is set to false in the finally block
