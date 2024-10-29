@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,11 +23,14 @@ class CustomBottomNavigationBar extends StatefulWidget {
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   final BusinessProfileController businessProfileController = Get.find(tag: 'business');
   RxString token = "".obs;
+  RxString subscriptionEnd = "".obs;
 
   @override
   void initState() {
     super.initState();
     token.value = MySharedPreferences.getString(authTokenKey);
+    subscriptionEnd.value = MySharedPreferences.getString(subscriptionKey);
+
   }
 
   @override
@@ -39,23 +41,6 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
       backgroundColor: const Color(0xfff8f9fa),
       resizeToAvoidBottomInset: false,
       extendBody: true,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.mainColor,
-        shape: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.h),
-          borderSide: BorderSide.none,
-        ),
-        onPressed: () {
-          log('is this token $token');
-
-          Get.to(() => AddNewCampaign(token: token.value));
-        },
-        child: Icon(
-          Icons.add,
-          size: 3.5.h,
-          color: AppColors.whiteColor,
-        ),
-      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Obx(
         () => BottomAppBar(
@@ -173,24 +158,56 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           ),
         ),
       ),
-      body: Obx(
-        () => Column(
-          children: [
-            Expanded(
-              child: isSelectedIndex.value == 0
-                  ? const HomeScreen()
-                  : isSelectedIndex.value == 1
-                      ? const WalletScreen()
-                      : isSelectedIndex.value == 2
-                          ? const NotificationScreen(
-                              title: 'bottom',
-                            )
-                          : const ProfileScreen(),
-            ),
-            SizedBox(height: 8.h), // Adjust the height as needed
-          ],
+      body:Stack(children: [
+        Obx(
+              () => Column(
+            children: [
+              Expanded(
+                child: isSelectedIndex.value == 0
+                    ? const HomeScreen()
+                    : isSelectedIndex.value == 1
+                    ? const WalletScreen()
+                    : isSelectedIndex.value == 2
+                    ? const NotificationScreen(
+                  title: 'bottom',
+                )
+                    : const ProfileScreen(),
+              ),
+              SizedBox(height: 8.h), // Adjust the height as needed
+            ],
+          ),
         ),
+      ],),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: subscriptionEnd.value.isEmpty ? Colors.grey : AppColors.mainColor,
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.h),
+          borderSide: BorderSide.none,
+        ),
+        onPressed: () {
+          if (subscriptionEnd.value.isEmpty) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Choose Plan by selecting Profile then Clicking on Gear button!')),
+              );
+            }          } else {
+            Get.to(() => AddNewCampaign(token: token.value));
+          }
+        },
+        child: Icon(
+          Icons.add,
+          size: 3.5.h,
+          color: AppColors.whiteColor,
+        ),
+
       ),
+
     );
+
+
+
+
+
+
   }
 }

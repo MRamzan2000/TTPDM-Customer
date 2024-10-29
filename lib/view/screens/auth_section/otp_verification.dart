@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:get/get.dart';
@@ -8,17 +9,23 @@ import 'package:ttpdm/controller/custom_widgets/widgets.dart';
 import 'package:ttpdm/controller/getx_controllers/verifyotp_controller.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 
-class OtpVerification extends StatelessWidget {
+class OtpVerification extends StatefulWidget {
   final String title;
   final String email;
 
-  OtpVerification({super.key, required this.title, required this.email});
-
-  final RxString otpCode = ''.obs;
+  const OtpVerification({super.key, required this.title, required this.email});
 
   @override
+  State<OtpVerification> createState() => _OtpVerificationState();
+}
+
+class _OtpVerificationState extends State<OtpVerification> {
+  final RxString otpCode = ''.obs;
+  @override
   Widget build(BuildContext context) {
-    final VerifyOtpController verifyOtpController = Get.put(VerifyOtpController(context: context));
+    final VerifyOtpController verifyOtpController =
+        Get.put(VerifyOtpController(context: context));
+
     return Scaffold(
       backgroundColor: const Color(0xfff8f9fa),
       body: SizedBox(
@@ -33,21 +40,30 @@ class OtpVerification extends StatelessWidget {
                 Text(
                   'Enter the verification code',
                   textAlign: TextAlign.center,
-                  style: CustomTextStyles.onBoardingHeading.copyWith(fontSize: 24.px),
+                  style: CustomTextStyles.onBoardingHeading
+                      .copyWith(fontSize: 24.px),
                 ),
                 getVerticalSpace(1.2.h),
                 Text(
-                  'We have just sent you a 4-digit code on $email',
+                  'We have just sent you a 4-digit code on ${widget.email}',
                   textAlign: TextAlign.center,
-                  style: CustomTextStyles.onBoardingLight
-                      .copyWith(color: AppColors.blackColor, fontWeight: FontWeight.w500, fontSize: 14.px, fontFamily: 'bold'),
+                  style: CustomTextStyles.onBoardingLight.copyWith(
+                    color: AppColors.blackColor,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14.px,
+                    fontFamily: 'bold',
+                  ),
                 ),
                 getVerticalSpace(5.2.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     OtpTextField(
-                      textStyle: TextStyle(fontSize: 24.px, color: const Color(0xff4D4F53), fontWeight: FontWeight.w700, fontFamily: 'bold'),
+                      textStyle: TextStyle(
+                          fontSize: 24.px,
+                          color: const Color(0xff4D4F53),
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'bold'),
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       enabledBorderColor: Colors.transparent,
@@ -58,10 +74,9 @@ class OtpVerification extends StatelessWidget {
                       filled: true,
                       fillColor: const Color(0xffF3F3F3),
                       onSubmit: (value) {
+                        log("submit value is :$value}");
                         otpCode.value = value;
-                      },
-                      onCodeChanged: (value) {
-                        otpCode.value = value;
+                        log("value after submitted :${otpCode.value}");
                       },
                     ),
                   ],
@@ -75,18 +90,24 @@ class OtpVerification extends StatelessWidget {
                               ? spinkit
                               : Text(
                                   'Next ',
-                                  style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
+                                  style: CustomTextStyles.buttonTextStyle
+                                      .copyWith(color: AppColors.whiteColor),
                                 ),
                           onTap: () {
-                            if (otpCode.value.isEmpty) {
+                            log("value after submitted :${otpCode.value}");
+
+                            if (otpCode.value.isEmpty ||
+                                otpCode.value.length != 4) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Please enter the otp')),
+                                const SnackBar(
+                                    content: Text(
+                                        'Please enter a valid 4-digit OTP')),
                               );
                             } else {
                               verifyOtpController.verifyOtp(
-                                email: email,
+                                email: widget.email,
                                 otp: otpCode.value,
-                                title: title,
+                                title: widget.title,
                               );
                             }
                           },
