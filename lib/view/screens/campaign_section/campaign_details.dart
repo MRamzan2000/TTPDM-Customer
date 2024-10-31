@@ -300,7 +300,7 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                             ),
                             SizedBox(width: .8.h),
                             Text(
-                              range.isNotEmpty ? range : "${widget.startDate} To ${widget.endTime}",
+                              range.isNotEmpty ? range : "${widget.startDate} To ${widget.endDate}",
                               style: TextStyle(
                                 color: range.isNotEmpty ? AppColors.blackColor : AppColors.mainColor,
                                 fontWeight: FontWeight.w400,

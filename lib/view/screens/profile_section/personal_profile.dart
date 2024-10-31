@@ -187,6 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   tiktok: businessProfileController.approvedProfiles[index]!.tiktokUrl!,
                                   webUrl: businessProfileController.approvedProfiles[index]!.websiteUrl!,
                                   status: businessProfileController.approvedProfiles[index]!.status,
+                              rejectionReason: businessProfileController.approvedProfiles[index]!.rejectionReason.toString() ,
                                 ));
                           },
                           child: Container(
@@ -324,6 +325,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   tiktok: businessProfileController.pendingProfiles[index]!.tiktokUrl!,
                                   webUrl: businessProfileController.pendingProfiles[index]!.websiteUrl!,
                                   status: businessProfileController.pendingProfiles[index]!.status,
+                                  rejectionReason: businessProfileController.pendingProfiles[index]!.rejectionReason.toString(),
                                 ));
                           },
                           child: Container(
@@ -462,6 +464,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   tiktok: businessProfileController.rejectedProfiles[index]!.tiktokUrl!,
                                   webUrl: businessProfileController.rejectedProfiles[index]!.websiteUrl!,
                                   status: businessProfileController.rejectedProfiles[index]!.status,
+                                  rejectionReason: businessProfileController.rejectedProfiles[index]!.rejectionReason.toString(),
                                 ));
                           },
                           child: Container(

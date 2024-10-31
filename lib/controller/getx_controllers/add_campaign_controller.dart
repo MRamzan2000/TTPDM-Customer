@@ -73,6 +73,7 @@ class AddCampaignController extends GetxController {
               backgroundColor: Colors.white,
               todayHighlightColor: AppColors.mainColor,
               onSelectionChanged: onSelectionChanged,
+              minDate: DateTime.now(),
               selectionMode: DateRangePickerSelectionMode.range,
               initialSelectedRange: PickerDateRange(
                 DateTime.now().subtract(const Duration(days: 4)),

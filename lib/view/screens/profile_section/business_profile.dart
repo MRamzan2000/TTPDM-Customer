@@ -21,6 +21,7 @@ class BusinessProfile extends StatefulWidget {
   final String targetArea;
   final String description;
   final String businessId;
+  final String rejectionReason;
   final List<String> imagesList;
   final String logo;
   final String token;
@@ -47,7 +48,7 @@ class BusinessProfile extends StatefulWidget {
       required this.insta,
       required this.tiktok,
       required this.linkdin,
-      required this.status});
+      required this.status, required this.rejectionReason});
 
   @override
   State<BusinessProfile> createState() => _BusinessProfileState();
@@ -319,52 +320,74 @@ class _BusinessProfileState extends State<BusinessProfile> {
                                 : const SizedBox.shrink(),
                             widget.imagesList.isEmpty
                                 ? const SizedBox.shrink()
-                                : SizedBox(
-                                    height: 50.3.h,
-                                    child: GridView.builder(
-                                      padding: EdgeInsets.zero,
-                                      itemCount: widget.imagesList.length,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      gridDelegate:
-                                          SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisCount: 3,
-                                              mainAxisSpacing: 2.1.h,
-                                              crossAxisSpacing: 1.6.h),
-                                      itemBuilder: (context, index) {
-                                        return Container(
-                                          alignment: Alignment.center,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: .5.h, vertical: .5.h),
-                                          height: 11.3.h,
-                                          width: 11.6.h,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(1.h),
-                                              color: AppColors.whiteColor,
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                    widget.imagesList[index]),
-                                                fit: BoxFit.cover,
-                                              ),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                    offset: Offset(0, 1),
-                                                    spreadRadius: 0,
-                                                    blurRadius: 8,
-                                                    color: Color(0xffFFE4EA))
-                                              ]),
-                                        );
-                                      },
-                                    ),
-                                  ),
+                                : Container(
+                              padding: EdgeInsets.only(left: 1.h,right: 1.h,top: 1.h),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(1.h),
+                                  color: Colors.grey.withOpacity(0.2)),
+                              height: 32.3.h,
+                              child: GridView.builder(
+                                padding: EdgeInsets.zero,
+                                itemCount: widget.imagesList.length,
+                                gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    mainAxisSpacing: 2.1.h,
+                                    crossAxisSpacing: 1.6.h),
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    alignment: Alignment.center,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: .5.h, vertical: .5.h),
+                                    height: 11.3.h,
+                                    width: 11.6.h,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                        BorderRadius.circular(1.h),
+                                        color: AppColors.whiteColor,
+                                        image: DecorationImage(
+                                          image: NetworkImage(
+                                              widget.imagesList[index]),
+                                          fit: BoxFit.cover,
+                                        ),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                              offset: Offset(0, 1),
+                                              spreadRadius: 0,
+                                              blurRadius: 8,
+                                              color: Color(0xffFFE4EA))
+                                        ]),
+                                  );
+                                },
+                              ),
+                            ),
+                            widget.status == "rejected"? getVerticalSpace(1.h):getVerticalSpace(0),
+
                             widget.status == "rejected"
-                                ? Text(
-                                    "Business was Rejected",
-                                    style: CustomTextStyles.buttonTextStyle
-                                        .copyWith(color: AppColors.mainColor),
-                                  )
-                                : const SizedBox.shrink()
+                                ?Text(
+                              'Rejection Reason',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'bold',
+                                  fontSize: 14.px,
+                                  color: const Color(0xff282827)),
+                            ):const SizedBox.shrink(),
+
+                            widget.status == "rejected"?  getVerticalSpace(1.h):getVerticalSpace(0),
+                            widget.status == "rejected"
+                                ? Container(alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: 2.h,horizontal: 2.h),
+                              decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(1.5.h),
+                              color: Colors.white
+                            ),
+                            child: Text(widget.rejectionReason, style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'bold',
+                                fontSize: 12.px,
+                                color: const Color(0xff282827)),),)
+                                : const SizedBox.shrink(),
+                            widget.status == "rejected"?  getVerticalSpace(2.h):getVerticalSpace(0),
+
                           ]),
                     ),
                   )),

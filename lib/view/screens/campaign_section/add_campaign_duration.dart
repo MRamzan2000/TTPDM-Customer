@@ -233,7 +233,7 @@ class _AddCampaignDurationState extends State<AddCampaignDuration> {
                                       ),
                                     );
                                   }
-                                  return SizedBox.shrink(); // Return an empty widget if not available
+                                  return const SizedBox.shrink(); // Return an empty widget if not available
                                 },
                               ),
                             ),
