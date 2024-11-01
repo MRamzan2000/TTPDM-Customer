@@ -407,7 +407,9 @@ WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                                                         startTime: campaign.startTime,
                                                         endTime: campaign.endTime,
                                                         status: campaign.status,
-                                                        analysis: campaign.analytics));
+                                                        analysis: campaign.analytics,
+                                                      rejectionReason: campaign.rejectionReason.toString(),
+                                                    ));
                                                   } else {
                                                     Get.to(() => CampaignName(
                                                           businessId: campaign.business.id,
@@ -422,7 +424,9 @@ WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                                                           endTime: campaign.endTime,
                                                           status: campaign.status,
                                                           analysis: const [],
-                                                        ));
+                                                      rejectionReason: campaign.rejectionReason.toString(),
+
+                                                    ));
                                                   }
                                                 },
                                                 child: Container(

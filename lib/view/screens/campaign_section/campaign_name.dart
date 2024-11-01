@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -25,6 +24,7 @@ class CampaignName extends StatefulWidget {
   final String startTime;
   final String endTime;
   final String status;
+  final String rejectionReason;
   const CampaignName({
     super.key,
     required this.businessId,
@@ -38,7 +38,7 @@ class CampaignName extends StatefulWidget {
     required this.startTime,
     required this.endTime,
     required this.status,
-    required this.analysis,
+    required this.analysis, required this.rejectionReason,
   });
 
   @override
@@ -51,7 +51,7 @@ class _CampaignNameState extends State<CampaignName> {
   final String range = '';
   final RxList<String> imageList =
       <String>['assets/pngs/imageicon.png', 'assets/pngs/videos.png'].obs;
-  final List<String> items = ['Business', 'Poster', 'Scheduling', 'Cancel'];
+  final List<String> items = ['Cancel'];
   final RxList<int> impressions = <int>[].obs;
   final RxList<int> clicks = <int>[].obs;
   final RxList<String> dates = <String>[].obs;
@@ -60,7 +60,7 @@ class _CampaignNameState extends State<CampaignName> {
   List<AnalysisData> salesData = [];
   String convertDateToMonth(String dateString) {
     DateTime dateTime = DateTime.parse(dateString);
-    return DateFormat('MMM').format(dateTime); // Outputs "aug", "sep", etc.
+    return DateFormat('MMM').format(dateTime);
   }
 
   void filterOutClicks() {
@@ -377,6 +377,7 @@ class _CampaignNameState extends State<CampaignName> {
                           ),
                         )
                       : const SizedBox.shrink(),
+
                   widget.status == "rejected" || widget.status == "pending"
                       ? const SizedBox.shrink()
                       : GestureDetector(
@@ -473,8 +474,33 @@ class _CampaignNameState extends State<CampaignName> {
                             )
                       : const SizedBox.shrink(),
                   widget.status == "rejected" || widget.status == "pending"
-                      ? getVerticalSpace(3.h)
-                      : const SizedBox.shrink()
+                      ? getVerticalSpace(1.h)
+                      :  getVerticalSpace(2.h),
+                  widget.status == "rejected"
+                      ?Align(alignment: Alignment.topLeft,
+                        child: Text('Rejection Reason',
+                          style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'bold',
+                          fontSize: 14.px,
+                          color: AppColors.mainColor),
+                        ),
+                      ):const SizedBox.shrink(),
+                  widget.status == "rejected"?  getVerticalSpace(1.h):getVerticalSpace(0),
+                  widget.status == "rejected"
+                      ? Container(alignment: Alignment.center,
+                    padding: EdgeInsets.symmetric(vertical: 2.h,horizontal: 2.h),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(1.5.h),
+                        color: Colors.grey.withOpacity(0.1)
+                    ),
+                    child:Text(widget.rejectionReason.isNotEmpty?widget.rejectionReason:"No Reason Added", style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'bold',
+                        fontSize: 12.px,
+                        color: const Color(0xff282827)),),)
+                      : const SizedBox.shrink(),
+                  getVerticalSpace(1.h)
                 ],
               ),
             ),

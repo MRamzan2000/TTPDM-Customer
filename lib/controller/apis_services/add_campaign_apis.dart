@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:ttpdm/controller/apis_services/poster_apis.dart';
 import 'package:ttpdm/controller/utils/apis_constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -15,7 +14,6 @@ import 'package:ttpdm/controller/utils/preference_key.dart';
 
 import '../../models/get_campaigns_by_status_model.dart';
 import '../custom_widgets/widgets.dart';
-import '../getx_controllers/get_fcm_token_send_notification_controller.dart';
 
 class AddCampaignApis {
   Future<void> addCampaignApi({

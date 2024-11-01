@@ -386,7 +386,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
                                 fontSize: 12.px,
                                 color: const Color(0xff282827)),),)
                                 : const SizedBox.shrink(),
-                            widget.status == "rejected"?  getVerticalSpace(2.h):getVerticalSpace(0),
+                            widget.status == "rejected"?  getVerticalSpace(2.h):getVerticalSpace(3.h),
 
                           ]),
                     ),

@@ -99,7 +99,7 @@ class _CampaignDetailsState extends State<CampaignDetails> {
     debugPrint('End Date: $endDate');
 
     // Calculate total days and hours
-    int totalDays = (endDate.difference(startDate).inDays).clamp(0, double.infinity).toInt();
+    int totalDays = (endDate.difference(startDate).inDays + 1).clamp(0, double.infinity).toInt();
     DateTime startTime = DateTime.parse('${startDate.toIso8601String().split("T")[0]} ${widget.startTime}');
     DateTime endTime = DateTime.parse('${startDate.toIso8601String().split("T")[0]} ${widget.endTime}');
     int numberOfHours = (endTime.difference(startTime).inHours).clamp(0, double.infinity).toInt();
@@ -110,22 +110,20 @@ class _CampaignDetailsState extends State<CampaignDetails> {
     debugPrint('Number of Hours: $numberOfHours');
 
     // Calculate base fee
-    double baseFee = (dayFee * totalDays) + (hourFee * numberOfHours);
+    double baseFee = (dayFee * totalDays) * (hourFee * numberOfHours);
     debugPrint('Base Fee: $baseFee');
 
     // Calculate total fee using platform fees
     totalFee = widget.selectedPlatforms.fold(0.0, (sum, platform) {
       double platformFee = platformFees[platform] ?? 0.0;
       debugPrint('Platform: $platform, Platform Fee: $platformFee');
-      return sum + (baseFee * platformFee);
+      return sum + (baseFee + platformFee);
     });
 
     // Round totalFee to two decimal places
     totalFee = double.parse(totalFee.toStringAsFixed(2));
     debugPrint('Total Fee: $totalFee');
-  }
-
-  @override
+  }  @override
   Widget build(BuildContext context) {
     String range = '';
 
@@ -352,25 +350,23 @@ class _CampaignDetailsState extends State<CampaignDetails> {
                 children: [
                   customElevatedButton(
                       onTap: () {
-                        if (totalFee != null) {
-                          openCampaignSubmit(
-                            context,
-                            totalFee!,
-                            campaignName: widget.campaignName,
-                            campaignDescription: widget.campaignDescription,
-                            businessId: widget.businessId,
-                            selectedPoster: widget.selectedPoster,
-                            campaignPlatForms: widget.campaignPlatForms,
-                            startDate: addCampaignController.startFormatDate.value,
-                            endDate: addCampaignController.endFormatDate.value,
-                            startTime: widget.startTime,
-                            endTime: widget.endTime,
-                            businessName: widget.businessName,
-                            token: widget.token,
-                            clientSecretKey: getStripeKeyController.stripeKey.value!.secretKey.toString(),
-                          );
-                        }
-                      },
+                        openCampaignSubmit(
+                          context,
+                          totalFee,
+                          campaignName: widget.campaignName,
+                          campaignDescription: widget.campaignDescription,
+                          businessId: widget.businessId,
+                          selectedPoster: widget.selectedPoster,
+                          campaignPlatForms: widget.campaignPlatForms,
+                          startDate: addCampaignController.startFormatDate.value,
+                          endDate: addCampaignController.endFormatDate.value,
+                          startTime: widget.startTime,
+                          endTime: widget.endTime,
+                          businessName: widget.businessName,
+                          token: widget.token,
+                          clientSecretKey: getStripeKeyController.stripeKey.value!.secretKey.toString(),
+                        );
+                                            },
                       title: Text(
                         'Submit',
                         style: CustomTextStyles.buttonTextStyle.copyWith(color: AppColors.whiteColor),
